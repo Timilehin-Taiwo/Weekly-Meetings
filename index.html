@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lakowe Portfolio — Performance Dashboard</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #ffffff;
+    --bg: #f7f6f3;
+    --border: rgba(0,0,0,0.09);
+    --border-md: rgba(0,0,0,0.14);
+    --text-primary: #18181A;
+    --text-secondary: #5A5A62;
+    --text-muted: #9898A0;
+    --annex-blue: #1A5FB4;
+    --annex-blue-light: #E8F1FC;
+    --cx-green: #1A8A5A;
+    --cx-green-light: #E5F5EE;
+    --red: #C93A3A;
+    --red-bg: #FDF0F0;
+    --amber: #A85C00;
+    --amber-bg: #FEF6EC;
+    --green: #2D7D3A;
+    --green-bg: #EDF7EF;
+    --gray: #737380;
+    --gray-bg: #F2F2F4;
+    --accent: #1A5FB4;
+    --nav-h: 60px;
+    --sidebar-w: 240px;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--nav-h);
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 28px;
+    gap: 32px;
+  }
+  .nav-brand {
+    font-size: 15px; font-weight: 600; color: var(--text-primary);
+    letter-spacing: -0.02em; white-space: nowrap; margin-right: 8px;
+  }
+  .nav-brand span { color: var(--annex-blue); }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 6px 16px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    color: var(--text-secondary); border: none; background: none;
+    transition: all 0.15s;
+  }
+  .nav-tab:hover { background: var(--bg); color: var(--text-primary); }
+  .nav-tab.active { background: var(--accent); color: #fff; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .nav-date { font-size: 12px; color: var(--text-muted); }
+  .nav-badge {
+    font-size: 11px; font-weight: 600; padding: 3px 9px;
+    border-radius: 20px; letter-spacing: 0.03em;
+  }
+  .badge-annex { background: var(--annex-blue-light); color: var(--annex-blue); }
+  .badge-cx { background: var(--cx-green-light); color: var(--cx-green); }
+
+  /* ── LAYOUT ── */
+  .page { display: none; margin-top: var(--nav-h); min-height: calc(100vh - var(--nav-h)); }
+  .page.active { display: block; }
+
+  /* ── DASHBOARD PAGE ── */
+  .dash-container { max-width: 1080px; margin: 0 auto; padding: 28px 24px 48px; }
+
+  .section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); margin: 0 0 12px;
+  }
+  .project-block { margin-bottom: 36px; }
+  .project-heading {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+    padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  }
+  .project-heading h2 { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
+
+  .metrics-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .metric-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 18px; box-shadow: var(--shadow);
+  }
+  .metric-label { font-size: 11px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .metric-value { font-size: 22px; font-weight: 600; letter-spacing: -0.03em; color: var(--text-primary); }
+  .metric-delta { font-size: 11px; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+  .delta-up { color: var(--green); }
+  .delta-down { color: var(--red); }
+  .delta-flat { color: var(--text-muted); }
+  .delta-warn { color: var(--amber); }
+
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .chart-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px; box-shadow: var(--shadow);
+  }
+  .chart-card h3 { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+  .chart-wrap { position: relative; height: 170px; width: 100%; }
+  .legend-row { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
+  .leg-dot { width: 9px; height: 9px; border-radius: 2px; }
+
+  .status-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px; box-shadow: var(--shadow); margin-bottom: 16px;
+  }
+  .status-card h3 { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+  .status-list { display: flex; flex-direction: column; gap: 9px; }
+  .status-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; }
+  .s-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .s-red { background: var(--red); }
+  .s-amber { background: #E8960C; }
+  .s-green { background: #2D9E45; }
+  .s-gray { background: #ADADB8; }
+  .s-dept { font-weight: 600; color: var(--text-primary); min-width: 130px; flex-shrink: 0; }
+  .s-note { color: var(--text-secondary); line-height: 1.45; }
+
+  .alert-strip {
+    border-radius: var(--radius-sm); padding: 11px 16px; font-size: 13px; line-height: 1.5;
+    margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;
+  }
+  .alert-red { background: var(--red-bg); border-left: 3px solid var(--red); color: #5A1A1A; }
+  .alert-blue { background: var(--annex-blue-light); border-left: 3px solid var(--annex-blue); color: #0E2E5E; }
+  .alert-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  .cross-issues {
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px; box-shadow: var(--shadow);
+  }
+  .cross-issues h3 { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+
+  /* ── DEPARTMENTS PAGE ── */
+  .dept-container { max-width: 1080px; margin: 0 auto; padding: 28px 24px 48px; }
+  .dept-layout { display: grid; grid-template-columns: var(--sidebar-w) 1fr; gap: 24px; align-items: start; }
+
+  .dept-sidebar {
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); position: sticky; top: calc(var(--nav-h) + 20px);
+  }
+  .sidebar-section { padding: 12px 0; }
+  .sidebar-section:not(:last-child) { border-bottom: 1px solid var(--border); }
+  .sidebar-section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); padding: 4px 16px 8px;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 16px; cursor: pointer; font-size: 13px; font-weight: 500;
+    color: var(--text-secondary); border-radius: 0; transition: all 0.12s;
+    border: none; background: none; width: 100%; text-align: left;
+  }
+  .sidebar-item:hover { background: var(--bg); color: var(--text-primary); }
+  .sidebar-item.active { background: var(--accent); color: #fff; }
+  .sidebar-item.active .dept-count { background: rgba(255,255,255,0.25); color: #fff; }
+  .dept-count {
+    margin-left: auto; font-size: 10px; font-weight: 700;
+    background: var(--bg); color: var(--text-muted);
+    padding: 2px 7px; border-radius: 20px;
+  }
+  .dept-icon { font-size: 13px; width: 16px; text-align: center; flex-shrink: 0; }
+
+  .dept-main { }
+  .dept-panel { display: none; }
+  .dept-panel.active { display: block; }
+
+  .dept-header {
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow);
+    display: flex; align-items: flex-start; gap: 16px;
+  }
+  .dept-icon-big {
+    width: 44px; height: 44px; border-radius: var(--radius); display: flex;
+    align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+  }
+  .dept-header-text h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 3px; }
+  .dept-header-text p { font-size: 13px; color: var(--text-secondary); }
+  .dept-project-tags { display: flex; gap: 6px; margin-top: 8px; }
+  .dept-tag {
+    font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 20px;
+    letter-spacing: 0.02em;
+  }
+
+  .next-steps-list { display: flex; flex-direction: column; gap: 10px; }
+  .step-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 20px; box-shadow: var(--shadow);
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .step-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.09); transform: translateY(-1px); }
+  .step-card-top { display: flex; align-items: flex-start; gap: 12px; }
+  .step-source-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+    white-space: nowrap; margin-top: 1px; flex-shrink: 0; letter-spacing: 0.03em;
+  }
+  .step-text { font-size: 13px; color: var(--text-primary); line-height: 1.55; font-weight: 500; flex: 1; }
+  .step-meta { display: flex; align-items: center; gap: 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .step-result { font-size: 12px; color: var(--text-secondary); line-height: 1.45; flex: 1; }
+  .step-date { font-size: 11px; color: var(--text-muted); white-space: nowrap; font-weight: 500; }
+  .step-status-pill {
+    font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+    white-space: nowrap; letter-spacing: 0.03em;
+  }
+  .pill-track { background: var(--green-bg); color: var(--green); }
+  .pill-delay { background: var(--red-bg); color: var(--red); }
+  .pill-hold { background: var(--gray-bg); color: var(--gray); }
+  .pill-done { background: var(--green-bg); color: var(--green); }
+
+  .empty-state {
+    text-align: center; padding: 48px 24px; color: var(--text-muted);
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  }
+  .empty-state p { font-size: 14px; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #D8D8E0; border-radius: 3px; }
+
+  @media (max-width: 720px) {
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    .dept-layout { grid-template-columns: 1fr; }
+    .dept-sidebar { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Lakowe <span>Portfolio</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('dashboard', this)">Dashboard</button>
+    <button class="nav-tab" onclick="showPage('departments', this)">Departments</button>
+  </div>
+  <div class="nav-right">
+    <span class="nav-date">Last updated: Apr 9 & Apr 7, 2026</span>
+    <span class="nav-badge badge-annex">Annexe</span>
+    <span class="nav-badge badge-cx">Crossings</span>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     PAGE 1 · DASHBOARD
+══════════════════════════════════════════ -->
+<div id="page-dashboard" class="page active">
+<div class="dash-container">
+
+  <!-- ANNEXE -->
+  <div class="project-block">
+    <div class="project-heading">
+      <span class="nav-badge badge-annex" style="font-size:11px;padding:3px 10px;">Lakowe Annexe</span>
+      <h2>Performance Overview</h2>
+      <span style="font-size:12px;color:var(--text-muted);margin-left:auto">Jan 5 – Apr 9, 2026</span>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Total Inflow</div>
+        <div class="metric-value">₦6.27B</div>
+        <div class="metric-delta delta-up">↑ +₦300M since Jan</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Units Sold</div>
+        <div class="metric-value">78</div>
+        <div class="metric-delta delta-down">↓ 2 revocations from 80</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Value of Sales</div>
+        <div class="metric-value">₦6.89B</div>
+        <div class="metric-delta delta-flat">Flat since mid-Jan</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Account Balance</div>
+        <div class="metric-value" style="color:var(--red)">₦82.8M</div>
+        <div class="metric-delta delta-warn">↓ From ₦388M on Jan 5</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Inflow & Balance Trend</h3>
+        <div class="legend-row">
+          <span class="leg"><span class="leg-dot" style="background:#1A5FB4"></span>Total inflow (₦B)</span>
+          <span class="leg"><span class="leg-dot" style="background:#E8960C;"></span>Account balance (₦100M units)</span>
+        </div>
+        <div class="chart-wrap"><canvas id="c1" role="img" aria-label="Annex inflow grew from 5.97B to 6.27B while balance fell from 388M to 82.8M">Inflow grew from 5.97B to 6.27B; balance fell sharply from 388M to 82.8M.</canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Units Sold vs Active Offers</h3>
+        <div class="legend-row">
+          <span class="leg"><span class="leg-dot" style="background:#2D9E45"></span>Units sold</span>
+          <span class="leg"><span class="leg-dot" style="background:#C93A3A"></span>Active offer letters</span>
+        </div>
+        <div class="chart-wrap"><canvas id="c2" role="img" aria-label="Units peaked at 80, fell to 78; active offers mostly 0-1 throughout">Units peaked at 80, fell to 78. Active offers barely above zero.</canvas></div>
+      </div>
+    </div>
+
+    <div class="alert-strip alert-red">
+      <span class="alert-icon">⚠</span>
+      <span><strong>Cash-construction risk:</strong> Account balance (₦82.8M) risks being outpaced by BAFF's construction burn. Sub-target set: reach ₦1B+ to sustain build momentum. Sales strategy review underway — direction expected end of Apr 7 week.</span>
+    </div>
+
+    <div class="status-card">
+      <h3>Construction & Delivery Status — Apr 9</h3>
+      <div class="status-list">
+        <div class="status-item"><span class="s-dot s-green"></span><span class="s-dept">Gate House</span><span class="s-note">Complete — contractor touch-ups deadline Apr 8; IPD final inspection Apr 9</span></div>
+        <div class="status-item"><span class="s-dot s-green"></span><span class="s-dept">Power Cables</span><span class="s-note">Stringing complete; pole backfilling concluded</span></div>
+        <div class="status-item"><span class="s-dot s-amber"></span><span class="s-dept">Internal Roads</span><span class="s-note">Jay Jay Okocha: compaction ongoing. Finidi George 480m fully complete. Peter Rufai section 2 bends cast. MEP pipe works on Adokiye, Ilerika, Omonike</span></div>
+        <div class="status-item"><span class="s-dot s-amber"></span><span class="s-dept">Drainage</span><span class="s-note">Second-lane drainage contracted and active. BAFF ahead of schedule on 1.2km run. April target: 140 manholes</span></div>
+        <div class="status-item"><span class="s-dot s-amber"></span><span class="s-dept">Speed Bumps</span><span class="s-note">Supplier engaged; ARUP on-site feedback expected. 3 bumps on road currently — adequacy under review</span></div>
+        <div class="status-item"><span class="s-dot s-red"></span><span class="s-dept">Layout Approval</span><span class="s-note">File now with Commissioner of Physical Planning — team escalating directly. Blocked since Aug 2025</span></div>
+        <div class="status-item"><span class="s-dot s-gray"></span><span class="s-dept">Solar (Gatehouse)</span><span class="s-note">On hold — reassess July 2026</span></div>
+        <div class="status-item"><span class="s-dot s-gray"></span><span class="s-dept">LNT 2nd Lane</span><span class="s-note">On hold pending funding formula conclusion</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CROSSINGS -->
+  <div class="project-block">
+    <div class="project-heading">
+      <span class="nav-badge badge-cx" style="font-size:11px;padding:3px 10px;">Lakowe Crossings</span>
+      <h2>Performance Overview</h2>
+      <span style="font-size:12px;color:var(--text-muted);margin-left:auto">Jan 5 – Apr 7, 2026</span>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Total Inflow</div>
+        <div class="metric-value">₦1.72B</div>
+        <div class="metric-delta delta-up">↑ +₦670M since Jan</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Units Sold</div>
+        <div class="metric-value">6</div>
+        <div class="metric-delta delta-flat">+2 in Jan; stagnant since</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Value of Sales</div>
+        <div class="metric-value">₦2.07B</div>
+        <div class="metric-delta delta-warn">Adjusted ↓ after product switch</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Budget Spent</div>
+        <div class="metric-value">₦488M</div>
+        <div class="metric-delta delta-flat">of ₦527M monthly budget</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Cumulative Sales Inflow (₦B)</h3>
+        <div class="chart-wrap"><canvas id="c3" role="img" aria-label="Crossings inflow grew from 1.05B to 1.72B over the period">Inflow grew from ₦1.05B to ₦1.72B.</canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Construction Status — Apr 7</h3>
+        <div class="status-list" style="margin-top:4px">
+          <div class="status-item"><span class="s-dot s-green"></span><span class="s-dept">Park / Landscape</span><span class="s-note">Fountain pumps connected; irrigation energized; marble tops Apr 9; full park target end-April</span></div>
+          <div class="status-item"><span class="s-dot s-amber"></span><span class="s-dept">Sandfilling</span><span class="s-note">6,750 of 7,500 cbm delivered; CX9/CX10 volumes to be added; swamp buggy active</span></div>
+          <div class="status-item"><span class="s-dot s-amber"></span><span class="s-dept">Hospitality Studios</span><span class="s-note">Redesigned from apartments to ~20 studios. Final design: Mon Apr 13</span></div>
+          <div class="status-item"><span class="s-dot s-amber"></span><span class="s-dept">MEP Sign-off</span><span class="s-note">ARUP raised issues — full cross-discipline sign-off target: Apr 13</span></div>
+          <div class="status-item"><span class="s-dot s-red"></span><span class="s-dept">Layout Approval</span><span class="s-note">On hold 6+ weeks; name discrepancy on survey plan identified as new issue</span></div>
+          <div class="status-item"><span class="s-dot s-gray"></span><span class="s-dept">BOLAD Lights</span><span class="s-note">Stuck in Chinese port — alternate freight being explored. Target: end of May (tentative)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-strip alert-blue">
+      <span class="alert-icon">◆</span>
+      <span><strong>Strategic pivot:</strong> Hospitality units redesigned from apartments to ~20 studios, activating a new revenue layer. "Coming soon" billboard pending design freeze Apr 13. DA also pushing for full Phase 1 civil commitment vs piecemeal tranches.</span>
+    </div>
+  </div>
+
+  <!-- CROSS-PROJECT -->
+  <div class="cross-issues">
+    <h3>Cross-Project Issues</h3>
+    <div class="status-list">
+      <div class="status-item"><span class="s-dot s-red"></span><span class="s-dept">Sales Stall</span><span class="s-note">Both projects near-zero new sales Q1 2026. Annexe stuck at 78 units since Feb; Crossings at 6 since mid-Jan. No visible pipeline depth in meeting minutes.</span></div>
+      <div class="status-item"><span class="s-dot s-red"></span><span class="s-dept">Cash Squeeze</span><span class="s-note">Annexe borrowed ₦100M from Elms Gardens (Jan 26) + ₦50M (Feb 12), unrepaid. Balance oscillating ₦47M–₦388M. BAFF mobilisation repeatedly held up by payment readiness.</span></div>
+      <div class="status-item"><span class="s-dot s-amber"></span><span class="s-dept">Regulatory Delays</span><span class="s-note">Layout approvals on hold at both sites. Annexe drainage clearance blocking provisional approval since Aug 2025. Crossings has name discrepancy on survey plan.</span></div>
+      <div class="status-item"><span class="s-dot s-amber"></span><span class="s-dept">Contractor Risk</span><span class="s-note">BAFF's construction scope now risks outpacing Annexe cash. DA also flagged risk of sole-proprietorship contracts at Crossings — instructed BAFF to institutionalise processes. Harmonised POW still not formally locked.</span></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE 2 · DEPARTMENTS
+══════════════════════════════════════════ -->
+<div id="page-departments" class="page">
+<div class="dept-container">
+
+  <div class="dept-layout">
+    <!-- Sidebar -->
+    <div class="dept-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Lakowe Annexe</div>
+        <button class="sidebar-item active" onclick="showDept('annex-design', this)">
+          <span class="dept-icon">✏</span>Design
+          <span class="dept-count">4</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('annex-costing', this)">
+          <span class="dept-icon">📐</span>Costing
+          <span class="dept-count">4</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('annex-ipd', this)">
+          <span class="dept-icon">🏗</span>IPD
+          <span class="dept-count">5</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('annex-operations', this)">
+          <span class="dept-icon">📊</span>Operations
+          <span class="dept-count">2</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('annex-fincon', this)">
+          <span class="dept-icon">💳</span>Fincon
+          <span class="dept-count">2</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('annex-telemarketing', this)">
+          <span class="dept-icon">📞</span>Telemarketing
+          <span class="dept-count">1</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('annex-mcc', this)">
+          <span class="dept-icon">📣</span>MCC
+          <span class="dept-count">2</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('annex-sales', this)">
+          <span class="dept-icon">🤝</span>Sales
+          <span class="dept-count">1</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('annex-legal', this)">
+          <span class="dept-icon">⚖</span>Legal
+          <span class="dept-count">1</span>
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Lakowe Crossings</div>
+        <button class="sidebar-item" onclick="showDept('cx-design', this)">
+          <span class="dept-icon">✏</span>Design
+          <span class="dept-count">4</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('cx-costing', this)">
+          <span class="dept-icon">📐</span>Costing
+          <span class="dept-count">6</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('cx-finplanning', this)">
+          <span class="dept-icon">📈</span>Fin Planning
+          <span class="dept-count">1</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('cx-ipd', this)">
+          <span class="dept-icon">🏗</span>IPD
+          <span class="dept-count">6</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('cx-landscape', this)">
+          <span class="dept-icon">🌿</span>Landscape
+          <span class="dept-count">5</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('cx-operations', this)">
+          <span class="dept-icon">📊</span>Operations
+          <span class="dept-count">1</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('cx-fincon', this)">
+          <span class="dept-icon">💳</span>Fincon
+          <span class="dept-count">1</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('cx-sales', this)">
+          <span class="dept-icon">🤝</span>Sales
+          <span class="dept-count">1</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('cx-mcc', this)">
+          <span class="dept-icon">📣</span>MCC
+          <span class="dept-count">2</span>
+        </button>
+        <button class="sidebar-item" onclick="showDept('cx-general', this)">
+          <span class="dept-icon">📋</span>General
+          <span class="dept-count">1</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main panels -->
+    <div class="dept-main">
+
+      <!-- ── ANNEX DESIGN ── -->
+      <div id="panel-annex-design" class="dept-panel active">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:var(--annex-blue-light);color:var(--annex-blue)">✏</div>
+          <div class="dept-header-text">
+            <h2>Design</h2>
+            <p>Layout approvals, gate house finishing, signage, boundary works</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--annex-blue-light);color:var(--annex-blue)">Lakowe Annexe</span>
+              <span class="dept-tag" style="background:var(--red-bg);color:var(--red)">2 Delayed</span>
+              <span class="dept-tag" style="background:var(--green-bg);color:var(--green)">2 On Track</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Schedule a meeting with the Commissioner of Physical Planning. Speak to Uncle P (who manages consultant Dondemira) before approaching commissioner directly.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">File is now with the Commissioner of Physical Planning. Consultant advised team NOT to approach directly — team disagreed and decided to escalate. Provisional Layout Approval blocked since Aug 2025.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-delay">Delayed</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Contractor to finalise gate house touch-up — deadline Wednesday Apr 8. IPD + Design team to be on site Thursday Apr 9 for final inspection.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Site visited last week — changes observed. Finalisation of additional changes expected this week.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-delay">Delayed</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Receive signage design from ARUP alongside design for turning-points along the second lane. 3 additional speed bumps to be added along the access road.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Signage design confirmed for delivery Apr 2. Covers speed levels and road markings.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Measure the length of the boundary fence along Finidi George and share with Costing.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Detailed plan discussed. Fence to extend along Finidi George line, carving off access for Landwey (neighbouring developer). Implications for 2-hectare plot under review.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Report with an overlay of current progress over the main layout — every 3 weeks.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Needed to align current construction progress with original layout plan and set road construction goals.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANNEX COSTING ── -->
+      <div id="panel-annex-costing" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#FEF6EC;color:var(--amber)">📐</div>
+          <div class="dept-header-text">
+            <h2>Costing</h2>
+            <p>Infrastructure valuations, funding requirements, road & drainage costs</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--annex-blue-light);color:var(--annex-blue)">Lakowe Annexe</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Picture updates on work progress of second lane of LNT road (concrete).</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Visual progress updates required for reporting. Stringing of wires video previously presented.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Contractor valuation letter expected next week. Disbursement plan for April: ~₦600M total — ₦~500M for internal roads + access road valuation; ₦~30M for power connection close-out works.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">~₦1B already paid to contractors to date in April. Full valuation letter to follow.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Provide cost for the boundary fence along Finidi George road.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Fence plan discussed — extension along Finidi George line to carve off access for Landwey. Cost needs to be quantified.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Revisit the cost to stone base the Annexe second lane road — focus on drainages first due to rains. Reassess after drainage completion (target: May 6).</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Stone base contract is active. Drainage must be completed first before stone base focus shifts. Rainy season risk factor.</div>
+              <span class="step-date">Due: May 6</span>
+              <span class="step-status-pill pill-hold">On Hold</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANNEX IPD ── -->
+      <div id="panel-annex-ipd" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#EDF7EF;color:#2D7D3A">🏗</div>
+          <div class="dept-header-text">
+            <h2>IPD</h2>
+            <p>Site execution, roads, drainage, MEP, targets</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--annex-blue-light);color:var(--annex-blue)">Lakowe Annexe</span>
+              <span class="dept-tag" style="background:var(--green-bg);color:var(--green)">5 On Track</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Inspect the contractor's finish on the gate house together with Design team. IPD + Design to be on site Thursday Apr 9.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Final inspection of contractor finish — gate house completion pending this visit.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Updates on progress of internal roads. Finidi George layer works — BAFF to start Tuesday next week.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Jay Jay Okocha: compaction ongoing, Lab QA/QC expected → stabilisation + stone base. Peter Rufai: section 2 bends cast & formwork removed. Finidi George: 480m fully completed. Manholes: 140 target for April. Lift stations: 10 target, first in advanced stage.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Feedback on construction of drainage. 1.3km drainage to Ibudo Wura — 60 days — target May 29.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">BAFF ahead of schedule on 1.2km drainage. First 80m: reinforcement + blinding complete. Base slab casting commenced. Working in 80m sections. 2-month delivery confirmed if funding flows consistently.</div>
+              <span class="step-date">Due: May 29</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Close out location and cost for speed bumps by next meeting. Verify specifications for correct bump count. Redo existing inconsistent bumps to fit the height of the 3rd bump across the road.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Engaging supplier on location + cost. ARUP on site Tuesday to advise. Only 3 bumps on access road — adequacy questioned. Team to verify against design standards for correct number for road length.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Updates on the access road edge protection timelines. Instruct contractor to clear Segun Odegbami road outside the fence.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Exposed edges along access road where it branches out need protection. Plan: concrete slope from edge to pavement. Segun Odegbami location confirmed outside estate fence on a commercial plot.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Present targets for the month of April and share formal written targets with Taiwo.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">April targets: 140 manholes (100 + 40 deficit); Complete Finidi George drainage ✓; Commence Peter Rufai section 2 ✓; Compaction + stone base on Adokiye, Ilerika, Amunike; 10 lift stations before rainy season.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANNEX OPERATIONS ── -->
+      <div id="panel-annex-operations" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#F2F2F4;color:#5A5A62">📊</div>
+          <div class="dept-header-text">
+            <h2>Operations</h2>
+            <p>Sales metrics, inflows, account balance reporting</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--annex-blue-light);color:var(--annex-blue)">Lakowe Annexe</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Provide update on sales offer letters, inflow and total value of sales.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Current figures: Total inflow ₦6.27B · Sales: 78 units · Value of Sales: ₦6.89B · Balance: ₦82.78M · 2 active offer letters in progress. Sales strategy review underway. BAFF's build rate risks outpacing balance.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">CRM tool to aid telemarketing in messaging unreachable leads.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Telemarketing has 33 unresponsive/unqualified leads after price discovery. A CRM tool would enable structured re-engagement and lead tracking.</div>
+              <span class="step-date">TBD</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANNEX FINCON ── -->
+      <div id="panel-annex-fincon" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#FEF6EC;color:var(--amber)">💳</div>
+          <div class="dept-header-text">
+            <h2>Fincon</h2>
+            <p>Payments, disbursements, inter-project loans</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--annex-blue-light);color:var(--annex-blue)">Lakowe Annexe</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Process payments — April disbursement requirement: ~₦600M total by end of month.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">₦~500M for contractor valuation (internal roads + access road — letter expected next week). ₦~30M for power connection close-out. ~₦1B already paid to contractors to date in April.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Repayment of inter-project loans: Annexe borrowed ₦100M from Elms Gardens (Jan 29) and ₦50M (Feb 12).</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Original return date was Feb 5 for the first ₦100M loan. Status of repayment remains outstanding per latest minutes.</div>
+              <span class="step-date">Overdue</span>
+              <span class="step-status-pill pill-delay">Delayed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANNEX TELEMARKETING ── -->
+      <div id="panel-annex-telemarketing" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#F2F2F4;color:#5A5A62">📞</div>
+          <div class="dept-header-text">
+            <h2>Telemarketing</h2>
+            <p>Lead generation, qualifying, and sales handover</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--annex-blue-light);color:var(--annex-blue)">Lakowe Annexe</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Share weekly leads report on Lakowe Annexe promotional campaign.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Updated figures (LinkedIn campaign): 42 total leads generated (↑ from 40). Qualified leads: 5 distributed to sales reps. Pending/under assessment: 4. Unresponsive/unqualified: 33. 1 lead booked for site inspection this Saturday. Of 5 qualified, 2 referred to Adiva (not Annexe).</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANNEX MCC ── -->
+      <div id="panel-annex-mcc" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#FEF0F0;color:var(--red)">📣</div>
+          <div class="dept-header-text">
+            <h2>MCC</h2>
+            <p>Marketing, brand strategy, campaigns, lead nurturing</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--annex-blue-light);color:var(--annex-blue)">Lakowe Annexe</span>
+              <span class="dept-tag" style="background:var(--green-bg);color:var(--green)">On Track</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Share leads nurtured in the email campaign with the sales team immediately (management challenge issued).</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">600–300 leads obtained from third party. Marketing was planning an email nurture sequence before sharing — management challenged this and directed immediate handover to sales team.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Marketing strategy: (1) Staff-wide LinkedIn initiative — C-suite executives to repost all Mixta posts. (2) Submit brand strategy document. (3) Evaluate new billboard locations — currently only 1 billboard in Ikeja, none on Ibeju-Lekki axis. (4) Assess engaging a new external consultant.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">MCC expected to bring proactive ideas to meetings. Storytelling gap identified — Lakowe has 10+ year track record not being used as competitive advantage. Brand strategy document must come first as foundation for all above.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANNEX SALES ── -->
+      <div id="panel-annex-sales" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:var(--green-bg);color:var(--green)">🤝</div>
+          <div class="dept-header-text">
+            <h2>Sales</h2>
+            <p>Offer letters, site inspections, revenue targets</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--annex-blue-light);color:var(--annex-blue)">Lakowe Annexe</span>
+              <span class="dept-tag" style="background:var(--red-bg);color:var(--red)">Critical</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Define and execute strategy to get account balance to ₦1B+ to sustain BAFF's build momentum. Sales strategy review direction expected by end of this week.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">2 active offer letters still in progress. Sales stuck at 78 units for several months. "Sales has dried up a little bit." Risk: BAFF's construction pace will outpace account balance if sales don't close. Sub-target: ₦1B+ in account.</div>
+              <span class="step-date">Due: Apr 9</span>
+              <span class="step-status-pill pill-delay">Delayed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANNEX LEGAL ── -->
+      <div id="panel-annex-legal" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#F2F2F4;color:#5A5A62">⚖</div>
+          <div class="dept-header-text">
+            <h2>Legal</h2>
+            <p>Trademark registration, intellectual property</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--annex-blue-light);color:var(--annex-blue)">Lakowe Annexe</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--annex-blue-light);color:var(--annex-blue)">ANNEXE</span>
+              <div class="step-text">Waiting on publication for LNT name trademark registration.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Acknowledgement slip and acceptance letter received (3 weeks early). Publication window: Aug 21 (new). Trademark certificate expected Oct 21 (new). Final completion: March 2027.</div>
+              <span class="step-date">Publication: Aug 21</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ CROSSINGS ══ -->
+
+      <!-- ── CX DESIGN ── -->
+      <div id="panel-cx-design" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:var(--cx-green-light);color:var(--cx-green)">✏</div>
+          <div class="dept-header-text">
+            <h2>Design</h2>
+            <p>Hospitality concept, layout approval, signage, roundabout alignment</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--cx-green-light);color:var(--cx-green)">Lakowe Crossings</span>
+              <span class="dept-tag" style="background:var(--red-bg);color:var(--red)">1 Delayed</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Finalise design for hospitality initiative — new deadline Monday Apr 13. Share concept drawings with MCC team for billboard immediately after.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Not completed by Apr 7 deadline. One-bedroom unit adjustments and block extension revisions still required. DA noted freeze is urgently needed so commercial signboard can go up on site. Billboard to appear immediately after BOLAD lights for the park are done.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-delay">Delayed</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Assess the economic viability of eliminating an existing road vs proceeding with new addition. Drainage implications to be considered.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">New road alignment introduced but DA challenged: adds infrastructure cost without removing an existing road. Team to assess whether an existing road can be safely eliminated. Decision deferred — team will proceed with most economical option.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">A sign post positioned strategically in Lakowe, updated annually, capturing hospitality footfall statistics.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">DA suggested displaying annual foot traffic stats on a physical billboard/signpost. Visible reference for prospective commercial clients on expected traction in the area.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Follow up with Costing and Procurement for the layout approval process.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">On hold for 6 weeks. Project Link sent cost and assessment for Lagos state. Issue noted: discrepancies on the name on the survey plan.</div>
+              <span class="step-date">Due: May 4</span>
+              <span class="step-status-pill pill-hold">On Hold</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CX COSTING ── -->
+      <div id="panel-cx-costing" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#FEF6EC;color:var(--amber)">📐</div>
+          <div class="dept-header-text">
+            <h2>Costing</h2>
+            <p>Sandfilling, park works, contractor management, funding requirements</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--cx-green-light);color:var(--cx-green)">Lakowe Crossings</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Update on sandfilling progress. Present budgeted vs actual figures to measure progress. Communicate with Shadrach.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">6,750 cbm delivered of 7,500 target. Diesel price spike: +30% (₦11,500 → ₦16,500/load). CX9 & CX10 volumes still to be estimated and added. DA challenged piecemeal approach — pushed for full Phase 1 contract commitment (~₦2.6–2.7B).</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Engage Hazel on the base for the BOLAD lights. Receive samples of work from both contractors.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">HAZEL expressed reluctance to provide a sample without being paid. Team to negotiate following this. WEMSEL confirmed to bring sample this week (Apr 10).</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Proceed to make payment of ₦3M to the contractor (Critics) for cladding of water tanks.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Design frozen and contractor selected. Work plan received. Concern raised about rusting — team suggested car-paint finish as solution.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Inform BAFF about institutionalising their contracting processes.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">DA raised concerns about risks of high-value contracts with sole proprietorships — vulnerability if key individual becomes incapacitated. Team directed to advise BAFF to formally institutionalise their contracting practices.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Present April funding requirements at next meeting.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Funding gap between contractor obligations and available balance is a key risk. Full Phase 1 commitment figure estimated at ₦2.6–2.7B.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Close out finalised contractor discussions with DA and Mrs H. Investigate Jabak's basis for past performance comments on BAFF before final award recommendation.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">2 reports submitted — Technical (ARUP) and Commercial (JABAK). DA expressed concerns about JABAK's commercial report, citing low rating for BAFF. Investigation required before final award.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-delay">Delayed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CX FIN PLANNING ── -->
+      <div id="panel-cx-finplanning" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#FEF6EC;color:var(--amber)">📈</div>
+          <div class="dept-header-text">
+            <h2>Fin Planning</h2>
+            <p>Budget variance analysis, project profitability</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--cx-green-light);color:var(--cx-green)">Lakowe Crossings</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Collaborate with the Costing team to demonstrate the impact of budget variances on projected project profitability.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">BA requested reconciliation of initial sandfilling budget vs actual consumption. Diesel price spike (+30%) and volume shortfall are key variance drivers impacting project financials.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CX IPD ── -->
+      <div id="panel-cx-ipd" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:var(--cx-green-light);color:var(--cx-green)">🏗</div>
+          <div class="dept-header-text">
+            <h2>IPD</h2>
+            <p>Sandfilling, MEP sign-off, targets, flood management, debris clearing</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--cx-green-light);color:var(--cx-green)">Lakowe Crossings</span>
+              <span class="dept-tag" style="background:var(--amber-bg);color:var(--amber)">1 Delayed</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Feedback on sandfilling progress and targets. CX9 & CX10 flagged for immediate fill. Clear road alignment into Phase 1 with swamp buggy. Share with Taiwo Apr 9.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Swamp buggy continuing through this week — clearing road alignment to end of Phase 1. 6,750 cbm received. DA pushing mindset shift toward committing to full phase rather than 2,500 cbm tranches.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">PM team to provide a properly substantiated completion percentage before next meeting. Validate targets for April.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">DA suggested 5% completion vs. the presented 27%. PM team mandated to supply new figure based on detailed program of works. End of June targets: internal roads mobilised; drainages + pipe works commenced; stone base ongoing.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Update on debris clearing — communicate new timeline. Swamp buggy now on site.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Swamp buggy actively clearing alignment to Phase 1 end. End-of-April target for debris clearing reaffirmed. Still delayed relative to original timeline.</div>
+              <span class="step-date">Due: Apr 30</span>
+              <span class="step-status-pill pill-delay">Delayed</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Commence discussions with ARUP on sump design for flood water management. Ensure there is a plan to prevent the site from damming.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Site visit for sump design discussion postponed from Apr 7 to Thursday Apr 9 due to public holidays.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Get ARUP sign-off on MEP designs — secure full cross-discipline sign-off from all consultants at Thursday meeting.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">ARUP raised issues on MEP designs. Meeting scheduled Apr 8. Target close-out: Apr 9. Risk: if each discipline signs only their portion, liability is unclear if errors arise. Resolution: full cross-discipline sign-off required.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Share site progress pictures and visual summary.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Images and videos of site progress to be shared for reporting and marketing purposes.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CX LANDSCAPE ── -->
+      <div id="panel-cx-landscape" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:var(--green-bg);color:var(--green)">🌿</div>
+          <div class="dept-header-text">
+            <h2>Landscape</h2>
+            <p>Park construction, sculptures, lighting, fountain, main gate</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--cx-green-light);color:var(--cx-green)">Lakowe Crossings</span>
+              <span class="dept-tag" style="background:var(--red-bg);color:var(--red)">2 Delayed</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Review more vendors and finalise park sculptures with Mrs H. Engage Nike Art Gallery for additional sculptor talent.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Vision: 4 sculptures telling the story of Lakowe Crossings. Two sculptors engaged — Sculptor 1 (Stephen): steel works; Sculptor 2 (Basi's apprentice): mixed metal/concrete/fiberglass. DA direction: sculptures should be FACELESS, somber yet positive/joyful — not realistic or scary.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Provide progress updates on the park. Marble tops concluded by Thursday Apr 9. Target: entire park done by end of April (except BOLAD lights).</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Fountain: pump correction timeline 2 weeks (Apr 17). Umbrella-style nozzles and lighting to be installed within 2 weeks. Marble top contractor visited Apr 7 and did a sample.</div>
+              <span class="step-date">Due: Apr 30</span>
+              <span class="step-status-pill pill-delay">Delayed</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Follow up closely on BOLAD lights contractor — explore alternate freight route. 2-week delay acknowledged.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">BOLAD lights stuck in Chinese port. Shipping disrupted (not via Strait of Hormuz). Contractor exploring alternate route. Timeline now tentative end of next month. Beyond project team's control. Park completion target set for everything EXCEPT these lights.</div>
+              <span class="step-date">Due: End of May</span>
+              <span class="step-status-pill pill-delay">Delayed</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">RAFFTRACK to conclude main gate on clearview fence — 2-week timeline (deadline Apr 17). Set hard deadline in writing.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Main gate done — 4 panels left to conclude this week (tentative Apr 10). 5-week delay noted. Team instructed to set a hard deadline in writing.</div>
+              <span class="step-date">Due: Apr 17</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Updates on the cladding for water tanks. Proceed to fund ₦3M.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Design frozen and contractor selected. Work plan received. Concern raised about rusting — team suggested car-paint finish as solution. ₦3M to be released.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CX OPERATIONS ── -->
+      <div id="panel-cx-operations" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#F2F2F4;color:#5A5A62">📊</div>
+          <div class="dept-header-text">
+            <h2>Operations</h2>
+            <p>Sales metrics, inflows, account balance</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--cx-green-light);color:var(--cx-green)">Lakowe Crossings</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Provide weekly updates on sales metrics and inflows.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Current figures: Sales: 6 units · Value of Sales: ₦2.07B · Inflow: ₦1.72B · Account balance: ₦99M. 1 active offer expiring Apr 8. 2 pending offers in pipeline for this week/next.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CX FINCON ── -->
+      <div id="panel-cx-fincon" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#FEF6EC;color:var(--amber)">💳</div>
+          <div class="dept-header-text">
+            <h2>Fincon</h2>
+            <p>Contractor payments and mobilisation funding</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--cx-green-light);color:var(--cx-green)">Lakowe Crossings</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Process payments — mobilise contractors and vendors. Total budget for the month: ₦527M (including 20,000 cubic metres of sand).</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">₦488M paid to date out of ₦527M monthly budget. ₦315M additional total budget for the month.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-done">Completed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CX SALES ── -->
+      <div id="panel-cx-sales" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:var(--green-bg);color:var(--green)">🤝</div>
+          <div class="dept-header-text">
+            <h2>Sales</h2>
+            <p>Offer letters, inflows, 6-week cumulative target</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--cx-green-light);color:var(--cx-green)">Lakowe Crossings</span>
+              <span class="dept-tag" style="background:var(--red-bg);color:var(--red)">Critical</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Ongoing conversations — inflows this week. Present a clear pathway to ₦1B cumulative 6-week target.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">2 pending offers expected to convert this week/next. Clarification needed: whether the 1 active offer expiring Apr 8 is one of these 2 pending. No new inflows confirmed yet. Civil mobilisation tied to sales raising at least ₦800M.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CX MCC ── -->
+      <div id="panel-cx-mcc" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#FEF0F0;color:var(--red)">📣</div>
+          <div class="dept-header-text">
+            <h2>MCC</h2>
+            <p>Site visibility, hospitality billboard, marketing strategy</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--cx-green-light);color:var(--cx-green)">Lakowe Crossings</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Share a timeline and work breakdown on when the "Coming Soon" billboard for the hospitality initiative will be on site.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Billboard should come up immediately after the BOLAD lights for the park are done. Design from Design team needed first (target Apr 13).</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Come up with more challenging plans to reflect the scale of the project being built. Identify successful approaches other developers are employing and ways to improve them.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">Team tasked to present bold marketing ideas. DA: need to create a visually striking image of activity that gives the impression of the scale of the project — raising ₦50B. General environment perceived as not conveying adequate scale.</div>
+              <span class="step-date">Due: Apr 13</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CX GENERAL ── -->
+      <div id="panel-cx-general" class="dept-panel">
+        <div class="dept-header">
+          <div class="dept-icon-big" style="background:#F2F2F4;color:#5A5A62">📋</div>
+          <div class="dept-header-text">
+            <h2>General</h2>
+            <p>Cross-departmental strategic directives</p>
+            <div class="dept-project-tags">
+              <span class="dept-tag" style="background:var(--cx-green-light);color:var(--cx-green)">Lakowe Crossings</span>
+            </div>
+          </div>
+        </div>
+        <div class="next-steps-list">
+          <div class="step-card">
+            <div class="step-card-top">
+              <span class="step-source-badge" style="background:var(--cx-green-light);color:var(--cx-green)">CROSSINGS</span>
+              <div class="step-text">Every department to ruminate and think on the following points ahead of the next session: (1) How to create a visually striking image of activity that conveys the scale of the project — i.e. plans to raise ₦50B. (2) The general environment is perceived as not okay. (3) Moving sandfill to site has to be on a bigger scale to give the volume impression needed.</div>
+            </div>
+            <div class="step-meta">
+              <div class="step-result">DA raised the need for all departments to proactively think about improving sales and site perception. Scale of the project is currently not being communicated effectively.</div>
+              <span class="step-date">Due: Apr 7 → Next session</span>
+              <span class="step-status-pill pill-track">On Track</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end dept-main -->
+  </div><!-- end dept-layout -->
+</div><!-- end dept-container -->
+</div><!-- end page-departments -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+  function showPage(id, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function showDept(id, btn) {
+    document.querySelectorAll('.dept-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7'];
+  const inflow  = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27];
+  const balance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,82.78];
+  const units   = [80,79,79,79,79,78,78,78,78,78,78,78,78,78,78];
+  const offers  = [0,1,0,1,1,1,0,1,1,1,0,0,0,2,2];
+
+  const gridC = 'rgba(0,0,0,0.06)';
+  const textC = '#7A7A84';
+  const base = {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{ticks:{color:textC,font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:7},grid:{color:gridC}},
+      y:{ticks:{color:textC,font:{size:10}},grid:{color:gridC}}
+    }
+  };
+
+  new Chart(document.getElementById('c1'),{type:'line',data:{labels,datasets:[
+    {label:'Inflow (₦B)',data:inflow,borderColor:'#1A5FB4',backgroundColor:'rgba(26,95,180,0.06)',borderWidth:2,pointRadius:2.5,pointBackgroundColor:'#1A5FB4',fill:true,tension:0.35,yAxisID:'y'},
+    {label:'Balance (₦100M)',data:balance.map(v=>+(v/100).toFixed(2)),borderColor:'#D4830A',backgroundColor:'rgba(212,131,10,0.05)',borderWidth:2,pointRadius:2.5,pointBackgroundColor:'#D4830A',fill:false,tension:0.35,borderDash:[5,3],yAxisID:'y1'}
+  ]},options:{...base,scales:{...base.scales,y:{...base.scales.y,position:'left',ticks:{color:textC,font:{size:10}}},y1:{...base.scales.y,position:'right',ticks:{color:textC,font:{size:10}},grid:{display:false}}}}});
+
+  new Chart(document.getElementById('c2'),{type:'bar',data:{labels,datasets:[
+    {label:'Units sold',data:units,backgroundColor:'rgba(45,158,69,0.75)',borderRadius:3,yAxisID:'y'},
+    {label:'Active offers',data:offers,backgroundColor:'rgba(201,58,58,0.7)',borderRadius:3,yAxisID:'y1'}
+  ]},options:{...base,scales:{...base.scales,y:{...base.scales.y,min:75,max:82,ticks:{color:textC,font:{size:10}}},y1:{...base.scales.y,position:'right',min:0,max:4,ticks:{color:textC,font:{size:10}},grid:{display:false}}}}});
+
+  const cxL  = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7'];
+  const cxIn = [1.05,1.179,1.3,1.3,1.3,1.415,1.415,1.415,1.415,1.415,2.07,1.68,1.72,1.72,1.72];
+  new Chart(document.getElementById('c3'),{type:'line',data:{labels:cxL,datasets:[
+    {label:'Inflow (₦B)',data:cxIn,borderColor:'#1A8A5A',backgroundColor:'rgba(26,138,90,0.07)',borderWidth:2,pointRadius:2.5,pointBackgroundColor:'#1A8A5A',fill:true,tension:0.35}
+  ]},options:{...base}});
+</script>
+</body>
+</html>
