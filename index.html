@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Lakowe Portfolio — Performance Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   :root {
     --white: #ffffff;
@@ -56,11 +56,10 @@
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; padding: 0 28px;
     gap: 32px;
-    overflow-x: auto; /* Allows horizontal scrolling on small screens */
+    overflow-x: auto;
     white-space: nowrap;
   }
   
-  /* Hide scrollbar for nav but keep functionality */
   nav::-webkit-scrollbar { display: none; }
   nav { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -105,6 +104,8 @@
     display: inline-flex; align-items: center; gap: 6px;
   }
   .upload-btn:hover { background: var(--text-primary); }
+  
+  .transcript-btn { background: var(--brand-red); }
 
   .page { display: none; margin-top: var(--nav-h); min-height: calc(100vh - var(--nav-h)); padding-top: 20px; }
   .page.active { display: block; }
@@ -266,80 +267,126 @@
   .empty-state h3 { font-size: 18px; color: var(--text-secondary); margin-bottom: 8px;}
   .empty-state p { font-size: 14px; }
 
+  /* ── UI INJECTIONS FOR APP & TRANSCRIPTS (Hidden on Desktop) ── */
+  .fab-mobile, .bottom-nav, .action-sheet, .action-overlay { display: none !important; }
+  
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6); z-index: 200; display: none;
+    backdrop-filter: blur(2px);
+  }
+  .modal {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: var(--white); width: 90%; max-width: 500px;
+    border-radius: var(--radius); z-index: 210; padding: 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: none;
+  }
+  .modal h3 { font-size: 18px; margin-bottom: 12px; color: var(--text-primary); }
+  .modal p { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+  .modal textarea {
+    width: 100%; height: 160px; padding: 12px; border-radius: 8px;
+    border: 1px solid var(--border); font-family: inherit; font-size: 14px;
+    resize: none; margin-bottom: 16px; background: var(--brand-grey-light);
+  }
+  .modal-btn {
+    width: 100%; background: var(--brand-red); color: #fff;
+    padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .modal-btn:hover { background: var(--brand-red-hover); }
 
-  /* ── FULL RESPONSIVE MEDIA QUERIES ── */
-
-  /* Tablet / Smaller Laptops */
+  /* ── FULL RESPONSIVE MEDIA QUERIES (NATIVE APP FEEL ON MOBILE) ── */
   @media (max-width: 992px) {
-    .dept-layout {
-      grid-template-columns: 200px 1fr;
-      gap: 20px;
-    }
+    .dept-layout { grid-template-columns: 200px 1fr; gap: 20px; }
     .landing-buttons { flex-direction: column; width: 100%; max-width: 320px; }
     .landing-btn { padding: 16px 24px; }
   }
 
-  /* Mobile Phones & Tablets */
   @media (max-width: 768px) {
-    nav { padding: 0 16px; gap: 16px; }
-    .nav-brand { font-size: 14px; }
-    .nav-right { gap: 10px; }
-    .nav-date { display: none; } /* Hide date to save space on mobile */
-    .upload-btn { padding: 6px 10px; font-size: 11px; }
+    body { padding-bottom: 70px; } /* Space for bottom nav */
+    
+    /* Top Nav Adaptations */
+    nav { padding: 0 16px; gap: 12px; }
+    .nav-brand { font-size: 15px; margin-right: auto; }
+    .nav-tabs, .nav-right .upload-btn, .nav-right .transcript-btn, .nav-date { display: none; } /* Hide desktop actions */
 
     .dash-container, .dept-container { padding: 10px 16px 32px; }
 
+    /* Responsive Charts */
     .charts-row { grid-template-columns: 1fr; }
+    .chart-wrap { height: 240px; } /* Ensures charts are never clogged */
+    
     .target-item { flex-direction: column; gap: 4px; }
     .t-name { min-width: auto; }
 
-    /* Transform Vertical Sidebar to Horizontal Sticky Scrollable Menu on Mobile */
-    .dept-layout { grid-template-columns: 1fr; gap: 20px; }
+    /* Transform Vertical Sidebar to Horizontal Scrollable Chips */
+    .dept-layout { grid-template-columns: 1fr; gap: 16px; }
     .dept-sidebar {
-      position: sticky;
-      top: var(--nav-h);
-      z-index: 90;
-      display: flex;
-      flex-direction: row;
-      border-radius: 0;
+      position: sticky; top: var(--nav-h); z-index: 90;
+      display: flex; flex-direction: row; border-radius: 0;
       border-left: none; border-right: none;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      margin: -10px -16px 16px;
-      padding: 0 16px;
-      width: calc(100% + 32px);
-      overflow-x: auto;
-      white-space: nowrap;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+      margin: -10px -16px 16px; padding: 0 16px;
+      width: calc(100% + 32px); overflow-x: auto; white-space: nowrap;
       background: var(--brand-grey-light);
     }
-    /* Hide scrollbar for sideways menu */
     .dept-sidebar::-webkit-scrollbar { display: none; }
     .dept-sidebar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    .sidebar-section { 
-      display: flex; 
-      flex-direction: row;
-      padding: 8px 0; 
-      border-bottom: none !important; 
-    }
+    .sidebar-section { display: flex; flex-direction: row; padding: 10px 0; border-bottom: none !important; }
     .sidebar-section-label { display: none; } /* Hidden in horizontal mode */
     .sidebar-item {
-      width: auto;
-      flex-shrink: 0;
-      border-radius: 20px;
-      padding: 8px 16px;
-      margin-right: 8px;
-      border: 1px solid var(--border);
-      background: var(--white);
+      width: auto; flex-shrink: 0; border-radius: 20px;
+      padding: 8px 16px; margin-right: 8px; border: 1px solid var(--border);
+      background: var(--white); box-shadow: var(--shadow);
     }
 
     .step-card-top { flex-direction: column; }
     .step-date { align-self: flex-start; margin-top: 8px;}
+
+    /* Native App Mobile Additions Trigger */
+    .fab-mobile {
+      display: flex !important; position: fixed; bottom: 85px; right: 20px;
+      width: 56px; height: 56px; background: var(--brand-red); color: white;
+      border-radius: 50%; justify-content: center; align-items: center;
+      box-shadow: 0 4px 12px rgba(211,47,47,0.4); font-size: 28px; z-index: 100;
+      cursor: pointer;
+    }
+    
+    .bottom-nav {
+      display: flex !important; position: fixed; bottom: 0; left: 0; right: 0;
+      height: 65px; background: var(--white); box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      justify-content: space-around; align-items: center; z-index: 99;
+      padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid var(--border);
+    }
+    .b-nav-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: var(--text-muted); width: 100%; height: 100%; cursor: pointer; transition: 0.2s;
+    }
+    .b-nav-item svg { width: 22px; height: 22px; margin-bottom: 4px; }
+    .b-nav-item span { font-size: 11px; font-weight: 600; }
+    .b-nav-item.active { color: var(--brand-red); }
+
+    .action-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5); z-index: 105;
+    }
+    .action-sheet {
+      display: block !important; position: fixed; bottom: -100%; left: 0; right: 0;
+      background: var(--white); border-radius: 20px 20px 0 0; z-index: 110;
+      padding: 24px; transition: bottom 0.3s ease; box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+    }
+    .action-sheet.active { bottom: 0; }
+    .sheet-handle { width: 40px; height: 5px; background: #e0e0e0; border-radius: 5px; margin: 0 auto 20px; }
+    .action-btn-mobile {
+      width: 100%; padding: 16px; background: var(--brand-grey-light); border-radius: 12px;
+      font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 12px; border: 1px solid var(--border);
+    }
   }
 
-  /* Very Small Mobile */
   @media (max-width: 480px) {
     .metrics-grid { grid-template-columns: 1fr; }
-    .upload-btn span { display: none; } /* Only show icon on extremely tight screens */
   }
 </style>
 </head>
@@ -348,16 +395,21 @@
 <nav>
   <div class="nav-brand" onclick="showLanding()" title="Return to Dashboard Selection">Lakowe <span>Portfolio</span></div>
   <div class="nav-tabs" id="nav-tabs-group" style="display:none;">
-    <button class="nav-tab active" onclick="showPage('dashboard', this)">Dashboard</button>
-    <button class="nav-tab" onclick="showPage('departments', this)">Departments Tasks</button>
+    <button class="nav-tab active" onclick="showPage('dashboard', this); syncMobileNav('dashboard')">Dashboard</button>
+    <button class="nav-tab" onclick="showPage('departments', this); syncMobileNav('departments')">Departments Tasks</button>
   </div>
   <div class="nav-right">
     <span class="nav-date" id="last-updated-text">Last updated: Apr 20, 2026</span>
     <span class="nav-badge badge-cx nav-project-btn" id="btn-nav-cx" onclick="selectProject('Crossings')">Crossings</span>
     <span class="nav-badge badge-annex nav-project-btn" id="btn-nav-annex" onclick="selectProject('Annexe')">Annexe</span>
+    
+    <button class="upload-btn transcript-btn" onclick="openTranscriptModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      Paste Transcript
+    </button>
     <label for="fileUpload" class="upload-btn">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-      <span>Upload</span>
+      Upload Sheet
     </label>
     <input type="file" id="fileUpload" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display:none;" onchange="handleFileUpload(event)">
   </div>
@@ -380,7 +432,6 @@
     <div class="project-heading">
       <span class="nav-badge badge-cx">Lakowe Crossings</span>
       <h2>Performance Overview</h2>
-      <span style="font-size:12px;color:var(--text-muted);margin-left:auto">As of Apr 20, 2026</span>
     </div>
 
     <div class="metrics-grid">
@@ -434,7 +485,6 @@
     <div class="project-heading">
       <span class="nav-badge badge-annex">Lakowe Annexe</span>
       <h2>Performance Overview</h2>
-      <span style="font-size:12px;color:var(--text-muted);margin-left:auto">As of Apr 20, 2026</span>
     </div>
 
     <div class="metrics-grid">
@@ -549,6 +599,44 @@
 
     </div></div></div></div>
 
+<div class="fab-mobile" onclick="toggleActionSheet()">+</div>
+
+<div class="action-overlay" id="actionOverlay" onclick="toggleActionSheet()"></div>
+<div class="action-sheet" id="actionSheet">
+  <div class="sheet-handle"></div>
+  <h3 style="margin-bottom: 20px; font-size: 18px;">Update Data</h3>
+  
+  <label for="fileUploadMobile" class="action-btn-mobile">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+    Upload Excel/CSV Report
+  </label>
+  <input type="file" id="fileUploadMobile" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display:none;" onchange="handleFileUpload(event)">
+  
+  <div class="action-btn-mobile" onclick="openTranscriptModal()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d32f2f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    Paste Meeting Transcript
+  </div>
+</div>
+
+<div class="modal-overlay" id="transcriptOverlay" onclick="closeTranscriptModal()"></div>
+<div class="modal" id="transcriptModal">
+  <h3>Smart Transcript Parser</h3>
+  <p>Paste raw meeting notes. Our heuristic engine will auto-extract actions and assign them.</p>
+  <textarea id="transcriptText" placeholder="e.g., The Design team needs to finish the layouts by Friday. Costing will review the budget tomorrow."></textarea>
+  <button class="modal-btn" onclick="processTranscript()" id="transcriptProcessBtn">Analyze & Extract</button>
+</div>
+
+<div class="bottom-nav">
+  <div class="b-nav-item active" id="bnav-dashboard" onclick="showPage('dashboard', document.querySelector('.nav-tab[onclick*=\'dashboard\']')); syncMobileNav('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+    <span>Dashboard</span>
+  </div>
+  <div class="b-nav-item" id="bnav-departments" onclick="showPage('departments', document.querySelector('.nav-tab[onclick*=\'departments\']')); syncMobileNav('departments')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+    <span>Tasks</span>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
   // ── UI NAVIGATION ──
@@ -556,7 +644,13 @@
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
     document.getElementById('page-' + id).classList.add('active');
-    btn.classList.add('active');
+    if(btn) btn.classList.add('active');
+  }
+
+  function syncMobileNav(id) {
+    document.querySelectorAll('.b-nav-item').forEach(b => b.classList.remove('active'));
+    let activeBNav = document.getElementById('bnav-' + id);
+    if(activeBNav) activeBNav.classList.add('active');
   }
 
   function showLanding() {
@@ -581,12 +675,105 @@
     if(document.getElementById('page-landing').classList.contains('active')) {
       const dashTab = document.querySelector('.nav-tab[onclick*="dashboard"]');
       showPage('dashboard', dashTab);
+      syncMobileNav('dashboard');
     }
 
     document.getElementById('panel-placeholder').style.display = 'flex'; 
     document.getElementById('dynamic-dept-container').style.display = 'none';
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
   }
+
+  // ── MOBILE UI CONTROLLERS ──
+  function toggleActionSheet() {
+    const sheet = document.getElementById('actionSheet');
+    const overlay = document.getElementById('actionOverlay');
+    if (sheet.classList.contains('active')) {
+      sheet.classList.remove('active');
+      overlay.style.display = 'none';
+    } else {
+      sheet.classList.add('active');
+      overlay.style.display = 'block';
+    }
+  }
+
+  function openTranscriptModal() {
+    // Hide action sheet if open
+    const sheet = document.getElementById('actionSheet');
+    if (sheet.classList.contains('active')) toggleActionSheet();
+    
+    document.getElementById('transcriptOverlay').style.display = 'block';
+    document.getElementById('transcriptModal').style.display = 'block';
+  }
+
+  function closeTranscriptModal() {
+    document.getElementById('transcriptOverlay').style.display = 'none';
+    document.getElementById('transcriptModal').style.display = 'none';
+    document.getElementById('transcriptText').value = '';
+    document.getElementById('transcriptProcessBtn').textContent = "Analyze & Extract";
+  }
+
+  // ── TRANSCRIPT PARSER LOGIC ──
+  function processTranscript() {
+    const text = document.getElementById('transcriptText').value;
+    if(!text.trim()) return alert("Please paste a transcript first.");
+
+    const btn = document.getElementById('transcriptProcessBtn');
+    btn.textContent = "Extracting Actions...";
+    btn.disabled = true;
+
+    setTimeout(() => {
+      const lines = text.split(/[.\n]/);
+      let newTasks = 0;
+      
+      // Keywords that typically indicate a task assignment
+      const taskKeywords = ['will', 'needs to', 'to do', 'must', 'action', 'task', 'assigned to', 'should'];
+      // Department lookup mappings
+      const depts = ['Design', 'Costing', 'IPD', 'Sales', 'MCC', 'Fincon', 'Operations', 'Legal', 'Landscape', 'AMC'];
+      
+      // Figure out currently active project context
+      let currentProj = 'Annexe';
+      const activeProjBtn = document.querySelector('.nav-project-btn.active');
+      if(activeProjBtn && activeProjBtn.innerText.includes('Crossings')) {
+          currentProj = 'Crossings';
+      }
+
+      lines.forEach(line => {
+        let isTask = taskKeywords.some(kw => line.toLowerCase().includes(kw));
+        if (isTask && line.trim().length > 15) {
+          
+          let matchedDept = 'General';
+          depts.forEach(d => { if(line.toLowerCase().includes(d.toLowerCase())) matchedDept = d; });
+          
+          // Inject the simulated extracted task at the top of the database
+          taskDatabase.unshift({
+            project: currentProj,
+            dept: matchedDept,
+            action: line.trim(),
+            explanation: "<strong>Result:</strong> AI Extracted Task<br><br><strong>Notes:</strong> Auto-parsed from Meeting Transcript.",
+            due: "Extracted (TBD)",
+            status: "Update Expected"
+          });
+          newTasks++;
+        }
+      });
+
+      btn.disabled = false;
+      closeTranscriptModal();
+
+      if(newTasks > 0) {
+        updateSidebarCounts();
+        
+        // Refresh the current department view if one is open
+        const activeDeptBtn = document.querySelector('.sidebar-item.active');
+        if(activeDeptBtn) activeDeptBtn.click();
+        
+        alert(`Heuristic scan complete! Extracted ${newTasks} new action items to ${currentProj}.`);
+      } else {
+        alert("No clear action items detected in the text. Try being more direct (e.g. 'Design will...').");
+      }
+    }, 800); // Artificial delay to simulate AI processing feeling
+  }
+
 
   // ── DEPARTMENT NORMALIZER ──
   function normalizeDept(deptStr) {
@@ -631,17 +818,9 @@
     "project": "Annexe",
     "dept": "Design",
     "action": "*Share Detailed Design of the Gate House",
-    "explanation": "<strong>Result:</strong> Boundary Fence<br><br><strong>Notes:</strong> Architect has been asked — needs to draft. Reason: second gate identified along the fence line.\nTIMELINE: ~2 weeks from Apr 20 = by May 4 for detailed gatehouse design (Akinwale confirmed).",
+    "explanation": "<strong>Result:</strong> Boundary Fence<br><br><strong>Notes:</strong> Architect has been asked — needs to draft. Reason: second gate identified along the fence line.\nTIMELINE: ~2 weeks from Apr 20 = by May 4 for detailed gatehouse design.",
     "due": "2026-05-04",
     "status": "On -Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Design",
-    "action": "Completed Tasks for the month",
-    "explanation": "<strong>Result:</strong> * Gatehouse snags resolved.\n* Received gatehouse signage designs.<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "Completed"
   },
   {
     "project": "Annexe",
@@ -655,169 +834,25 @@
     "project": "Annexe",
     "dept": "Costing",
     "action": "* Costing to present negotiated signage cost by Thursday Apr 23",
-    "explanation": "<strong>Result:</strong> Signage Design<br><br><strong>Notes:</strong> Vendors being contacted — feedback expected THIS WEEK.\nREVISED TIMELINE: Negotiated cost to be presented by THURSDAY Apr 23 (not Monday).\nProcess: get vendor quotes → compare → negotiate → present final cost Thursday.",
+    "explanation": "<strong>Result:</strong> Signage Design<br><br><strong>Notes:</strong> Vendors being contacted.",
     "due": "2026-04-23",
     "status": "On -Track"
   },
   {
     "project": "Annexe",
-    "dept": "Costing",
-    "action": "* Provide Cost for the boundary fence along Finidi George",
-    "explanation": "<strong>Result:</strong> Boundary Fence<br><br><strong>Notes:</strong> Expecting detailed gatehouse design from the design team",
-    "due": "2026-05-04",
-    "status": "On - Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Costing",
-    "action": "* Report HFP production timeline today (Apr 21).",
-    "explanation": "<strong>Result:</strong> Speed bumps<br><br><strong>Notes:</strong> PRODUCTION RISK — NOT A PAYMENT ISSUE.\nHFP pavers are non-standard (special colour) — not regularly produced by HFP.\nContractor spoke with HFP on Saturday and again this morning (Apr 20).\nHFP to respond with availability BEFORE CLOSE OF BUSINESS TODAY.",
-    "due": "2026-04-23",
-    "status": "On - Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Costing",
-    "action": "* Include LNT second lane (250 metres of concrete road) - Once Funding formula is concluded",
-    "explanation": "<strong>Result:</strong> Road Construction<br><br><strong>Notes:</strong> ON HOLD",
-    "due": "TBD",
-    "status": "On Hold"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Costing",
-    "action": "* Reassess solar solution for gatehouse — July 2026",
-    "explanation": "<strong>Result:</strong> Insert solar to the gate house.<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "2026-07-08",
-    "status": "On Hold"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Costing",
-    "action": "* Revisit the cost to stone base the road (After the drainage is concluded) - Focus on drainages for now due to the rains",
-    "explanation": "<strong>Result:</strong> Annexe second lane stone base CONTRACT IS ACTIVE.\nComplete drainage FIRST before focusing on stone base<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "2026-05-06",
-    "status": "On Hold"
-  },
-  {
-    "project": "Annexe",
     "dept": "IPD",
-    "action": "* Confirm BAFF remobilized after ₦32M payment. \n\n* Segun Odegbami clearing to commence immediately - bring forward POW",
+    "action": "* Confirm BAFF remobilized after ₦32M payment.",
     "explanation": "<strong>Result:</strong> Clear the site for the road<br><br><strong>Notes:</strong> STILL NOT STARTED — site activities still severely slowed.",
     "due": "2026-04-23",
     "status": "Delayed"
   },
   {
-    "project": "Annexe",
-    "dept": "IPD",
-    "action": "Tasks on Hold",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "Sandfilling of Lakowe Annex second lane on hold till drainage is concluded",
-    "status": "ON HOLD"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Operations",
-    "action": "Provide update on sales offer letters, Inflow and Total Value of sales",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "2026-04-23",
-    "status": "Update Expected"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Operations",
-    "action": "* CRM tool to aid telemarketing to help message unreachable leads.",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "On-Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Fincon",
-    "action": "Process Payments - N32Mln to BAFF and N50M refund to Elms Garden",
-    "explanation": "<strong>Result:</strong> Facilitate work on site<br><br><strong>Notes:</strong> ₦32M PAYMENT: Confirmed sent to BAFF",
-    "due": "2026-04-23",
-    "status": "Update Expected"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Fincon",
-    "action": "Annex Borrowed N100M from Elms Gardens -  29 Jan\n\nAnnexe repaid N50M to Elms Gardens",
-    "explanation": "<strong>Result:</strong> Repayment<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "On-Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Telemarketing",
-    "action": "Share weekly Leads Report on Lakowe Annex promotional campaign.",
-    "explanation": "<strong>Result:</strong> Assess the quality of leads<br><br><strong>Notes:</strong> NO AD CURRENTLY RUNNING — confirmed by Marketing rep.\nNo leads update provided. Campaign effectively paused.",
-    "due": "2026-04-23",
-    "status": "Update Expected"
-  },
-  {
-    "project": "Annexe",
-    "dept": "MCC",
-    "action": "* Board 1 to be ready in 2 weeks (4th May)",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "2026-05-04",
-    "status": "On -Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "MCC",
-    "action": "* MCC/IPD to scope billboard re-erection as part of Segun Odegbami clearing. Find vendor.",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> Gate billboard has sunk into ground due to sand filling — now barely visible.\nACTION: Clear immediately + find vendor for re-erection.",
-    "due": "2026-04-23",
-    "status": "On -Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Legal",
-    "action": "*Waiting on Publication",
-    "explanation": "<strong>Result:</strong> Secure approval for the LNT name<br><br><strong>Notes:</strong> Obtained acknowledgement slip.\n\nReceived acceptance letter (3 weeks early).\n\nPublication 6 months- Old (9th September), New (Aug 21)\n\nTrademark Certificate: Old (9th November), New (Oct 21)\n\nFinal - March 2027",
-    "due": "2026-08-21",
-    "status": "On -Track"
-  },
-  {
     "project": "Crossings",
     "dept": "Design",
-    "action": "* Send Proposal to Olamide (Costing) for cost estimate.\n\n* Render/elevation images to be prepared → share with MCC for 'coming soon' graphic\n\nPrev Timeline - 7 April - NEW TIMELINE - 20 APR",
-    "explanation": "<strong>Result:</strong> Concept Design<br><br><strong>Notes:</strong> MAJOR REDESIGN PRESENTED — SITE MOVED FROM CX9 → CX10.\n\nNEW INVENTORY:\n• Commercial: 6 units | \n• Residential: 68 units \n  – Floors 1 & 2: 32 units of 1-bed apartments \n  – Floors 3 & 4: 36 units \n• Unit mix: studios + 1-beds;\n• Terraces: facing the park\n• Roof: potential roof garden / events space discussed — deferred for later detailing",
+    "action": "* Send Proposal to Olamide (Costing) for cost estimate.",
+    "explanation": "<strong>Result:</strong> Concept Design<br><br><strong>Notes:</strong> MAJOR REDESIGN PRESENTED — SITE MOVED FROM CX9 → CX10.",
     "due": "2026-04-23",
     "status": "Delayed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Design",
-    "action": "* Render/elevation images to be prepared → share with MCC for 'coming soon' graphic",
-    "explanation": "<strong>Result:</strong> Coming soon billboard<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "2026-04-27",
-    "status": "Delayed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Design",
-    "action": "* Share update on the final decision (Most economic option) by Thursday - 23 Apr",
-    "explanation": "<strong>Result:</strong> Roundabout alignment<br><br><strong>Notes:</strong> The team to refine and share the update independently",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Design",
-    "action": "* Follow up with costing and procurement for the layout approval",
-    "explanation": "<strong>Result:</strong> Layout approval<br><br><strong>Notes:</strong> On Hold for 6 weeks\n\nProject Link - sent cost and assessmemt for Lagos state.\n\nAn issue noted with discrepancies on the name on the survey plan",
-    "due": "2026-05-04",
-    "status": "On-Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Design",
-    "action": "Completed Tasks for the month",
-    "explanation": "<strong>Result:</strong> * Provisional Approval for a clients plot - CX3<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "Completed"
   },
   {
     "project": "Crossings",
@@ -829,165 +864,21 @@
   },
   {
     "project": "Crossings",
-    "dept": "Costing",
-    "action": "* Follow up with AMC on the decision between BAFF or FUNKUS",
-    "explanation": "<strong>Result:</strong> General Infrastructure Works<br><br><strong>Notes:</strong> The team confirmed to share in next meeting",
+    "dept": "IPD",
+    "action": "* Get ARUP sign off on MEP designs",
+    "explanation": "<strong>Result:</strong> Finalize all sign offs<br><br><strong>Notes:</strong> PARTIAL COMPLETION. Civil designs: SIGNED OFF and CLOSED OUT by ARUP.",
     "due": "2026-04-27",
     "status": "Delayed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Costing",
-    "action": "Completed Tasks for the month",
-    "explanation": "<strong>Result:</strong> Payment made for 7,500 cubic meters of sand.<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "Completed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "AMC",
-    "action": "* Decision between BAFF or FUNKUS",
-    "explanation": "<strong>Result:</strong> General Infrastructure Works<br><br><strong>Notes:</strong> The team is waiting on management to decide the contractor.",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "IPD",
-    "action": "* Receive advice from ARUP on sump design by Wed Apr 22",
-    "explanation": "<strong>Result:</strong> Ensure there is a plan to prevent the site from damming<br><br><strong>Notes:</strong> ARUP to come back to us by Wednesday.",
-    "due": "2026-04-22",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "IPD",
-    "action": "* Get ARUP sign off on MEP designs (team to secure full cross-discipline sign-off from consultants at Thursday meeting.)\n\nDeadline: Friday - 17 Apr - Delayed",
-    "explanation": "<strong>Result:</strong> Finalize all sign offs<br><br><strong>Notes:</strong> PARTIAL COMPLETION. Civil designs: SIGNED OFF and CLOSED OUT by ARUP. ✓\nMEP/Electrical: ARUP requested schedule-of-manuals updates after Friday meeting. Sign-off expected by Friday 17 Apr once updates are submitted. RISK: multi-discipline coordination still needed — each discipline must sign off all disciplines, not just their own, to ensure clear accountability.",
-    "due": "2026-04-27",
-    "status": "Delayed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "IPD",
-    "action": "* Share site progress pictures",
-    "explanation": "<strong>Result:</strong> Visual Summary<br><br><strong>Notes:</strong> Share images and videos of the site progress",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "IPD",
-    "action": "Completed Tasks for the month",
-    "explanation": "<strong>Result:</strong> Panels installed and park powered up.<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "Completed"
   },
   {
     "project": "Crossings",
     "dept": "Landscape",
     "action": "* Review more vendors and finalize with Mrs H.",
-    "explanation": "<strong>Result:</strong> Park sculptures and benches<br><br><strong>Notes:</strong> Vision: 4 sculptures telling the story of Lakowe Crossings. Two sculptors engaged — Sculptor 1 (Stephen): steel works; Sculptor 2 (Basi's apprentice): mixed metal/concrete/fiberglass.\n\nDA's direction: sculptures should be FACELESS, somber yet positive/joyful — not realistic or scary. Suggestion raised to engage Nike Art Gallery to source additional talent from their network.",
+    "explanation": "<strong>Result:</strong> Park sculptures and benches<br><br><strong>Notes:</strong> Vision: 4 sculptures telling the story of Lakowe Crossings. Two sculptors engaged.",
     "due": "2026-04-27",
     "status": "Delayed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Landscape",
-    "action": "* Follow up closely on BOLAD lights contractor.\n\nDelay for 2 weeks",
-    "explanation": "<strong>Result:</strong> To light up the park area<br><br><strong>Notes:</strong> No furher updates, contractor still elusive",
-    "due": "2026-04-27",
-    "status": "Delayed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Landscape",
-    "action": "* To receive samples of work from both contractors and select a contractor.",
-    "explanation": "<strong>Result:</strong> Base for Bollad Lights<br><br><strong>Notes:</strong> Decide on which contractor and share with costing",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Landscape",
-    "action": "* Updates on the cladding",
-    "explanation": "<strong>Result:</strong> Finish up the park area<br><br><strong>Notes:</strong> Contractor paid - Fabrication and installation - 9 -10 days - Apr 28th",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Landscape",
-    "action": "* Engage Bravo gate to secure the park.",
-    "explanation": "<strong>Result:</strong> Security for the park area.<br><br><strong>Notes:</strong> The park is complete and needs security",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Landscape",
-    "action": "Completed Tasks for the month",
-    "explanation": "<strong>Result:</strong> Main gate for clearview fence completed<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "Completed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Operations",
-    "action": "Provide weekly updates",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> Sales- 6",
-    "due": "2026-04-27",
-    "status": "Update Expected"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Fincon",
-    "action": "Process Payments - N141 Mn for next tranche of sand \nfilling",
-    "explanation": "<strong>Result:</strong> Mobilize Contractors and Vendors<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "2026-04-27",
-    "status": "Update Expected"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Fincon",
-    "action": "Total budget for the month is N315MN - Including 20,000 cubic metres - N527Mn",
-    "explanation": "<strong>Result:</strong> Paid N488Mn till date<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "Completed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "MCC",
-    "action": "* A sign post positioned strategically in Lakowe, updated annualy (that captures hospitality footfall)",
-    "explanation": "<strong>Result:</strong> Bill Boards<br><br><strong>Notes:</strong> The billboard should come up immediately after the bolad lights for the park is done.",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "MCC",
-    "action": "* Board 1 to be ready in 2 weeks (4th May)\n\n* Board 2 and 3 to be ready in 4 weeks (18th May)\n\n* Move current board from the park to the golf estate",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> Placement: At the gold road round about.",
-    "due": "2026-05-04",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "MCC",
-    "action": "* Come up with more challenging plans to reflect the scale of the project being built.",
-    "explanation": "<strong>Result:</strong> Improve sales and Brand Visibility<br><br><strong>Notes:</strong> This will be bi-monthly",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "General",
-    "action": "* Every department should ruminate and think on the following points ahead of the next session.",
-    "explanation": "<strong>Result:</strong> Improve Sales<br><br><strong>Notes:</strong> Bi-monthly task: Everyone to present ideas they observed competitors or similar brands perform to boost marketing or sales.",
-    "due": "Bi - Monthly",
-    "status": "Ongoing"
   }
-];
+  ];
 
   function updateSidebarCounts() {
     document.querySelectorAll('.sidebar-item').forEach(btn => {
@@ -1062,9 +953,12 @@
     container.style.display = 'block';
   }
 
+  // ── CSV & EXCEL PARSING ──
   function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
+
+    if(document.getElementById('actionSheet').classList.contains('active')) toggleActionSheet();
 
     const fileExt = file.name.split('.').pop().toLowerCase();
 
@@ -1214,6 +1108,7 @@
   }
 
   // ── CHARTS (Red & Grey Theme) ──
+  // Using responsive true and maintainAspectRatio false explicitly to avoid clogging on small mobile screens
   const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7'];
   const inflow  = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27];
   const balance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,61.9];
