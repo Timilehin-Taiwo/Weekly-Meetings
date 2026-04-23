@@ -72,10 +72,7 @@
   .nav-brand:hover { opacity: 0.7; }
   .nav-brand span { color: var(--brand-red); }
   
-  /* Desktop Tabs logic */
-  #nav-tabs-group { display: none; gap: 8px; }
-  #nav-tabs-group.show-on-desktop { display: flex; }
-  
+  .nav-tabs { display: flex; gap: 8px; }
   .nav-tab {
     padding: 8px 18px; border-radius: var(--radius-sm);
     font-size: 13px; font-weight: 600; cursor: pointer;
@@ -271,6 +268,7 @@
   .empty-state h3 { font-size: 18px; color: var(--text-secondary); margin-bottom: 8px;}
   .empty-state p { font-size: 14px; }
 
+
   /* ── UI INJECTIONS FOR APP & TRANSCRIPTS (Hidden on Desktop) ── */
   .fab-mobile, .bottom-nav, .action-sheet, .action-overlay { display: none !important; }
   
@@ -314,7 +312,7 @@
     .nav-brand { font-size: 15px; margin-right: auto; }
     
     /* 🔴 STRICT OVERRIDE TO STOP JS FROM FORCING DESKTOP NAV TABS ON MOBILE */
-    #nav-tabs-group.show-on-desktop, 
+    #nav-tabs-group, 
     .nav-right .upload-btn, 
     .transcript-btn, 
     .nav-date { 
@@ -331,31 +329,30 @@
     .t-name { min-width: auto; }
 
     /* 🔴 STRICT OVERRIDE TO STOP JS FROM STACKING SIDEBAR VERTICALLY */
-    .dept-layout { grid-template-columns: 1fr; gap: 16px; }
+    .dept-layout { grid-template-columns: 1fr !important; gap: 16px !important; }
     .dept-sidebar {
-      position: sticky; top: var(--nav-h); z-index: 90;
-      display: flex !important; flex-direction: row !important; border-radius: 0;
-      border-left: none; border-right: none;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.03);
-      margin: -10px -16px 16px; padding: 0 16px;
-      width: calc(100% + 32px); overflow-x: auto; white-space: nowrap;
-      background: var(--brand-grey-light);
+      position: sticky !important; top: var(--nav-h) !important; z-index: 90 !important;
+      display: flex !important; flex-direction: row !important; border-radius: 0 !important;
+      border-left: none !important; border-right: none !important;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.03) !important;
+      margin: -10px -16px 16px !important; padding: 0 16px !important;
+      width: calc(100% + 32px) !important; overflow-x: auto !important; white-space: nowrap !important;
+      background: var(--brand-grey-light) !important;
     }
-    .dept-sidebar::-webkit-scrollbar { display: none; }
-    .dept-sidebar { -ms-overflow-style: none; scrollbar-width: none; }
+    .dept-sidebar::-webkit-scrollbar { display: none !important; }
 
     /* The JS tries to make this "block". We FORCE it to be "flex" row on mobile */
     .sidebar-section { 
       display: flex !important; 
       flex-direction: row !important; 
-      padding: 10px 0; 
+      padding: 10px 0 !important; 
       border-bottom: none !important; 
     }
     .sidebar-section-label { display: none !important; } 
     .sidebar-item {
-      width: auto; flex-shrink: 0; border-radius: 20px;
-      padding: 8px 16px; margin-right: 8px; border: 1px solid var(--border);
-      background: var(--white); box-shadow: var(--shadow);
+      width: auto !important; flex-shrink: 0 !important; border-radius: 20px !important;
+      padding: 8px 16px !important; margin-right: 8px !important; border: 1px solid var(--border) !important;
+      background: var(--white) !important; box-shadow: var(--shadow) !important;
     }
 
     .step-card-top { flex-direction: column; }
@@ -363,18 +360,18 @@
 
     /* Native App Mobile Additions Trigger */
     .fab-mobile {
-      display: flex !important; position: fixed; bottom: 85px; right: 20px;
-      width: 56px; height: 56px; background: var(--brand-red); color: white;
-      border-radius: 50%; justify-content: center; align-items: center;
-      box-shadow: 0 4px 12px rgba(211,47,47,0.4); font-size: 28px; z-index: 100;
-      cursor: pointer;
+      display: flex !important; position: fixed !important; bottom: 85px !important; right: 20px !important;
+      width: 56px !important; height: 56px !important; background: var(--brand-red) !important; color: white !important;
+      border-radius: 50% !important; justify-content: center !important; align-items: center !important;
+      box-shadow: 0 4px 12px rgba(211,47,47,0.4) !important; font-size: 28px !important; z-index: 100 !important;
+      cursor: pointer !important;
     }
     
     .bottom-nav {
-      display: flex !important; position: fixed; bottom: 0; left: 0; right: 0;
-      height: 65px; background: var(--white); box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-      justify-content: space-around; align-items: center; z-index: 99;
-      padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid var(--border);
+      display: flex !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important;
+      height: 65px !important; background: var(--white) !important; box-shadow: 0 -2px 10px rgba(0,0,0,0.05) !important;
+      justify-content: space-around !important; align-items: center !important; z-index: 99 !important;
+      padding-bottom: env(safe-area-inset-bottom) !important; border-top: 1px solid var(--border) !important;
     }
     .b-nav-item {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -411,7 +408,7 @@
 
 <nav>
   <div class="nav-brand" onclick="showLanding()" title="Return to Dashboard Selection">Lakowe <span>Portfolio</span></div>
-  <div id="nav-tabs-group">
+  <div class="nav-tabs" id="nav-tabs-group">
     <button class="nav-tab active" onclick="showPage('dashboard', this); syncMobileNav('dashboard')">Dashboard</button>
     <button class="nav-tab" onclick="showPage('departments', this); syncMobileNav('departments')">Departments Tasks</button>
   </div>
@@ -675,7 +672,10 @@
   function showLanding() {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-landing').classList.add('active');
-    document.getElementById('nav-tabs-group').classList.remove('show-on-desktop');
+    
+    // Desktop Nav group fix to respect Mobile CSS
+    document.getElementById('nav-tabs-group').style.display = 'none';
+    
     document.querySelectorAll('.nav-project-btn').forEach(btn => btn.classList.remove('active'));
   }
 
@@ -684,13 +684,15 @@
     if(proj === 'Crossings') document.getElementById('btn-nav-cx').classList.add('active');
     if(proj === 'Annexe') document.getElementById('btn-nav-annex').classList.add('active');
 
-    // Display overrides fixed to play nice with mobile CSS
+    // Remove inline 'block'/'none' on mobile sidebars so CSS !important works.
     document.getElementById('block-crossings').style.display = (proj === 'Crossings') ? 'block' : 'none';
     document.getElementById('block-annexe').style.display = (proj === 'Annexe') ? 'block' : 'none';
-    document.getElementById('sidebar-crossings').style.display = (proj === 'Crossings') ? '' : 'none';
-    document.getElementById('sidebar-annexe').style.display = (proj === 'Annexe') ? '' : 'none';
+    
+    document.getElementById('sidebar-crossings').style.display = (proj === 'Crossings') ? 'flex' : 'none';
+    document.getElementById('sidebar-annexe').style.display = (proj === 'Annexe') ? 'flex' : 'none';
 
-    document.getElementById('nav-tabs-group').classList.add('show-on-desktop');
+    // Show tabs on desktop securely
+    document.getElementById('nav-tabs-group').style.display = 'flex';
     
     if(document.getElementById('page-landing').classList.contains('active')) {
       const dashTab = document.querySelector('.nav-tab[onclick*="dashboard"]');
@@ -830,7 +832,7 @@
     "project": "Annexe",
     "dept": "Design",
     "action": "*Share Detailed Design of the Gate House",
-    "explanation": "<strong>Result:</strong> Boundary Fence<br><br><strong>Notes:</strong> Architect has been asked — needs to draft. Reason: second gate identified along the fence line.\nTIMELINE: ~2 weeks from Apr 20 = by May 4 for detailed gatehouse design (Akinwale confirmed).",
+    "explanation": "<strong>Result:</strong> Boundary Fence<br><br><strong>Notes:</strong> Architect has been asked — needs to draft. Reason: second gate identified along the fence line.\nTIMELINE: ~2 weeks from Apr 20 = by May 4 for detailed gatehouse design.",
     "due": "2026-05-04",
     "status": "On -Track"
   },
@@ -1416,7 +1418,6 @@
   }
 
   // ── CHARTS (Red & Grey Theme) ──
-  // Limiting ticks so graph breathes cleanly on small screens
   const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7'];
   const inflow  = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27];
   const balance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,61.9];
