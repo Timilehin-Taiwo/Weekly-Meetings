@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -491,8 +491,8 @@
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-costing', this, 'Annexe', 'Costing')">
           Costing <span class="dept-count">0</span>
         </button>
-        <button class="sidebar-item annexe-btn" onclick="showDept('annex-ipd', this, 'Annexe', 'IPD/PDU')">
-          IPD/PDU <span class="dept-count">0</span>
+        <button class="sidebar-item annexe-btn" onclick="showDept('annex-ipd', this, 'Annexe', 'IPD')">
+          IPD <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-operations', this, 'Annexe', 'Operations')">
           Operations <span class="dept-count">0</span>
@@ -540,7 +540,9 @@
           </div>
       </div>
 
-    </div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    </div></div></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
   // ── UI NAVIGATION ──
   function showPage(id, btn) {
@@ -579,74 +581,17 @@
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
   }
 
-  // Database Array - Mapped comprehensively from the 8-column sheets (extracted JSON)
-  let taskDatabase = [
-    { project: 'Crossings', dept: 'Design', action: '* Send Proposal to Olamide (Costing) for cost estimate.  * Render/elevation images to be prepared → share with MCC for \'coming soon\' graphic  Prev Timeline - 7 April - NEW TIMELINE - 20 APR', explanation: '<strong>Result:</strong> Concept Design<br><br><strong>Notes:</strong> MAJOR REDESIGN PRESENTED — SITE MOVED FROM CX9 → CX10.<br><br>NEW INVENTORY:<br>• Commercial: 6 units | <br>• Residential: 68 units <br>  – Floors 1 & 2: 32 units of 1-bed apartments <br>  – Floors 3 & 4: 36 units <br>• Unit mix: studios + 1-beds;<br>• Terraces: facing the park<br>• Roof: potential roof garden / events space discussed — deferred for later detailing', due: '2026-04-23', status: 'Delayed' },
-    { project: 'Crossings', dept: 'Design', action: '* Render/elevation images to be prepared → share with MCC for \'coming soon\' graphic', explanation: '<strong>Result:</strong> Coming soon billboard<br><br><strong>Notes:</strong> ', due: '2026-04-27', status: 'Delayed' },
-    { project: 'Crossings', dept: 'Design', action: '* Share update on the final decision (Most economic option) by Thursday - 23 Apr', explanation: '<strong>Result:</strong> Roundabout alignment<br><br><strong>Notes:</strong> The team to refine and share the update independently', due: '2026-04-27', status: 'On -Track' },
-    { project: 'Crossings', dept: 'Design', action: 'Completed Tasks for the month', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> Concluded the review of ARUPs drawings - moved to tender (10 Dec 2025 - 20 Feb 2026; 2 Months) after 1 week delay', due: 'N/A', status: 'Completed' },
-    { project: 'Crossings', dept: 'Costing', action: 'Mobilization of the contractor - civil - (Tied to sales raising at least N800Mln)', explanation: '<strong>Result:</strong> Award contract for road alignment<br><br><strong>Notes:</strong> The scope needs to be evaluated based on current costs compared with when Harup did the designs. Value engineering expected.', due: '2026-04-30', status: 'On -Track' },
-    { project: 'Crossings', dept: 'Costing', action: 'MEP: Tender & Prequalification process.', explanation: '<strong>Result:</strong> Review estimates submitted<br><br><strong>Notes:</strong> Expected by Wednesday 15 Apr', due: '2026-04-30', status: 'On -Track' },
-    { project: 'Crossings', dept: 'Costing', action: 'Completed Tasks for the month', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> Payment to consultant and clearing contractor concluded', due: 'N/A', status: 'Completed' },
-    { project: 'Crossings', dept: 'Landscape', action: 'Complete the Park.', explanation: '<strong>Result:</strong> Complete the park<br><br><strong>Notes:</strong> 1 month to connect to permanent power', due: '2026-04-30', status: 'On -Track' },
-    { project: 'Crossings', dept: 'Landscape', action: 'Completed Tasks for the month', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> Installation of bollards, Installation of water fountain', due: 'N/A', status: 'Completed' },
-    { project: 'Crossings', dept: 'IPD', action: 'Conclude installation of BOLAD lights.', explanation: '<strong>Result:</strong> Conclude installation of BOLAD lights<br><br><strong>Notes:</strong> Ongoing installation process.', due: '2026-04-30', status: 'On -Track' },
-    { project: 'Crossings', dept: 'IPD', action: 'Conclude carting away of debris', explanation: '<strong>Result:</strong> Clear site<br><br><strong>Notes:</strong> Clear site for mobilization', due: '2026-04-30', status: 'On -Track' },
-    { project: 'Crossings', dept: 'IPD', action: 'Completed Tasks for the month', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> ', due: 'N/A', status: 'Completed' },
-    { project: 'Crossings', dept: 'Operations', action: 'Provide update on  sales offer letters , Inflow  and Total Value of sales', explanation: '<strong>Result:</strong> Track Sales<br><br><strong>Notes:</strong> Sales- 6 (N17mln, cheque yet to be cleared)', due: '2026-04-27', status: 'Update Expected' },
-    { project: 'Crossings', dept: 'Operations', action: 'Provide update on  sales offer letters , Inflow  and Total Value of sales', explanation: '<strong>Result:</strong> Track Sales<br><br><strong>Notes:</strong> Value of Sales - N2.202B', due: '2026-04-27', status: 'Update Expected' },
-    { project: 'Crossings', dept: 'Operations', action: 'Provide update on  sales offer letters , Inflow  and Total Value of sales', explanation: '<strong>Result:</strong> Track Sales<br><br><strong>Notes:</strong> Sales Inflow -  1.3B', due: '2026-04-27', status: 'Update Expected' },
-    { project: 'Crossings', dept: 'Operations', action: 'Provide update on  sales offer letters , Inflow  and Total Value of sales', explanation: '<strong>Result:</strong> Track Sales<br><br><strong>Notes:</strong> Account balance - N178m', due: '2026-04-27', status: 'Update Expected' },
-    { project: 'Crossings', dept: 'Operations', action: 'Provide update on  sales offer letters , Inflow  and Total Value of sales', explanation: '<strong>Result:</strong> Track Sales<br><br><strong>Notes:</strong> 1 active Offer letter', due: '2026-04-27', status: 'Update Expected' },
-    { project: 'Crossings', dept: 'FINCON', action: 'Process Payments', explanation: '<strong>Result:</strong> Mobilize Contractors and Vendors <br><br><strong>Notes:</strong> Total budget for the month is N315MN - Including 20,000 cubic metres - N527Mn', due: '2026-04-27', status: 'Update Expected' },
-    { project: 'Crossings', dept: 'FINCON', action: 'Process Payments', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> Paid N488Mn till date', due: 'N/A', status: 'Completed' },
-    { project: 'Crossings', dept: 'Sales', action: 'Ongoing Conversations - Inflows this week', explanation: '<strong>Result:</strong> Achieve sales targets<br><br><strong>Notes:</strong> No active offer letter yet.<br><br>2 offer letters expired - sales team following up with these clients.<br><br>N23million inflow expected nextweek.', due: '2026-04-27', status: 'Update Expected' },
-    { project: 'Crossings', dept: 'Sales', action: 'Ongoing Conversations - Inflows this week', explanation: '<strong>Result:</strong> Achieve sales targets<br><br><strong>Notes:</strong> No active offer letter yet.<br><br>2 offer letters expired - sales team following up with these clients.<br><br>N23million inflow expected nextweek.', due: '2026-04-27', status: 'Update Expected' },
-    { project: 'Crossings', dept: 'Legal', action: '*Feedback on acceptance letter in 6 weeks', explanation: '<strong>Result:</strong> Secure approval for the LNT name<br><br><strong>Notes:</strong> Obtained acknowledgement slip.<br><br>Received acceptance letter (3 weeks early).<br><br>Publication 6 months- Old (9th September), New (Aug 21)<br><br>Trademark Certificate: Old (9th November), New (Oct 21)<br><br>Final - March 2027', due: '2026-04-27', status: 'On -Track' },
-    { project: 'Crossings', dept: 'MCC', action: '* Board 1 to be ready in 2 weeks (4th May)  * Board 2 and 3 to be ready in 4 weeks (18th May)  * Move current board from the park to the golf estate', explanation: '<strong>Result:</strong> Placement: At the gold road round about.<br><br><strong>Notes:</strong> ', due: '2026-05-04', status: 'On -Track' },
-    { project: 'Crossings', dept: 'MCC', action: '* Come up with more challenging plans to reflect the scale of the project being built.', explanation: '<strong>Result:</strong> Improve sales and Brand Visibility<br><br><strong>Notes:</strong> This will be bi-monthly', due: '2026-04-27', status: 'On -Track' },
-    { project: 'Crossings', dept: 'MCC', action: 'Completed Tasks for the month', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> ', due: 'N/A', status: 'Completed' },
-    { project: 'Crossings', dept: 'General', action: '* Every department should ruminate and think on the following points ahead of the next session.', explanation: '<strong>Result:</strong> Improve Sales<br><br><strong>Notes:</strong> Bi-monthly task: Everyone to present ideas they observed competitors or similar brands perform to boost marketing or sales.', due: 'Bi - Monthly', status: 'Ongoing' },
-    { project: 'Annexe', dept: 'Design', action: '* Report with an overlay of the current progress of work over the main layout - Every 3 Weeks', explanation: '<strong>Result:</strong> Align current progress with initial layout<br><br><strong>Notes:</strong> Updates from last 4 weeks ', due: '2026-04-23', status: 'On -Track' },
-    { project: 'Annexe', dept: 'Design', action: '* Design to contact Uncle P TODAY (Apr 20). If no provisional layout by Apr 22, proceed directly to Commissioner.', explanation: '<strong>Result:</strong> Leveraging Layout Approvals to define construction phases and clear clients for site mobilization.<br><br><strong>Notes:</strong> 2-WEEK WINDOW EXPIRES IN 2 DAYS (Wed Apr 22).', due: '2026-04-22', status: 'Delayed' },
-    { project: 'Annexe', dept: 'Design', action: '*Share Detailed Design of the Gate House', explanation: '<strong>Result:</strong> Boundary Fence<br><br><strong>Notes:</strong> Architect has been asked — needs to draft. Reason: second gate identified along the fence line.<br>TIMELINE: ~2 weeks from Apr 20 = by May 4 for detailed gatehouse design (Akinwale confirmed).', due: '2026-05-04', status: 'On -Track' },
-    { project: 'Annexe', dept: 'Design', action: 'Completed Tasks for the month', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> * Gatehouse snags resolved.<br>* Received gatehouse signage designs.', due: 'N/A', status: 'Completed' },
-    { project: 'Annexe', dept: 'Costing', action: '*Picture Updates - work progress on second lane of LNT road - (Concrete).', explanation: '<strong>Result:</strong> Show visual progress updates<br><br><strong>Notes:</strong> Presented stringing of wires video.', due: '2026-04-23', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'Costing', action: '* Costing to send signage design to IPD and Dapo', explanation: '<strong>Result:</strong> Procurement of signages<br><br><strong>Notes:</strong> Signage procurement requires Dapos team to integrate properly with layout logic. Expected by Friday 17 Apr.', due: '2026-04-20', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'Costing', action: '* Conclude internal valuation for BAFF and advance payment documentation for April Disbursments', explanation: '<strong>Result:</strong> Facilitate work on site<br><br><strong>Notes:</strong> Contractor valuation ongoing. Request for N600M for completion cycle of internal roads.', due: '2026-04-23', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'IPD/PDU', action: '140 manholes (100 target + 40 deficit) + connected pipes', explanation: '<strong>Result:</strong> Second Lane of Annex (Get this ready to be able to drive to site while paving LNT road)<br><br><strong>Notes:</strong> ', due: '2026-04-30', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'IPD/PDU', action: 'Complete Efinedi George drainage', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> • Complete Finidi George drainage ✓ DONE — 480m completed', due: 'N/A', status: 'Completed' },
-    { project: 'Annexe', dept: 'IPD/PDU', action: 'Commence Peter Rufai section 2', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> • Commence Peter Rufai section 2 ✓ DONE — bends cast, formwork removed', due: 'N/A', status: 'Completed' },
-    { project: 'Annexe', dept: 'IPD/PDU', action: 'Conclude pipeworks on Ilerika, Amunike and Adokiye - APR 6', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> • Conclude pipeworks Ilerika, Amuneke, Adokiye ✓ DONE — eastern section completed Apr 6', due: 'N/A', status: 'Completed' },
-    { project: 'Annexe', dept: 'IPD/PDU', action: 'Compaction, stabilisation + stone base: Adokiye, Ilerika, Amunike', explanation: '<strong>Result:</strong> Road Construction<br><br><strong>Notes:</strong> ', due: 'TBD', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'IPD/PDU', action: 'Clear access constraints on Sunday Oliseh and complete sandfilling', explanation: '<strong>Result:</strong> Site readiness<br><br><strong>Notes:</strong> ', due: 'TBD', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'IPD/PDU', action: 'Stone base post-drainage on Sunday Oliseh (after QA/QC)', explanation: '<strong>Result:</strong> Road Construction<br><br><strong>Notes:</strong> ', due: 'TBD', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'IPD/PDU', action: '10 lift stations before rainy season', explanation: '<strong>Result:</strong> Preventative infrastructure<br><br><strong>Notes:</strong> ', due: 'TBD', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'Operations', action: 'Provide update on sales offer letters, Inflow and Total Value of sales', explanation: '<strong>Result:</strong> Sales, Inflows, Account Balance, etc<br><br><strong>Notes:</strong> ', due: '2026-04-20', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'Operations', action: 'Provide update on sales offer letters, Inflow and Total Value of sales', explanation: '<strong>Result:</strong> Sales, Inflows, Account Balance, etc<br><br><strong>Notes:</strong> Total Inflow - N6.27b', due: '2026-04-20', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'Operations', action: 'Provide update on sales offer letters, Inflow and Total Value of sales', explanation: '<strong>Result:</strong> Sales, Inflows, Account Balance, etc<br><br><strong>Notes:</strong> Sales- 78 (down 2 revocations)', due: '2026-04-20', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'Operations', action: 'Provide update on sales offer letters, Inflow and Total Value of sales', explanation: '<strong>Result:</strong> Sales, Inflows, Account Balance, etc<br><br><strong>Notes:</strong> Value of Sales - N6.89b', due: '2026-04-20', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'Operations', action: 'Provide update on sales offer letters, Inflow and Total Value of sales', explanation: '<strong>Result:</strong> Sales, Inflows, Account Balance, etc<br><br><strong>Notes:</strong> Balance - N 82.8Mn', due: '2026-04-20', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'Operations', action: 'Provide update on sales offer letters, Inflow and Total Value of sales', explanation: '<strong>Result:</strong> Sales, Inflows, Account Balance, etc<br><br><strong>Notes:</strong> 1 active offer', due: '2026-04-20', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'Operations', action: 'Sales inflow reporting and revs update', explanation: '<strong>Result:</strong> Monitor cash flow risk<br><br><strong>Notes:</strong> Escalation sent to finance. DA flagged burn rate urgency given account balance standing at N82.8Mn', due: '2026-04-23', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'Fincon', action: 'Repayment of inter-project loans', explanation: '<strong>Result:</strong> Debt settlement<br><br><strong>Notes:</strong> N150M owed to Elms Gardens overdue. Requesting 30 day extension', due: '2026-04-23', status: 'Delayed' },
-    { project: 'Annexe', dept: 'Telemarketing', action: 'Share weekly Leads Report on Elms and Lakowe Annex email blast. ', explanation: '<strong>Result:</strong> Assess the quality of leads<br><br><strong>Notes:</strong> 42 leads generated; 5 qualified. Passing to sales closers', due: '2026-04-23', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'MCC', action: 'Implement LinkedIn strategy for C-Suite', explanation: '<strong>Result:</strong> Expand reach<br><br><strong>Notes:</strong> Storytelling gap identified. Creating thought leadership articles for MD.', due: '2026-04-23', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'Sales', action: 'Strategy to push balance to N1B+', explanation: '<strong>Result:</strong> Achieve Sales Targets<br><br><strong>Notes:</strong> Sales stuck at 78 units. Needs urgent promotional drive', due: '2026-04-23', status: 'Update Expected' },
-    { project: 'Annexe', dept: 'Legal', action: '*Feedback on acceptance letter in 6 weeks', explanation: '<strong>Result:</strong> Secure approval for the LNT name<br><br><strong>Notes:</strong> Obtained acknowledgement slip.<br><br>Received acceptance letter (3 weeks early).<br><br>Publication 6 months- Old (9th September), New (Aug 21)<br><br>Trademark Certificate: Old (9th November), New (Oct 21)<br><br>Final - March 2027', due: '2026-04-23', status: 'On -Track' }
-  ];
+  let taskDatabase = [];
 
   // ── Intelligent Sidebar Counter Logic ──
   function updateSidebarCounts() {
     document.querySelectorAll('.sidebar-item').forEach(btn => {
       const onClickAttr = btn.getAttribute('onclick');
       if (onClickAttr) {
-        // Parse the embedded project and department name natively from the onclick logic
         const match = onClickAttr.match(/showDept\([^,]+,\s*this,\s*'([^']+)',\s*'([^']+)'\)/);
         if (match) {
           const proj = match[1];
           const dept = match[2];
-          // Count active items
           const count = taskDatabase.filter(t => t.project === proj && t.dept === dept).length;
           const span = btn.querySelector('.dept-count');
           if(span) span.textContent = count;
@@ -654,11 +599,6 @@
       }
     });
   }
-
-  // Automatically count on initial load
-  window.onload = function() {
-    updateSidebarCounts();
-  };
 
   // ── Render Tasks ──
   function showDept(panelId, btn, projName, deptName) {
@@ -683,18 +623,17 @@
       list.innerHTML = `<div style="padding:20px; color:#888;">No active tasks found for ${deptName}.</div>`;
     } else {
       filtered.forEach(task => {
-        // Accurate Color Status Logic based on extracted status
         let statStr = (task.status || '').toLowerCase();
         let dueStr = (task.due || '').toLowerCase();
         
         let statusClass = 'ontrack'; // Default to green
         
         if (statStr.includes('delay') || dueStr.includes('overdue') || statStr.includes('past due')) {
-          statusClass = 'delayed'; // Set to red
+          statusClass = 'delayed'; 
         } else if (statStr.includes('achieved') || statStr.includes('completed') || task.action.toLowerCase().includes('completed') || dueStr.includes('done') || dueStr.includes('achieved')) {
-          statusClass = 'achieved'; // Set to blue
+          statusClass = 'achieved'; 
         } else if (statStr.includes('update expected')) {
-          statusClass = 'update'; // Set to orange
+          statusClass = 'update'; 
         }
 
         list.innerHTML += `
@@ -737,11 +676,11 @@
             const data = e.target.result;
             const workbook = XLSX.read(data, { type: 'binary' });
             
-            // Assume the first sheet holds the data
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
+            // Reads the LAST sheet by default (Assuming new reports are appended at the end).
+            // Change to workbook.SheetNames[0] if your newest sheet is at the beginning.
+            const latestSheetName = workbook.SheetNames[workbook.SheetNames.length - 1];
+            const worksheet = workbook.Sheets[latestSheetName];
             
-            // Convert to array of arrays (header: 1 forces it to be a 2D array like the CSV output)
             const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
             processData(rows);
             finalizeUpload();
@@ -754,14 +693,13 @@
 
   function finalizeUpload() {
       document.getElementById('last-updated-text').textContent = 'Last updated: ' + new Date().toLocaleDateString();
-      alert('Data successfully parsed! UI Metrics, Targets, and Task Counters updated.');
+      alert('Data successfully parsed! Tasks, Departments, and Merged Cells processed.');
       
       const activeBtn = document.querySelector('.sidebar-item.active');
       if(activeBtn) activeBtn.click();
   }
 
   function parseCSV(csvText) {
-    // Parser config to navigate Quotes natively
     const rows = [];
     let currentRow = [];
     let curString = '';
@@ -791,77 +729,121 @@
   }
 
   function processData(rows) {
-    // Empty Task DB so we can populate from new file securely
     taskDatabase = [];
-    
-    // Arrays for dynamic targets
     let cxTargets = [];
     let annexTargets = [];
 
-    // Parse loop using intelligent extraction mapping to earlier HTML structure
-    for(let i=1; i<rows.length; i++) {
+    let currentProj = 'Annexe'; 
+    let headerIdx = -1;
+    
+    // Dynamic Column Map
+    let colMap = { dept: -1, action: -1, due: -1, result: -1, explanation: -1, status: -1 };
+
+    // Step 1: Scan for Header Row to map columns dynamically
+    for (let i = 0; i < Math.min(25, rows.length); i++) {
+      if (!rows[i]) continue;
+      let rowStr = rows[i].join(' ').toLowerCase();
+      
+      // Attempt to automatically detect project from context
+      if (rowStr.includes('lakowe crossings') || rowStr.includes('crossings')) currentProj = 'Crossings';
+      else if (rowStr.includes('lakowe annexe') || rowStr.includes('lakowe annex')) currentProj = 'Annexe';
+
+      // Detect header row based on keywords
+      if (rowStr.includes('department') && (rowStr.includes('next steps') || rowStr.includes('action'))) {
+        headerIdx = i;
+        for (let c = 0; c < rows[i].length; c++) {
+          let colName = String(rows[i][c]).toLowerCase().replace(/\s+/g, ' ').trim();
+          if (colName.includes('department')) colMap.dept = c;
+          else if (colName.includes('next steps') || colName.includes('action')) colMap.action = c;
+          else if (colName.includes('timeline') || colName.includes('due date')) colMap.due = c;
+          else if (colName === 'result') colMap.result = c;
+          else if (colName.includes('explanation') || colName.includes('notes')) colMap.explanation = c;
+          else if (colName === 'status') colMap.status = c;
+        }
+        break; // Stop once header is found
+      }
+    }
+
+    // Fallback if header detection fails but data exists
+    if (headerIdx === -1) {
+       colMap = { dept: 1, action: 2, due: 3, result: 4, explanation: 5, status: 7 };
+    }
+
+    let currentDept = 'General'; // Used to forward-fill merged cells
+
+    // Step 2: Extract Data
+    for (let i = 0; i < rows.length; i++) {
       const cols = rows[i];
-      if(!cols || cols.length < 3) continue;
+      if (!cols || cols.length === 0) continue;
       
-      // Ensure all cols are strings for the `.includes()` check
       let strRow = cols.join(' ').toLowerCase();
-      let proj = strRow.includes('crossings') ? 'Crossings' : 'Annexe';
-      
-      // LOGIC 1: Detect Metrics 
-      if (strRow.includes('metric') || String(cols[0]).toLowerCase().includes('inflow') || String(cols[0]).toLowerCase().includes('sold') || String(cols[0]).toLowerCase().includes('balance')) {
-        let key = String(cols[0]).toLowerCase();
-        let val = cols[1] || cols[2]; // Assumes value is in col B or C
-        
-        // Map natively to the element ID created earlier
-        if(key.includes('inflow')) document.getElementById(proj === 'Crossings' ? 'val-cx-inflow' : 'val-annex-inflow').textContent = val;
-        if(key.includes('units') || key.includes('sold')) document.getElementById(proj === 'Crossings' ? 'val-cx-units' : 'val-annex-units').textContent = val;
-        if(key.includes('sales')) document.getElementById(proj === 'Crossings' ? 'val-cx-sales' : 'val-annex-sales').textContent = val;
+      if (strRow.trim() === '') continue;
+
+      // Handle Targets and Metrics
+      if (strRow.includes('metric') || String(cols[0] || '').toLowerCase().includes('inflow') || String(cols[0] || '').toLowerCase().includes('sold') || String(cols[0] || '').toLowerCase().includes('balance')) {
+        let key = String(cols[0] || '').toLowerCase();
+        let val = cols[1] || cols[2] || cols[3] || ''; 
+        if(key.includes('inflow')) document.getElementById(currentProj === 'Crossings' ? 'val-cx-inflow' : 'val-annex-inflow').textContent = val;
+        if(key.includes('units') || key.includes('sold')) document.getElementById(currentProj === 'Crossings' ? 'val-cx-units' : 'val-annex-units').textContent = val;
+        if(key.includes('sales')) document.getElementById(currentProj === 'Crossings' ? 'val-cx-sales' : 'val-annex-sales').textContent = val;
         if(key.includes('budget')) document.getElementById('val-cx-budget').textContent = val;
         if(key.includes('offer')) document.getElementById('val-cx-offers').textContent = val;
         if(key.includes('balance')) document.getElementById('val-annex-balance').textContent = val;
         continue;
       }
 
-      // LOGIC 2: Detect Monthly Targets
-      if (strRow.includes('target') || String(cols[0]).toLowerCase() === 'target') {
-        let name = cols[2];
-        let desc = cols[3];
-        let state = (String(cols[4]) || '').toLowerCase().includes('carry') ? 'carryover' : 'new-target';
-        
-        let htmlStr = `<div class="target-item ${state}"><span class="t-name">${name}</span><span class="t-note">${desc}</span></div>`;
-        if (proj === 'Crossings') cxTargets.push(htmlStr); else annexTargets.push(htmlStr);
-        continue;
+      if (strRow.includes('target') && !strRow.includes('department')) {
+         let name = cols[1] || cols[2] || '';
+         let desc = cols[2] || cols[3] || cols[4] || '';
+         if (name.length > 3) {
+           let state = strRow.includes('carry') ? 'carryover' : 'new-target';
+           let htmlStr = `<div class="target-item ${state}"><span class="t-name">${name}</span><span class="t-note">${desc}</span></div>`;
+           if (currentProj === 'Crossings') cxTargets.push(htmlStr); else annexTargets.push(htmlStr);
+         }
+         continue;
       }
 
-      // LOGIC 3: Full 8-Column Integration parser
-      // Col 0: S/N
-      // Col 1: Dept
-      // Col 2: Action
-      // Col 3: Due Date
-      // Col 4: Result (Outcome expected)
-      // Col 5: Explanation Notes
-      // Col 6: Project
-      // Col 7: Status (On Track, Delayed, Update Expected)
-      
-      let resText = cols[4] ? cols[4].trim() : 'N/A';
-      let expText = cols[5] ? cols[5].trim() : 'No notes provided.';
-      let formatExplanation = `<strong>Result:</strong> ${resText}<br><br><strong>Notes:</strong> ${expText}`;
+      // Skip the header row and anything above it
+      if (headerIdx !== -1 && i <= headerIdx) continue;
 
-      taskDatabase.push({
-        project: proj,
-        dept: cols[1] || 'General',
-        action: cols[2] || 'No action specified',
-        explanation: formatExplanation,
-        due: cols[3] || 'TBD',
-        status: cols[7] || 'On-Track'
-      });
+      // Map columns dynamically safely
+      let deptVal = colMap.dept !== -1 && cols[colMap.dept] ? String(cols[colMap.dept]).trim() : '';
+      let actionVal = colMap.action !== -1 && cols[colMap.action] ? String(cols[colMap.action]).trim() : '';
+      let dueVal = colMap.due !== -1 && cols[colMap.due] ? String(cols[colMap.due]).trim() : '';
+      let resultVal = colMap.result !== -1 && cols[colMap.result] ? String(cols[colMap.result]).trim() : 'N/A';
+      let expVal = colMap.explanation !== -1 && cols[colMap.explanation] ? String(cols[colMap.explanation]).trim() : 'No notes provided.';
+      let statusVal = colMap.status !== -1 && cols[colMap.status] ? String(cols[colMap.status]).trim() : '';
+
+      // FORWARD FILL LOGIC: If cell is not empty, update the current department. (Solves merged cells)
+      if (deptVal && deptVal !== '' && deptVal.toLowerCase() !== 'department' && !deptVal.toLowerCase().includes('s/n')) {
+        currentDept = deptVal;
+      }
+
+      // Validate this is an actual task and not a stray header
+      if (actionVal && actionVal !== '' && !actionVal.toLowerCase().includes('next steps') && !actionVal.toLowerCase().includes('action point')) {
+        
+        // Fallback for status if missing in column
+        if (!statusVal || statusVal === '') {
+           statusVal = 'On-Track'; 
+           if (dueVal.toLowerCase().includes('delay') || strRow.includes('delay')) statusVal = 'Delayed';
+        }
+
+        let formatExplanation = `<strong>Result:</strong> ${resultVal}<br><br><strong>Notes:</strong> ${expVal}`;
+
+        taskDatabase.push({
+          project: currentProj,
+          dept: currentDept,
+          action: actionVal,
+          explanation: formatExplanation,
+          due: dueVal || 'TBD',
+          status: statusVal
+        });
+      }
     }
 
-    // Refresh Target UI if new targets found
-    if(cxTargets.length > 0) document.getElementById('targets-crossings').innerHTML = cxTargets.join('');
-    if(annexTargets.length > 0) document.getElementById('targets-annexe').innerHTML = annexTargets.join('');
+    if (cxTargets.length > 0) document.getElementById('targets-crossings').innerHTML = cxTargets.join('');
+    if (annexTargets.length > 0) document.getElementById('targets-annexe').innerHTML = annexTargets.join('');
 
-    // Trigger calculation of sidebar totals
     updateSidebarCounts();
   }
 
@@ -881,13 +863,11 @@
     }
   };
 
-  // Chart 1: Annexe Inflow & Balance (Grey)
   new Chart(document.getElementById('c1'),{type:'line',data:{labels,datasets:[
     {label:'Inflow (₦B)',data:inflow,borderColor:'#616161',backgroundColor:'rgba(97,97,97,0.1)',borderWidth:3,pointRadius:3,pointBackgroundColor:'#616161',fill:true,tension:0.35,yAxisID:'y'},
     {label:'Balance (₦100M)',data:balance.map(v=>+(v/100).toFixed(2)),borderColor:'#424242',backgroundColor:'rgba(66,66,66,0.05)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#424242',fill:false,tension:0.35,borderDash:[5,3],yAxisID:'y1'}
   ]},options:{...base,scales:{...base.scales,y:{...base.scales.y,position:'left'},y1:{...base.scales.y,position:'right',grid:{display:false}}}}});
 
-  // Chart 3: Crossings Cumulative Sales (Red)
   const cxIn = [1.05,1.179,1.3,1.3,1.3,1.415,1.415,1.415,1.415,1.415,2.07,1.68,1.72,1.72,1.72];
   new Chart(document.getElementById('c3'),{type:'line',data:{labels,datasets:[
     {label:'Inflow (₦B)',data:cxIn,borderColor:'#D32F2F',backgroundColor:'rgba(211,47,47,0.1)',borderWidth:3,pointRadius:3,pointBackgroundColor:'#D32F2F',fill:true,tension:0.35}
