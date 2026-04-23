@@ -253,8 +253,13 @@
   }
   .step-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.06); }
   
+  /* Status Colors */
   .step-card.ontrack { border-left: 4px solid #4caf50; background: #fcfdfc; }
   .step-card.delayed { border-left: 4px solid #f44336; background: #fffaf9; }
+  .step-card.achieved { border-left: 4px solid #2196f3; background: #f4faff; }
+  .step-card.achieved .step-date { background: #2196f3; color: white; }
+  .step-card.update { border-left: 4px solid #ff9800; background: #fffcf5; }
+  .step-card.update .step-date { background: #ff9800; color: white; }
 
   .step-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; width: 100%; }
   .step-text { font-size: 14px; color: var(--text-primary); line-height: 1.6; font-weight: 600; flex: 1; }
@@ -290,7 +295,7 @@
     <button class="nav-tab" onclick="showPage('departments', this)">Departments Tasks</button>
   </div>
   <div class="nav-right">
-    <span class="nav-date" id="last-updated-text">Last updated: Apr 9, 2026</span>
+    <span class="nav-date" id="last-updated-text">Last updated: Apr 20, 2026</span>
     <span class="nav-badge badge-cx nav-project-btn" id="btn-nav-cx" onclick="selectProject('Crossings')">Crossings</span>
     <span class="nav-badge badge-annex nav-project-btn" id="btn-nav-annex" onclick="selectProject('Annexe')">Annexe</span>
     <label for="fileUpload" class="upload-btn">
@@ -318,7 +323,7 @@
     <div class="project-heading">
       <span class="nav-badge badge-cx">Lakowe Crossings</span>
       <h2>Performance Overview</h2>
-      <span style="font-size:12px;color:var(--text-muted);margin-left:auto">Jan 5 – Apr 7, 2026</span>
+      <span style="font-size:12px;color:var(--text-muted);margin-left:auto">Jan 5 – Apr 20, 2026</span>
     </div>
 
     <div class="metrics-grid">
@@ -363,17 +368,17 @@
           </div>
         </div>
         <div class="target-list" id="targets-crossings">
-          <div class="target-item new-target"><span class="t-name">Park / Landscape</span><span class="t-note">Fountain pumps connected; full park target end-April</span></div>
-          <div class="target-item carryover"><span class="t-name">Sandfilling</span><span class="t-note">6,750 of 7,500 cbm delivered; swamp buggy active</span></div>
-          <div class="target-item new-target"><span class="t-name">Hospitality Studios</span><span class="t-note">Redesigned from apartments to ~20 studios. Final design pending.</span></div>
-          <div class="target-item carryover"><span class="t-name">MEP Sign-off</span><span class="t-note">ARUP raised issues — full cross-discipline sign-off required</span></div>
+          <div class="target-item new-target"><span class="t-name">Civil Mobilization</span><span class="t-note">Mobilization of the civil contractor (Tied to sales raising at least ₦800M)</span></div>
+          <div class="target-item new-target"><span class="t-name">MEP Procurement</span><span class="t-note">Tender & Prequalification process ongoing</span></div>
+          <div class="target-item carryover"><span class="t-name">BOLAD Lights</span><span class="t-note">Conclude the BOLAD Lights Installation</span></div>
+          <div class="target-item carryover"><span class="t-name">Site Clearing</span><span class="t-note">Conclude carting away of debris</span></div>
         </div>
       </div>
     </div>
 
     <div class="alert-strip alert-red">
       <span class="alert-icon">⚠</span>
-      <span><strong>Strategic pivot:</strong> Hospitality units redesigned from apartments to ~20 studios, activating a new revenue layer. "Coming soon" billboard pending design freeze.</span>
+      <span><strong>Strategic redesign:</strong> Hospitality site moved from CX9 to CX10. New Inventory features 6 Commercial units and 68 Residential units (mix of studios and 1-beds) with park-facing terraces.</span>
     </div>
   </div>
 
@@ -381,7 +386,7 @@
     <div class="project-heading">
       <span class="nav-badge badge-annex">Lakowe Annexe</span>
       <h2>Performance Overview</h2>
-      <span style="font-size:12px;color:var(--text-muted);margin-left:auto">Jan 5 – Apr 9, 2026</span>
+      <span style="font-size:12px;color:var(--text-muted);margin-left:auto">Jan 5 – Apr 20, 2026</span>
     </div>
 
     <div class="metrics-grid">
@@ -402,7 +407,7 @@
       </div>
       <div class="metric-card highlight">
         <div class="metric-label" style="color:var(--brand-red)">Account Balance</div>
-        <div class="metric-value" id="val-annex-balance" style="color:var(--brand-red)">₦82.78M</div>
+        <div class="metric-value" id="val-annex-balance" style="color:var(--brand-red)">₦82.8M</div>
         <div class="metric-delta" style="color:var(--brand-red)">↓ From ₦388M on Jan 5</div>
       </div>
     </div>
@@ -421,20 +426,17 @@
           </div>
         </div>
         <div class="target-list" id="targets-annexe">
-          <div class="target-item new-target"><span class="t-name">Manholes</span><span class="t-note">140 manholes (100 target + 40 deficit) and connected pipes</span></div>
-          <div class="target-item new-target"><span class="t-name">Finidi George Drainage</span><span class="t-note">Complete Finidi George drainage ✓ DONE — 480m completed</span></div>
-          <div class="target-item new-target"><span class="t-name">Peter Rufai Section 2</span><span class="t-note">Commence Peter Rufai section 2 ✓ DONE — bends cast, formwork removed</span></div>
-          <div class="target-item new-target"><span class="t-name">Compaction & Stone Base</span><span class="t-note">Compaction, stabilisation and stone base: Adokiye, Ilerika, Amunike</span></div>
-          <div class="target-item new-target"><span class="t-name">Sunday Oliseh</span><span class="t-note">Clear access constraints on Sunday Oliseh and then complete sandfilling. Stone base post-drainage.</span></div>
-          <div class="target-item new-target"><span class="t-name">Pipeworks</span><span class="t-note">Conclude pipeworks on Ilerika, Amunike and Adokiye - APR 6 ✓ DONE</span></div>
-          <div class="target-item new-target"><span class="t-name">Lift Stations</span><span class="t-note">10 lift stations before rainy season</span></div>
+          <div class="target-item carryover"><span class="t-name">140 Manholes</span><span class="t-note">100 target + 40 deficit, plus connected pipes to be completed.</span></div>
+          <div class="target-item new-target"><span class="t-name">Peter Rufai Drainage</span><span class="t-note">Commenced section 2 — bends cast and formwork removed.</span></div>
+          <div class="target-item carryover"><span class="t-name">Layout Approval</span><span class="t-note">2-week window expires Apr 22. Escalate directly to Commissioner if missed.</span></div>
+          <div class="target-item new-target"><span class="t-name">Gate House Design</span><span class="t-note">Detailed boundary fence design required due to second gate identification.</span></div>
         </div>
       </div>
     </div>
 
     <div class="alert-strip alert-grey">
       <span class="alert-icon">ℹ</span>
-      <span><strong>Cash-construction risk:</strong> Account balance (₦82.8M) risks being outpaced by construction burn rate. Target to reach ₦1B+ to sustain momentum.</span>
+      <span><strong>Approval Risk:</strong> Provisional Layout Approval is critically delayed. 2-week window given to consultant expires Wed Apr 22; failing this, direct escalation to Commissioner is required.</span>
     </div>
   </div>
 
@@ -577,46 +579,68 @@
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
   }
 
-  // Database Array - Updated with Apr 09 Lakowe Annex Data
+  // Database Array - Mapped comprehensively from the 8-column sheets
   let taskDatabase = [
-    // Crossings Tasks (Maintained from original)
-    { project: 'Crossings', dept: 'Design', action: 'Finalise design for hospitality initiative', explanation: 'Redesigned from apartments to studios. Awaiting final mechanical specs before print.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'Design', action: 'Assess economic viability of eliminating road', explanation: 'Decision deferred for economic option to reduce paving costs across layout.', due: 'Overdue' },
-    { project: 'Crossings', dept: 'Costing', action: 'Update on sandfilling progress vs actuals', explanation: 'Diesel price spike affecting budget. Negotiation with swamp buggy operators needed.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'IPD', action: 'Clear road alignment into Phase 1 with swamp buggy', explanation: 'Buggy active; pushing mindset shift among ground contractors.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'Landscape', action: 'Finalise park sculptures with Mrs H', explanation: 'Steel and mixed metal structures selected. Faceless and joyful. Installation next week.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'Operations', action: 'Provide weekly updates on sales metrics', explanation: 'Inflow at ₦1.72B. 1 active offer pending signature clearance.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'Fincon', action: 'Process contractor mobilisation payments', explanation: '₦488M paid of ₦527M monthly budget. Remaining to be cleared by Friday.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'Sales', action: 'Present clear pathway to ₦1B cumulative target', explanation: 'Pending offers to convert. Follow-up sequences triggered.', due: 'Delayed' },
-    { project: 'Crossings', dept: 'MCC', action: 'Present bold marketing ideas to reflect scale', explanation: 'Visually striking image of activity needed to capture investor imaginations.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'General', action: 'Scale visual impression for ₦50B raise', explanation: 'All departments to brainstorm on visual scale requirements.', due: 'Next session' },
+    // --- LAKOWE CROSSINGS TASKS ---
+    { project: 'Crossings', dept: 'Design', action: 'Send Proposal to Olamide (Costing) for cost estimate. Render/elevation images to be prepared', explanation: '<strong>Result:</strong> Concept Design<br><br><strong>Notes:</strong> MAJOR REDESIGN PRESENTED — SITE MOVED FROM CX9 → CX10. NEW INVENTORY: 6 Commercial units | 68 Residential units (mix of studios and 1-beds). Terraces facing the park.', due: 'Apr 23', status: 'Delayed' },
+    { project: 'Crossings', dept: 'Design', action: 'Render/elevation images to be prepared → share with MCC', explanation: '<strong>Result:</strong> Coming soon billboard<br><br><strong>Notes:</strong> For "coming soon" graphic billboard.', due: 'Apr 27', status: 'Delayed' },
+    { project: 'Crossings', dept: 'Design', action: 'Share update on the final decision for roundabout alignment', explanation: '<strong>Result:</strong> Roundabout alignment<br><br><strong>Notes:</strong> Assess the economic viability (Most economic option). The team to refine and share the update independently.', due: 'Apr 27', status: 'On -Track' },
+    { project: 'Crossings', dept: 'Design', action: 'Completed Tasks for the month', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> Concluded the review of ARUPs drawings.', due: 'Achieved', status: 'Completed' },
     
-    // Annexe Tasks (Mapped precisely from April 09 CSV sheet)
-    { project: 'Annexe', dept: 'Design', action: 'Report with an overlay of the current progress of work over the main layout', explanation: 'Updates from last 4 weeks. Programs alignment.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Design', action: 'Contractor to finalise touch-up', explanation: 'Visited site last week — changes observed. Finalisation of additional changes expected THIS week. IPD to be on site THURSDAY (Apr 9) for final inspection.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Design', action: 'Receive signage Design from ARUP', explanation: 'Signage design confirmed for delivery TODAY. Covers speed levels and road markings. 3 more speed bumps to be added.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Design', action: 'Measure the length of the boundary fence along Finidi George', explanation: 'Current fence runs from gatehouse along perimeter. Plan is to extend fence along Finidi George line and carve off access for Landwey.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Design', action: 'Schedule a meeting with the commissioner of physical planning', explanation: 'File is NOW WITH THE COMMISSIONER of Physical Planning. Consultant advised NOT to approach directly. Team disagreed — decided to escalate directly.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Costing', action: 'Picture Updates - work progress on second lane', explanation: 'Presented stringing of wires video.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Costing', action: 'Contractor valuation letter expected next week', explanation: 'DISBURSEMENT PLAN FOR APRIL: ~₦500M Contractor valuation (internal roads + access road), ~₦30M Power connection close-out works. ~₦1B already paid to contractors to date this month.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Costing', action: 'Provide Cost for the boundary fence along Finidi George', explanation: 'Plan is to extend fence along Finidi George line and carve off access for Landwey.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Costing', action: 'Include LNT second lane', explanation: 'Once Funding formula is concluded', due: 'On Hold' },
-    { project: 'Annexe', dept: 'Costing', action: 'Reassess solar solution for gatehouse', explanation: 'Insert solar to the gate house.', due: '2026-07-08' },
-    { project: 'Annexe', dept: 'Costing', action: 'Revisit the cost to stone base the road', explanation: 'Complete drainage FIRST before focusing on stone base.', due: '2026-05-06' },
-    { project: 'Annexe', dept: 'IPD', action: 'Inspect the contractors finish', explanation: 'IPD + Design team to be on site THURSDAY Apr 9 for final inspection of contractor finish.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'IPD', action: 'Updates on the access road edge protection', explanation: 'We need to protect exposed edges along the access road where it branches out. Concrete slope from edge to pavement.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'IPD', action: 'Instruct contractor to clear Segun Odegbami road', explanation: 'Need to clear the road outside the estate fence on a commercial plot.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'IPD', action: '1.3km drainage to Ibudowura', explanation: 'BAFF is AHEAD OF SCHEDULE on the 1.2km drainage: First 80m section reinforcement + blinding COMPLETED. Base slab casting COMMENCED.', due: '2026-05-29' },
-    { project: 'Annexe', dept: 'IPD', action: 'Verify specifications for correct bump count', explanation: 'Engaging supplier on location confirmation and payment negotiation. ARUP was on site Tuesday. Verify against design specs.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'IPD', action: 'Updates on progress of internal roads', explanation: 'Jay Jay Okocha: compaction ongoing. Peter Rufai: 2 bends cast. Finidi George: 480m FULLY COMPLETED. Target remains 140 manholes for April.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Operations', action: 'Provide update on sales offer letters, Inflow and Total Value of sales', explanation: 'Total Inflow: N6.27B. Sales: 78. Value: N6.89b. Balance: N82.78Mn. 2 active offer letters. BAFF build rate risks outpacing account balance.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Fincon', action: 'Process Payments', explanation: 'APRIL DISBURSEMENT REQUIREMENT: ~₦600M total by end of month.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Fincon', action: 'Repayment of inter-project loans', explanation: 'Annex Borrowed N100M from Elms Gardens. Annexe Borrowed N50M from Elms Gardens to advance BAFF.', due: 'Overdue' },
-    { project: 'Annexe', dept: 'Telemarketing', action: 'Share weekly Leads Report', explanation: 'Total leads generated: 42. Qualified: 5. Unresponsive: 33. 1 lead booked for site inspection.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'MCC', action: 'Share leads nurtured in the email campaign', explanation: '600–300 leads obtained from third party. Team agreed to share leads directly with sales team IMMEDIATELY.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'MCC', action: 'Marketing Strategy Notes', explanation: 'Staff-wide LinkedIn initiative (C-suite repost Mixta posts). Evaluate new billboard locations. Assess engaging a new external consultant. Submit brand strategy document.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Sales', action: 'Strategy to get account to ₦1Bn+', explanation: 'Sales stuck at 78 units. Strategy review underway. Risk: BAFF construction pace will outpace account balance.', due: '2026-04-09' },
-    { project: 'Annexe', dept: 'Legal', action: 'Waiting on Publication', explanation: 'Obtained acknowledgement slip. Received acceptance letter. Publication expected Aug 21.', due: '2026-08-21' }
+    { project: 'Crossings', dept: 'Costing', action: 'Mobilization of the contractor - civil', explanation: '<strong>Result:</strong> Award contract for road alignment<br><br><strong>Notes:</strong> Tied to sales raising at least ₦800Mln.', due: 'Apr 30', status: 'On -Track' },
+    { project: 'Crossings', dept: 'Costing', action: 'MEP: Tender & Prequalification process', explanation: '<strong>Result:</strong> Review estimates submitted<br><br><strong>Notes:</strong> Tender & Prequalification process ongoing.', due: 'Apr 30', status: 'On -Track' },
+    { project: 'Crossings', dept: 'Costing', action: 'Completed Tasks for the month', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> Payment to consultant and clearing contractor concluded.', due: 'Achieved', status: 'Completed' },
+
+    { project: 'Crossings', dept: 'IPD', action: 'Conclude carting away of debris', explanation: '<strong>Result:</strong> Clear site<br><br><strong>Notes:</strong> Clear site for mobilization.', due: 'Apr 30', status: 'On -Track' },
+    { project: 'Crossings', dept: 'IPD', action: 'Conclude the BOLAD Lights Installation', explanation: '<strong>Result:</strong> Conclude installation of BOLAD lights<br><br><strong>Notes:</strong> Ongoing installation process.', due: 'Apr 30', status: 'On -Track' },
+    { project: 'Crossings', dept: 'IPD', action: 'Completed Tasks for the month', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> Tasks wrapped up.', due: 'Achieved', status: 'Completed' },
+
+    { project: 'Crossings', dept: 'Landscape', action: 'Complete the Park', explanation: '<strong>Result:</strong> Complete the park<br><br><strong>Notes:</strong> Fountain pumps connected to electricity.', due: 'Apr 30', status: 'On -Track' },
+    { project: 'Crossings', dept: 'Landscape', action: 'Completed Tasks for the month', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> Installation of bollards, Installation of water fountain.', due: 'Achieved', status: 'Completed' },
+
+    { project: 'Crossings', dept: 'Operations', action: 'Provide weekly updates on sales metrics', explanation: '<strong>Result:</strong> Track Sales<br><br><strong>Notes:</strong> Inflow at ₦1.72B. 1 active offer pending signature clearance.', due: 'Apr 23', status: 'Update Expected' },
+
+    { project: 'Crossings', dept: 'Fincon', action: 'Process contractor mobilisation payments', explanation: '<strong>Result:</strong> Payment<br><br><strong>Notes:</strong> ₦488M paid of ₦527M monthly budget. Remaining to be cleared by Friday.', due: 'Apr 23', status: 'Update Expected' },
+
+    { project: 'Crossings', dept: 'Sales', action: 'Ongoing Conversations - Inflows this week', explanation: '<strong>Result:</strong> Achieve sales targets<br><br><strong>Notes:</strong> 3 active offer letters (1 in Mixta, 2 in HSF). Pending offers to convert. Follow-up sequences triggered.', due: 'Apr 23', status: 'Update Expected' },
+
+    { project: 'Crossings', dept: 'MCC', action: 'Erect Coming Soon Billboards: Board 1 (4th May), Boards 2 & 3 (18th May)', explanation: '<strong>Result:</strong> Placement<br><br><strong>Notes:</strong> At the gold road round about. Move current board from the park to the golf estate.', due: 'May 4', status: 'On -Track' },
+    { project: 'Crossings', dept: 'MCC', action: 'Come up with more challenging plans to reflect project scale', explanation: '<strong>Result:</strong> Improve sales and Brand Visibility<br><br><strong>Notes:</strong> This will be bi-monthly.', due: 'Apr 27', status: 'On -Track' },
+    { project: 'Crossings', dept: 'MCC', action: 'Completed Tasks for the month', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> Vendor selection finalized.', due: 'Achieved', status: 'Completed' },
+
+    { project: 'Crossings', dept: 'General', action: 'Competitor analysis & idea generation', explanation: '<strong>Result:</strong> Improve Sales<br><br><strong>Notes:</strong> Every department should ruminate on points ahead of next session. Present ideas observed from competitors.', due: 'Ongoing', status: 'On -Track' },
+
+    // --- LAKOWE ANNEXE TASKS ---
+    { project: 'Annexe', dept: 'Design', action: 'Report with an overlay of current progress over main layout', explanation: '<strong>Result:</strong> Align current progress with initial layout<br><br><strong>Notes:</strong> Updates from last 4 weeks. Align current progress with initial layout.', due: 'Apr 23', status: 'On -Track' },
+    { project: 'Annexe', dept: 'Design', action: 'Contact Uncle P TODAY (Apr 20). Proceed directly to Commissioner if no layout by Apr 22.', explanation: '<strong>Result:</strong> Leveraging Layout Approvals to define construction phases<br><br><strong>Notes:</strong> 2-WEEK WINDOW EXPIRES IN 2 DAYS (Wed Apr 22).', due: 'Apr 22', status: 'Delayed' },
+    { project: 'Annexe', dept: 'Design', action: 'Share Detailed Design of the Gate House (Boundary fence)', explanation: '<strong>Result:</strong> Boundary Fence<br><br><strong>Notes:</strong> Architect has been asked — needs to draft. Reason: second gate identified along the fence line. TIMELINE: ~2 weeks from Apr 20.', due: 'May 4', status: 'On -Track' },
+    { project: 'Annexe', dept: 'Design', action: 'Completed Tasks for the month', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> Gatehouse snags resolved. Received gatehouse signage designs.', due: 'Achieved', status: 'Completed' },
+
+    { project: 'Annexe', dept: 'Costing', action: 'Picture Updates - work progress on second lane of LNT road', explanation: '<strong>Result:</strong> Show visual progress updates<br><br><strong>Notes:</strong> Presented stringing of wires video.', due: 'Apr 20', status: 'Update Expected' },
+    { project: 'Annexe', dept: 'Costing', action: 'Send signage design to relevant teams', explanation: '<strong>Result:</strong> Procurement readiness<br><br><strong>Notes:</strong> Coordinate with design and procurement.', due: 'Apr 20', status: 'Update Expected' },
+    { project: 'Annexe', dept: 'Costing', action: 'Contractor valuation and April disbursements', explanation: '<strong>Result:</strong> Facilitate work on site<br><br><strong>Notes:</strong> ~₦600M requested for internal roads completion cycle.', due: 'Apr 23', status: 'Update Expected' },
+
+    { project: 'Annexe', dept: 'IPD', action: 'Complete 140 manholes & drainage connections', explanation: '<strong>Result:</strong> Second Lane of Annex<br><br><strong>Notes:</strong> 100 target + 40 deficit. Conclude pipeworks on Ilerika, Amunike and Adokiye.', due: 'Apr 30', status: 'Update Expected' },
+    { project: 'Annexe', dept: 'IPD', action: 'Complete Finidi George drainage', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> DONE — 480m completed.', due: 'Achieved', status: 'Completed' },
+    { project: 'Annexe', dept: 'IPD', action: 'Commence Peter Rufai section 2', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> DONE — bends cast, formwork removed.', due: 'Achieved', status: 'Completed' },
+    { project: 'Annexe', dept: 'IPD', action: 'Conclude pipeworks on Ilerika, Amunike and Adokiye', explanation: '<strong>Result:</strong> Completed<br><br><strong>Notes:</strong> DONE — eastern section completed Apr 6.', due: 'Achieved', status: 'Completed' },
+    { project: 'Annexe', dept: 'IPD', action: 'Compaction, stabilisation and stone base: Adokiye, Ilerika, Amunike', explanation: '<strong>Result:</strong> Road Construction<br><br><strong>Notes:</strong> Pending progression based on drainage completions.', due: 'TBD', status: 'Update Expected' },
+    { project: 'Annexe', dept: 'IPD', action: 'Clear access constraints on Sunday Oliseh and complete sandfilling', explanation: '<strong>Result:</strong> Site readiness<br><br><strong>Notes:</strong> Requires access to be fully established and cleared.', due: 'TBD', status: 'Update Expected' },
+    { project: 'Annexe', dept: 'IPD', action: 'Stone base post-drainage on Sunday Oliseh (after QA/QC)', explanation: '<strong>Result:</strong> Road Construction<br><br><strong>Notes:</strong> Needs QA/QC confirmation to trigger next steps.', due: 'TBD', status: 'Update Expected' },
+    { project: 'Annexe', dept: 'IPD', action: '10 lift stations before rainy season', explanation: '<strong>Result:</strong> Preventative infrastructure<br><br><strong>Notes:</strong> Objective requested prior to rains setting in.', due: 'TBD', status: 'Update Expected' },
+
+    { project: 'Annexe', dept: 'Operations', action: 'Provide update on sales offer letters, Inflow and Total Value of sales', explanation: '<strong>Result:</strong> Sales Update<br><br><strong>Notes:</strong> Sales- 3. Value of Sales - ₦683.3m.', due: 'Apr 20', status: 'Update Expected' },
+    { project: 'Annexe', dept: 'Operations', action: 'Sales inflow reporting and revs update', explanation: '<strong>Result:</strong> Monitor cash flow risk<br><br><strong>Notes:</strong> Balance at ₦82M vs burn rate risk. Escalation sent to finance. DA flagged burn rate urgency.', due: 'Apr 23', status: 'Update Expected' },
+
+    { project: 'Annexe', dept: 'Fincon', action: 'Repayment of inter-project loans', explanation: '<strong>Result:</strong> Debt settlement<br><br><strong>Notes:</strong> ₦150M owed to Elms Gardens overdue. Requesting 30-day extension.', due: 'Past Due', status: 'Delayed' },
+
+    { project: 'Annexe', dept: 'Telemarketing', action: 'Weekly leads report', explanation: '<strong>Result:</strong> Assess the quality of leads<br><br><strong>Notes:</strong> 42 leads generated; 5 qualified. Passing to sales closers.', due: 'Apr 23', status: 'Update Expected' },
+
+    { project: 'Annexe', dept: 'MCC', action: 'Implement LinkedIn strategy for C-Suite', explanation: '<strong>Result:</strong> Expand reach<br><br><strong>Notes:</strong> Storytelling gap identified. Creating thought-leadership articles.', due: 'Apr 23', status: 'Update Expected' },
+
+    { project: 'Annexe', dept: 'Sales', action: 'Strategy to push balance to ₦1B+', explanation: '<strong>Result:</strong> Achieve Sales Targets<br><br><strong>Notes:</strong> Sales stuck at 78 units. Needs urgent promotional drive.', due: 'Apr 23', status: 'Update Expected' },
+
+    { project: 'Annexe', dept: 'Legal', action: 'Monitor LNT Trademark publication', explanation: '<strong>Result:</strong> Secure approval for the LNT name<br><br><strong>Notes:</strong> Publication expected Aug 21. No action required right now.', due: 'Aug 21', status: 'On -Track' }
   ];
 
   // ── Intelligent Sidebar Counter Logic ──
@@ -666,12 +690,18 @@
       list.innerHTML = `<div style="padding:20px; color:#888;">No active tasks found for ${deptName}.</div>`;
     } else {
       filtered.forEach(task => {
-        // Color Status Logic based on 'due' keyword and timing
+        // Accurate Color Status Logic based on extracted status
+        let statStr = (task.status || '').toLowerCase();
         let dueStr = (task.due || '').toLowerCase();
+        
         let statusClass = 'ontrack'; // Default to green
         
-        if (dueStr.includes('overdue') || dueStr.includes('delay') || dueStr.includes('past') || dueStr.match(/jan|feb|mar|2025/)) {
+        if (statStr.includes('delay') || dueStr.includes('overdue') || statStr.includes('past due')) {
           statusClass = 'delayed'; // Set to red
+        } else if (statStr.includes('achieved') || statStr.includes('completed') || task.action.toLowerCase().includes('completed') || dueStr.includes('done') || dueStr.includes('achieved')) {
+          statusClass = 'achieved'; // Set to blue
+        } else if (statStr.includes('update expected')) {
+          statusClass = 'update'; // Set to orange
         }
 
         list.innerHTML += `
@@ -810,13 +840,27 @@
         continue;
       }
 
-      // LOGIC 3: Default is Department Task (Standard 5 Col: SN, Dept, Action, Explanation, Due Date)
+      // LOGIC 3: Full 8-Column Integration parser
+      // Col 0: S/N
+      // Col 1: Dept
+      // Col 2: Action
+      // Col 3: Due Date
+      // Col 4: Result (Outcome expected)
+      // Col 5: Explanation Notes
+      // Col 6: Project
+      // Col 7: Status (On Track, Delayed, Update Expected)
+      
+      let resText = cols[4] ? cols[4].trim() : 'N/A';
+      let expText = cols[5] ? cols[5].trim() : 'No notes provided.';
+      let formatExplanation = `<strong>Result:</strong> ${resText}<br><br><strong>Notes:</strong> ${expText}`;
+
       taskDatabase.push({
         project: proj,
         dept: cols[1] || 'General',
         action: cols[2] || 'No action specified',
-        explanation: cols[3] || '...',
-        due: cols[4] || 'TBD'
+        explanation: formatExplanation,
+        due: cols[3] || 'TBD',
+        status: cols[7] || 'On-Track'
       });
     }
 
