@@ -56,13 +56,8 @@
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; padding: 0 28px;
     gap: 32px;
-    overflow-x: auto;
-    white-space: nowrap;
   }
   
-  nav::-webkit-scrollbar { display: none; }
-  nav { -ms-overflow-style: none; scrollbar-width: none; }
-
   .nav-brand {
     font-size: 16px; font-weight: 700; color: var(--text-primary);
     letter-spacing: -0.02em; white-space: nowrap; margin-right: 8px;
@@ -72,7 +67,9 @@
   .nav-brand:hover { opacity: 0.7; }
   .nav-brand span { color: var(--brand-red); }
   
-  .nav-tabs { display: flex; gap: 8px; }
+  #nav-tabs-group { display: none; gap: 8px; }
+  #nav-tabs-group.active { display: flex; }
+  
   .nav-tab {
     padding: 8px 18px; border-radius: var(--radius-sm);
     font-size: 13px; font-weight: 600; cursor: pointer;
@@ -268,7 +265,6 @@
   .empty-state h3 { font-size: 18px; color: var(--text-secondary); margin-bottom: 8px;}
   .empty-state p { font-size: 14px; }
 
-
   /* ── UI INJECTIONS FOR APP & TRANSCRIPTS (Hidden on Desktop) ── */
   .fab-mobile, .bottom-nav, .action-sheet, .action-overlay { display: none !important; }
   
@@ -297,6 +293,7 @@
   }
   .modal-btn:hover { background: var(--brand-red-hover); }
 
+
   /* ── FULL RESPONSIVE MEDIA QUERIES (NATIVE APP FEEL ON MOBILE) ── */
   @media (max-width: 992px) {
     .dept-layout { grid-template-columns: 200px 1fr; gap: 20px; }
@@ -305,48 +302,45 @@
   }
 
   @media (max-width: 768px) {
-    body { padding-bottom: 90px !important; } /* Space for bottom nav */
+    body { padding-bottom: 90px !important; }
     
     /* Top Nav Adaptations */
     nav { padding: 0 16px; gap: 12px; }
     .nav-brand { font-size: 15px; margin-right: auto; }
     
-    /* 🔴 STRICT OVERRIDE TO STOP JS FROM FORCING DESKTOP NAV TABS ON MOBILE */
-    #nav-tabs-group, 
-    .nav-right .upload-btn, 
-    .transcript-btn, 
-    .nav-date { 
+    /* 🔴 STRICT OVERRIDE TO HIDE DESKTOP ACTIONS ON MOBILE */
+    #nav-tabs-group, .nav-right .upload-btn, .transcript-btn, .nav-date { 
         display: none !important; 
     } 
 
     .dash-container, .dept-container { padding: 10px 16px 32px; }
 
-    /* Responsive Charts - Give them breathing room to avoid clogs */
+    /* Responsive Charts - Hardcoded height to avoid clogs */
     .charts-row { grid-template-columns: 1fr; }
-    .chart-wrap { height: 250px !important; } 
+    .chart-wrap { height: 250px !important; min-height: 250px !important; } 
     
     .target-item { flex-direction: column; gap: 4px; }
     .t-name { min-width: auto; }
 
-    /* 🔴 STRICT OVERRIDE TO STOP JS FROM STACKING SIDEBAR VERTICALLY */
-    .dept-layout { grid-template-columns: 1fr !important; gap: 16px !important; }
+    /* 🔴 STRICT OVERRIDE: FORCE SIDEBAR INTO HORIZONTAL SCROLL CHIPS */
+    .dept-layout { display: flex !important; flex-direction: column !important; gap: 16px !important; }
     .dept-sidebar {
       position: sticky !important; top: var(--nav-h) !important; z-index: 90 !important;
       display: flex !important; flex-direction: row !important; border-radius: 0 !important;
-      border-left: none !important; border-right: none !important;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.03) !important;
-      margin: -10px -16px 16px !important; padding: 0 16px !important;
+      border: none !important; box-shadow: 0 4px 6px rgba(0,0,0,0.03) !important;
+      margin: -10px -16px 16px !important; padding: 10px 16px !important;
       width: calc(100% + 32px) !important; overflow-x: auto !important; white-space: nowrap !important;
-      background: var(--brand-grey-light) !important;
+      background: var(--brand-grey-light) !important; align-items: center;
     }
     .dept-sidebar::-webkit-scrollbar { display: none !important; }
+    .dept-sidebar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* The JS tries to make this "block". We FORCE it to be "flex" row on mobile */
     .sidebar-section { 
       display: flex !important; 
       flex-direction: row !important; 
-      padding: 10px 0 !important; 
+      padding: 0 !important; 
       border-bottom: none !important; 
+      margin: 0;
     }
     .sidebar-section-label { display: none !important; } 
     .sidebar-item {
@@ -358,7 +352,7 @@
     .step-card-top { flex-direction: column; }
     .step-date { align-self: flex-start; margin-top: 8px;}
 
-    /* Native App Mobile Additions Trigger */
+    /* Native App Mobile Components */
     .fab-mobile {
       display: flex !important; position: fixed !important; bottom: 85px !important; right: 20px !important;
       width: 56px !important; height: 56px !important; background: var(--brand-red) !important; color: white !important;
@@ -408,7 +402,7 @@
 
 <nav>
   <div class="nav-brand" onclick="showLanding()" title="Return to Dashboard Selection">Lakowe <span>Portfolio</span></div>
-  <div class="nav-tabs" id="nav-tabs-group">
+  <div id="nav-tabs-group">
     <button class="nav-tab active" onclick="showPage('dashboard', this); syncMobileNav('dashboard')">Dashboard</button>
     <button class="nav-tab" onclick="showPage('departments', this); syncMobileNav('departments')">Departments Tasks</button>
   </div>
@@ -559,9 +553,8 @@
 <div class="dept-container">
 
   <div class="dept-layout">
-    <div class="dept-sidebar">
-      
-      <div class="sidebar-section" id="sidebar-crossings" style="display: none;">
+    <div class="dept-sidebar" id="sidebar-crossings" style="display: none;">
+      <div class="sidebar-section">
         <div class="sidebar-section-label">Lakowe Crossings</div>
         <button class="sidebar-item" onclick="showDept('cx-design', this, 'Crossings', 'Design')">Design <span class="dept-count">0</span></button>
         <button class="sidebar-item" onclick="showDept('cx-costing', this, 'Crossings', 'Costing')">Costing <span class="dept-count">0</span></button>
@@ -574,8 +567,10 @@
         <button class="sidebar-item" onclick="showDept('cx-amc', this, 'Crossings', 'AMC')">AMC <span class="dept-count">0</span></button>
         <button class="sidebar-item" onclick="showDept('cx-general', this, 'Crossings', 'General')">General <span class="dept-count">0</span></button>
       </div>
+    </div>
 
-      <div class="sidebar-section" id="sidebar-annexe" style="display: none;">
+    <div class="dept-sidebar" id="sidebar-annexe" style="display: none;">
+      <div class="sidebar-section">
         <div class="sidebar-section-label annexe">Lakowe Annexe</div>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-design', this, 'Annexe', 'Design')">Design <span class="dept-count">0</span></button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-costing', this, 'Annexe', 'Costing')">Costing <span class="dept-count">0</span></button>
@@ -587,7 +582,6 @@
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-sales', this, 'Annexe', 'Sales')">Sales <span class="dept-count">0</span></button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-legal', this, 'Annexe', 'Legal')">Legal <span class="dept-count">0</span></button>
       </div>
-
     </div>
 
     <div class="dept-main">
@@ -615,7 +609,9 @@
 
     </div></div></div></div>
 
-<div class="fab-mobile" onclick="toggleActionSheet()">+</div>
+<div class="fab-mobile" onclick="toggleActionSheet()">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+</div>
 
 <div class="action-overlay" id="actionOverlay" onclick="toggleActionSheet()"></div>
 <div class="action-sheet" id="actionSheet">
@@ -672,10 +668,7 @@
   function showLanding() {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-landing').classList.add('active');
-    
-    // Desktop Nav group fix to respect Mobile CSS
     document.getElementById('nav-tabs-group').style.display = 'none';
-    
     document.querySelectorAll('.nav-project-btn').forEach(btn => btn.classList.remove('active'));
   }
 
@@ -684,14 +677,12 @@
     if(proj === 'Crossings') document.getElementById('btn-nav-cx').classList.add('active');
     if(proj === 'Annexe') document.getElementById('btn-nav-annex').classList.add('active');
 
-    // Remove inline 'block'/'none' on mobile sidebars so CSS !important works.
-    document.getElementById('block-crossings').style.display = (proj === 'Crossings') ? 'block' : 'none';
-    document.getElementById('block-annexe').style.display = (proj === 'Annexe') ? 'block' : 'none';
-    
-    document.getElementById('sidebar-crossings').style.display = (proj === 'Crossings') ? 'flex' : 'none';
-    document.getElementById('sidebar-annexe').style.display = (proj === 'Annexe') ? 'flex' : 'none';
+    // Use empty string to avoid overriding CSS media query flex rules on mobile
+    document.getElementById('block-crossings').style.display = (proj === 'Crossings') ? '' : 'none';
+    document.getElementById('block-annexe').style.display = (proj === 'Annexe') ? '' : 'none';
+    document.getElementById('sidebar-crossings').style.display = (proj === 'Crossings') ? '' : 'none';
+    document.getElementById('sidebar-annexe').style.display = (proj === 'Annexe') ? '' : 'none';
 
-    // Show tabs on desktop securely
     document.getElementById('nav-tabs-group').style.display = 'flex';
     
     if(document.getElementById('page-landing').classList.contains('active')) {
@@ -781,7 +772,6 @@
         updateSidebarCounts();
         const activeDeptBtn = document.querySelector('.sidebar-item.active');
         if(activeDeptBtn) activeDeptBtn.click();
-        
         alert(`Heuristic scan complete! Extracted ${newTasks} new action items to ${currentProj}.`);
       } else {
         alert("No clear action items detected in the text. Try being more direct (e.g. 'Design will...').");
@@ -1418,6 +1408,7 @@
   }
 
   // ── CHARTS (Red & Grey Theme) ──
+  // Limiting ticks so graph breathes cleanly on small screens
   const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7'];
   const inflow  = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27];
   const balance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,61.9];
@@ -1441,6 +1432,10 @@
   const cxIn = [1.05,1.179,1.3,1.3,1.3,1.415,1.415,1.415,1.415,1.415,2.07,1.68,1.72,1.72,1.72];
   new Chart(document.getElementById('c3'),{type:'line',data:{labels,datasets:[
     {label:'Inflow (₦B)',data:cxIn,borderColor:'#D32F2F',backgroundColor:'rgba(211,47,47,0.1)',borderWidth:3,pointRadius:3,pointBackgroundColor:'#D32F2F',fill:true,tension:0.35}
+  ]},options:{...base}});
+</script>
+</body>
+</html>
   ]},options:{...base}});
 </script>
 </body>
