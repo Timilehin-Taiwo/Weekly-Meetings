@@ -72,7 +72,10 @@
   .nav-brand:hover { opacity: 0.7; }
   .nav-brand span { color: var(--brand-red); }
   
-  .nav-tabs { display: flex; gap: 8px; }
+  /* Desktop Tabs logic */
+  #nav-tabs-group { display: none; gap: 8px; }
+  #nav-tabs-group.show-on-desktop { display: flex; }
+  
   .nav-tab {
     padding: 8px 18px; border-radius: var(--radius-sm);
     font-size: 13px; font-weight: 600; cursor: pointer;
@@ -106,6 +109,7 @@
   .upload-btn:hover { background: var(--text-primary); }
   
   .transcript-btn { background: var(--brand-red); }
+  .transcript-btn:hover { background: var(--brand-red-hover); }
 
   .page { display: none; margin-top: var(--nav-h); min-height: calc(100vh - var(--nav-h)); padding-top: 20px; }
   .page.active { display: block; }
@@ -282,7 +286,7 @@
     box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: none;
   }
   .modal h3 { font-size: 18px; margin-bottom: 12px; color: var(--text-primary); }
-  .modal p { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+  .modal p { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
   .modal textarea {
     width: 100%; height: 160px; padding: 12px; border-radius: 8px;
     border: 1px solid var(--border); font-family: inherit; font-size: 14px;
@@ -303,27 +307,34 @@
   }
 
   @media (max-width: 768px) {
-    body { padding-bottom: 70px; } /* Space for bottom nav */
+    body { padding-bottom: 90px !important; } /* Space for bottom nav */
     
     /* Top Nav Adaptations */
     nav { padding: 0 16px; gap: 12px; }
     .nav-brand { font-size: 15px; margin-right: auto; }
-    .nav-tabs, .nav-right .upload-btn, .nav-right .transcript-btn, .nav-date { display: none; } /* Hide desktop actions */
+    
+    /* 🔴 STRICT OVERRIDE TO STOP JS FROM FORCING DESKTOP NAV TABS ON MOBILE */
+    #nav-tabs-group.show-on-desktop, 
+    .nav-right .upload-btn, 
+    .transcript-btn, 
+    .nav-date { 
+        display: none !important; 
+    } 
 
     .dash-container, .dept-container { padding: 10px 16px 32px; }
 
-    /* Responsive Charts */
+    /* Responsive Charts - Give them breathing room to avoid clogs */
     .charts-row { grid-template-columns: 1fr; }
-    .chart-wrap { height: 240px; } /* Ensures charts are never clogged */
+    .chart-wrap { height: 250px !important; } 
     
     .target-item { flex-direction: column; gap: 4px; }
     .t-name { min-width: auto; }
 
-    /* Transform Vertical Sidebar to Horizontal Scrollable Chips */
+    /* 🔴 STRICT OVERRIDE TO STOP JS FROM STACKING SIDEBAR VERTICALLY */
     .dept-layout { grid-template-columns: 1fr; gap: 16px; }
     .dept-sidebar {
       position: sticky; top: var(--nav-h); z-index: 90;
-      display: flex; flex-direction: row; border-radius: 0;
+      display: flex !important; flex-direction: row !important; border-radius: 0;
       border-left: none; border-right: none;
       box-shadow: 0 4px 6px rgba(0,0,0,0.03);
       margin: -10px -16px 16px; padding: 0 16px;
@@ -333,8 +344,14 @@
     .dept-sidebar::-webkit-scrollbar { display: none; }
     .dept-sidebar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    .sidebar-section { display: flex; flex-direction: row; padding: 10px 0; border-bottom: none !important; }
-    .sidebar-section-label { display: none; } /* Hidden in horizontal mode */
+    /* The JS tries to make this "block". We FORCE it to be "flex" row on mobile */
+    .sidebar-section { 
+      display: flex !important; 
+      flex-direction: row !important; 
+      padding: 10px 0; 
+      border-bottom: none !important; 
+    }
+    .sidebar-section-label { display: none !important; } 
     .sidebar-item {
       width: auto; flex-shrink: 0; border-radius: 20px;
       padding: 8px 16px; margin-right: 8px; border: 1px solid var(--border);
@@ -394,7 +411,7 @@
 
 <nav>
   <div class="nav-brand" onclick="showLanding()" title="Return to Dashboard Selection">Lakowe <span>Portfolio</span></div>
-  <div class="nav-tabs" id="nav-tabs-group" style="display:none;">
+  <div id="nav-tabs-group">
     <button class="nav-tab active" onclick="showPage('dashboard', this); syncMobileNav('dashboard')">Dashboard</button>
     <button class="nav-tab" onclick="showPage('departments', this); syncMobileNav('departments')">Departments Tasks</button>
   </div>
@@ -432,6 +449,7 @@
     <div class="project-heading">
       <span class="nav-badge badge-cx">Lakowe Crossings</span>
       <h2>Performance Overview</h2>
+      <span style="font-size:12px;color:var(--text-muted);margin-left:auto">As of Apr 20, 2026</span>
     </div>
 
     <div class="metrics-grid">
@@ -485,6 +503,7 @@
     <div class="project-heading">
       <span class="nav-badge badge-annex">Lakowe Annexe</span>
       <h2>Performance Overview</h2>
+      <span style="font-size:12px;color:var(--text-muted);margin-left:auto">As of Apr 20, 2026</span>
     </div>
 
     <div class="metrics-grid">
@@ -656,7 +675,7 @@
   function showLanding() {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-landing').classList.add('active');
-    document.getElementById('nav-tabs-group').style.display = 'none';
+    document.getElementById('nav-tabs-group').classList.remove('show-on-desktop');
     document.querySelectorAll('.nav-project-btn').forEach(btn => btn.classList.remove('active'));
   }
 
@@ -665,12 +684,13 @@
     if(proj === 'Crossings') document.getElementById('btn-nav-cx').classList.add('active');
     if(proj === 'Annexe') document.getElementById('btn-nav-annex').classList.add('active');
 
+    // Display overrides fixed to play nice with mobile CSS
     document.getElementById('block-crossings').style.display = (proj === 'Crossings') ? 'block' : 'none';
     document.getElementById('block-annexe').style.display = (proj === 'Annexe') ? 'block' : 'none';
-    document.getElementById('sidebar-crossings').style.display = (proj === 'Crossings') ? 'block' : 'none';
-    document.getElementById('sidebar-annexe').style.display = (proj === 'Annexe') ? 'block' : 'none';
+    document.getElementById('sidebar-crossings').style.display = (proj === 'Crossings') ? '' : 'none';
+    document.getElementById('sidebar-annexe').style.display = (proj === 'Annexe') ? '' : 'none';
 
-    document.getElementById('nav-tabs-group').style.display = 'flex';
+    document.getElementById('nav-tabs-group').classList.add('show-on-desktop');
     
     if(document.getElementById('page-landing').classList.contains('active')) {
       const dashTab = document.querySelector('.nav-tab[onclick*="dashboard"]');
@@ -697,7 +717,6 @@
   }
 
   function openTranscriptModal() {
-    // Hide action sheet if open
     const sheet = document.getElementById('actionSheet');
     if (sheet.classList.contains('active')) toggleActionSheet();
     
@@ -725,12 +744,9 @@
       const lines = text.split(/[.\n]/);
       let newTasks = 0;
       
-      // Keywords that typically indicate a task assignment
       const taskKeywords = ['will', 'needs to', 'to do', 'must', 'action', 'task', 'assigned to', 'should'];
-      // Department lookup mappings
       const depts = ['Design', 'Costing', 'IPD', 'Sales', 'MCC', 'Fincon', 'Operations', 'Legal', 'Landscape', 'AMC'];
       
-      // Figure out currently active project context
       let currentProj = 'Annexe';
       const activeProjBtn = document.querySelector('.nav-project-btn.active');
       if(activeProjBtn && activeProjBtn.innerText.includes('Crossings')) {
@@ -744,7 +760,6 @@
           let matchedDept = 'General';
           depts.forEach(d => { if(line.toLowerCase().includes(d.toLowerCase())) matchedDept = d; });
           
-          // Inject the simulated extracted task at the top of the database
           taskDatabase.unshift({
             project: currentProj,
             dept: matchedDept,
@@ -762,8 +777,6 @@
 
       if(newTasks > 0) {
         updateSidebarCounts();
-        
-        // Refresh the current department view if one is open
         const activeDeptBtn = document.querySelector('.sidebar-item.active');
         if(activeDeptBtn) activeDeptBtn.click();
         
@@ -771,9 +784,8 @@
       } else {
         alert("No clear action items detected in the text. Try being more direct (e.g. 'Design will...').");
       }
-    }, 800); // Artificial delay to simulate AI processing feeling
+    }, 800); 
   }
-
 
   // ── DEPARTMENT NORMALIZER ──
   function normalizeDept(deptStr) {
@@ -818,9 +830,17 @@
     "project": "Annexe",
     "dept": "Design",
     "action": "*Share Detailed Design of the Gate House",
-    "explanation": "<strong>Result:</strong> Boundary Fence<br><br><strong>Notes:</strong> Architect has been asked — needs to draft. Reason: second gate identified along the fence line.\nTIMELINE: ~2 weeks from Apr 20 = by May 4 for detailed gatehouse design.",
+    "explanation": "<strong>Result:</strong> Boundary Fence<br><br><strong>Notes:</strong> Architect has been asked — needs to draft. Reason: second gate identified along the fence line.\nTIMELINE: ~2 weeks from Apr 20 = by May 4 for detailed gatehouse design (Akinwale confirmed).",
     "due": "2026-05-04",
     "status": "On -Track"
+  },
+  {
+    "project": "Annexe",
+    "dept": "Design",
+    "action": "Completed Tasks for the month",
+    "explanation": "<strong>Result:</strong> * Gatehouse snags resolved.\n* Received gatehouse signage designs.<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "TBD",
+    "status": "Completed"
   },
   {
     "project": "Annexe",
@@ -834,25 +854,169 @@
     "project": "Annexe",
     "dept": "Costing",
     "action": "* Costing to present negotiated signage cost by Thursday Apr 23",
-    "explanation": "<strong>Result:</strong> Signage Design<br><br><strong>Notes:</strong> Vendors being contacted.",
+    "explanation": "<strong>Result:</strong> Signage Design<br><br><strong>Notes:</strong> Vendors being contacted — feedback expected THIS WEEK.\nREVISED TIMELINE: Negotiated cost to be presented by THURSDAY Apr 23 (not Monday).\nProcess: get vendor quotes → compare → negotiate → present final cost Thursday.",
     "due": "2026-04-23",
     "status": "On -Track"
   },
   {
     "project": "Annexe",
+    "dept": "Costing",
+    "action": "* Provide Cost for the boundary fence along Finidi George",
+    "explanation": "<strong>Result:</strong> Boundary Fence<br><br><strong>Notes:</strong> Expecting detailed gatehouse design from the design team",
+    "due": "2026-05-04",
+    "status": "On - Track"
+  },
+  {
+    "project": "Annexe",
+    "dept": "Costing",
+    "action": "* Report HFP production timeline today (Apr 21).",
+    "explanation": "<strong>Result:</strong> Speed bumps<br><br><strong>Notes:</strong> PRODUCTION RISK — NOT A PAYMENT ISSUE.\nHFP pavers are non-standard (special colour) — not regularly produced by HFP.\nContractor spoke with HFP on Saturday and again this morning (Apr 20).\nHFP to respond with availability BEFORE CLOSE OF BUSINESS TODAY.",
+    "due": "2026-04-23",
+    "status": "On - Track"
+  },
+  {
+    "project": "Annexe",
+    "dept": "Costing",
+    "action": "* Include LNT second lane (250 metres of concrete road) - Once Funding formula is concluded",
+    "explanation": "<strong>Result:</strong> Road Construction<br><br><strong>Notes:</strong> ON HOLD",
+    "due": "TBD",
+    "status": "On Hold"
+  },
+  {
+    "project": "Annexe",
+    "dept": "Costing",
+    "action": "* Reassess solar solution for gatehouse — July 2026",
+    "explanation": "<strong>Result:</strong> Insert solar to the gate house.<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "2026-07-08",
+    "status": "On Hold"
+  },
+  {
+    "project": "Annexe",
+    "dept": "Costing",
+    "action": "* Revisit the cost to stone base the road (After the drainage is concluded) - Focus on drainages for now due to the rains",
+    "explanation": "<strong>Result:</strong> Annexe second lane stone base CONTRACT IS ACTIVE.\nComplete drainage FIRST before focusing on stone base<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "2026-05-06",
+    "status": "On Hold"
+  },
+  {
+    "project": "Annexe",
     "dept": "IPD",
-    "action": "* Confirm BAFF remobilized after ₦32M payment.",
+    "action": "* Confirm BAFF remobilized after ₦32M payment. \n\n* Segun Odegbami clearing to commence immediately - bring forward POW",
     "explanation": "<strong>Result:</strong> Clear the site for the road<br><br><strong>Notes:</strong> STILL NOT STARTED — site activities still severely slowed.",
+    "due": "2026-04-23",
+    "status": "Delayed"
+  },
+  {
+    "project": "Annexe",
+    "dept": "IPD",
+    "action": "Tasks on Hold",
+    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "Sandfilling of Lakowe Annex second lane on hold till drainage is concluded",
+    "status": "ON HOLD"
+  },
+  {
+    "project": "Annexe",
+    "dept": "Operations",
+    "action": "Provide update on sales offer letters, Inflow and Total Value of sales",
+    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "2026-04-23",
+    "status": "Update Expected"
+  },
+  {
+    "project": "Annexe",
+    "dept": "Operations",
+    "action": "* CRM tool to aid telemarketing to help message unreachable leads.",
+    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "TBD",
+    "status": "On-Track"
+  },
+  {
+    "project": "Annexe",
+    "dept": "Fincon",
+    "action": "Process Payments - N32Mln to BAFF and N50M refund to Elms Garden",
+    "explanation": "<strong>Result:</strong> Facilitate work on site<br><br><strong>Notes:</strong> ₦32M PAYMENT: Confirmed sent to BAFF",
+    "due": "2026-04-23",
+    "status": "Update Expected"
+  },
+  {
+    "project": "Annexe",
+    "dept": "Fincon",
+    "action": "Annex Borrowed N100M from Elms Gardens -  29 Jan\n\nAnnexe repaid N50M to Elms Gardens",
+    "explanation": "<strong>Result:</strong> Repayment<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "TBD",
+    "status": "On-Track"
+  },
+  {
+    "project": "Annexe",
+    "dept": "Telemarketing",
+    "action": "Share weekly Leads Report on Lakowe Annex promotional campaign.",
+    "explanation": "<strong>Result:</strong> Assess the quality of leads<br><br><strong>Notes:</strong> NO AD CURRENTLY RUNNING — confirmed by Marketing rep.\nNo leads update provided. Campaign effectively paused.",
+    "due": "2026-04-23",
+    "status": "Update Expected"
+  },
+  {
+    "project": "Annexe",
+    "dept": "MCC",
+    "action": "* Board 1 to be ready in 2 weeks (4th May)",
+    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "2026-05-04",
+    "status": "On -Track"
+  },
+  {
+    "project": "Annexe",
+    "dept": "MCC",
+    "action": "* MCC/IPD to scope billboard re-erection as part of Segun Odegbami clearing. Find vendor.",
+    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> Gate billboard has sunk into ground due to sand filling — now barely visible.\nACTION: Clear immediately + find vendor for re-erection.",
+    "due": "2026-04-23",
+    "status": "On -Track"
+  },
+  {
+    "project": "Annexe",
+    "dept": "Legal",
+    "action": "*Waiting on Publication",
+    "explanation": "<strong>Result:</strong> Secure approval for the LNT name<br><br><strong>Notes:</strong> Obtained acknowledgement slip.\n\nReceived acceptance letter (3 weeks early).\n\nPublication 6 months- Old (9th September), New (Aug 21)\n\nTrademark Certificate: Old (9th November), New (Oct 21)\n\nFinal - March 2027",
+    "due": "2026-08-21",
+    "status": "On -Track"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Design",
+    "action": "* Send Proposal to Olamide (Costing) for cost estimate.\n\n* Render/elevation images to be prepared → share with MCC for 'coming soon' graphic\n\nPrev Timeline - 7 April - NEW TIMELINE - 20 APR",
+    "explanation": "<strong>Result:</strong> Concept Design<br><br><strong>Notes:</strong> MAJOR REDESIGN PRESENTED — SITE MOVED FROM CX9 → CX10.\n\nNEW INVENTORY:\n• Commercial: 6 units | \n• Residential: 68 units \n  – Floors 1 & 2: 32 units of 1-bed apartments \n  – Floors 3 & 4: 36 units \n• Unit mix: studios + 1-beds;\n• Terraces: facing the park\n• Roof: potential roof garden / events space discussed — deferred for later detailing",
     "due": "2026-04-23",
     "status": "Delayed"
   },
   {
     "project": "Crossings",
     "dept": "Design",
-    "action": "* Send Proposal to Olamide (Costing) for cost estimate.",
-    "explanation": "<strong>Result:</strong> Concept Design<br><br><strong>Notes:</strong> MAJOR REDESIGN PRESENTED — SITE MOVED FROM CX9 → CX10.",
-    "due": "2026-04-23",
+    "action": "* Render/elevation images to be prepared → share with MCC for 'coming soon' graphic",
+    "explanation": "<strong>Result:</strong> Coming soon billboard<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "2026-04-27",
     "status": "Delayed"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Design",
+    "action": "* Share update on the final decision (Most economic option) by Thursday - 23 Apr",
+    "explanation": "<strong>Result:</strong> Roundabout alignment<br><br><strong>Notes:</strong> The team to refine and share the update independently",
+    "due": "2026-04-27",
+    "status": "On -Track"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Design",
+    "action": "* Follow up with costing and procurement for the layout approval",
+    "explanation": "<strong>Result:</strong> Layout approval<br><br><strong>Notes:</strong> On Hold for 6 weeks\n\nProject Link - sent cost and assessmemt for Lagos state.\n\nAn issue noted with discrepancies on the name on the survey plan",
+    "due": "2026-05-04",
+    "status": "On-Track"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Design",
+    "action": "Completed Tasks for the month",
+    "explanation": "<strong>Result:</strong> * Provisional Approval for a clients plot - CX3<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "TBD",
+    "status": "Completed"
   },
   {
     "project": "Crossings",
@@ -864,21 +1028,165 @@
   },
   {
     "project": "Crossings",
+    "dept": "Costing",
+    "action": "* Follow up with AMC on the decision between BAFF or FUNKUS",
+    "explanation": "<strong>Result:</strong> General Infrastructure Works<br><br><strong>Notes:</strong> The team confirmed to share in next meeting",
+    "due": "2026-04-27",
+    "status": "Delayed"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Costing",
+    "action": "Completed Tasks for the month",
+    "explanation": "<strong>Result:</strong> Payment made for 7,500 cubic meters of sand.<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "TBD",
+    "status": "Completed"
+  },
+  {
+    "project": "Crossings",
+    "dept": "AMC",
+    "action": "* Decision between BAFF or FUNKUS",
+    "explanation": "<strong>Result:</strong> General Infrastructure Works<br><br><strong>Notes:</strong> The team is waiting on management to decide the contractor.",
+    "due": "2026-04-27",
+    "status": "On -Track"
+  },
+  {
+    "project": "Crossings",
     "dept": "IPD",
-    "action": "* Get ARUP sign off on MEP designs",
-    "explanation": "<strong>Result:</strong> Finalize all sign offs<br><br><strong>Notes:</strong> PARTIAL COMPLETION. Civil designs: SIGNED OFF and CLOSED OUT by ARUP.",
+    "action": "* Receive advice from ARUP on sump design by Wed Apr 22",
+    "explanation": "<strong>Result:</strong> Ensure there is a plan to prevent the site from damming<br><br><strong>Notes:</strong> ARUP to come back to us by Wednesday.",
+    "due": "2026-04-22",
+    "status": "On -Track"
+  },
+  {
+    "project": "Crossings",
+    "dept": "IPD",
+    "action": "* Get ARUP sign off on MEP designs (team to secure full cross-discipline sign-off from consultants at Thursday meeting.)\n\nDeadline: Friday - 17 Apr - Delayed",
+    "explanation": "<strong>Result:</strong> Finalize all sign offs<br><br><strong>Notes:</strong> PARTIAL COMPLETION. Civil designs: SIGNED OFF and CLOSED OUT by ARUP. ✓\nMEP/Electrical: ARUP requested schedule-of-manuals updates after Friday meeting. Sign-off expected by Friday 17 Apr once updates are submitted. RISK: multi-discipline coordination still needed — each discipline must sign off all disciplines, not just their own, to ensure clear accountability.",
+    "due": "2026-04-27",
+    "status": "Delayed"
+  },
+  {
+    "project": "Crossings",
+    "dept": "IPD",
+    "action": "* Share site progress pictures",
+    "explanation": "<strong>Result:</strong> Visual Summary<br><br><strong>Notes:</strong> Share images and videos of the site progress",
+    "due": "2026-04-27",
+    "status": "On -Track"
+  },
+  {
+    "project": "Crossings",
+    "dept": "IPD",
+    "action": "Completed Tasks for the month",
+    "explanation": "<strong>Result:</strong> Panels installed and park powered up.<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "TBD",
+    "status": "Completed"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Landscape",
+    "action": "* Review more vendors and finalize with Mrs H.",
+    "explanation": "<strong>Result:</strong> Park sculptures and benches<br><br><strong>Notes:</strong> Vision: 4 sculptures telling the story of Lakowe Crossings. Two sculptors engaged — Sculptor 1 (Stephen): steel works; Sculptor 2 (Basi's apprentice): mixed metal/concrete/fiberglass.\n\nDA's direction: sculptures should be FACELESS, somber yet positive/joyful — not realistic or scary. Suggestion raised to engage Nike Art Gallery to source additional talent from their network.",
     "due": "2026-04-27",
     "status": "Delayed"
   },
   {
     "project": "Crossings",
     "dept": "Landscape",
-    "action": "* Review more vendors and finalize with Mrs H.",
-    "explanation": "<strong>Result:</strong> Park sculptures and benches<br><br><strong>Notes:</strong> Vision: 4 sculptures telling the story of Lakowe Crossings. Two sculptors engaged.",
+    "action": "* Follow up closely on BOLAD lights contractor.\n\nDelay for 2 weeks",
+    "explanation": "<strong>Result:</strong> To light up the park area<br><br><strong>Notes:</strong> No furher updates, contractor still elusive",
     "due": "2026-04-27",
     "status": "Delayed"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Landscape",
+    "action": "* To receive samples of work from both contractors and select a contractor.",
+    "explanation": "<strong>Result:</strong> Base for Bollad Lights<br><br><strong>Notes:</strong> Decide on which contractor and share with costing",
+    "due": "2026-04-27",
+    "status": "On -Track"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Landscape",
+    "action": "* Updates on the cladding",
+    "explanation": "<strong>Result:</strong> Finish up the park area<br><br><strong>Notes:</strong> Contractor paid - Fabrication and installation - 9 -10 days - Apr 28th",
+    "due": "2026-04-27",
+    "status": "On -Track"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Landscape",
+    "action": "* Engage Bravo gate to secure the park.",
+    "explanation": "<strong>Result:</strong> Security for the park area.<br><br><strong>Notes:</strong> The park is complete and needs security",
+    "due": "2026-04-27",
+    "status": "On -Track"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Landscape",
+    "action": "Completed Tasks for the month",
+    "explanation": "<strong>Result:</strong> Main gate for clearview fence completed<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "TBD",
+    "status": "Completed"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Operations",
+    "action": "Provide weekly updates",
+    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> Sales- 6",
+    "due": "2026-04-27",
+    "status": "Update Expected"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Fincon",
+    "action": "Process Payments - N141 Mn for next tranche of sand \nfilling",
+    "explanation": "<strong>Result:</strong> Mobilize Contractors and Vendors<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "2026-04-27",
+    "status": "Update Expected"
+  },
+  {
+    "project": "Crossings",
+    "dept": "Fincon",
+    "action": "Total budget for the month is N315MN - Including 20,000 cubic metres - N527Mn",
+    "explanation": "<strong>Result:</strong> Paid N488Mn till date<br><br><strong>Notes:</strong> No notes provided.",
+    "due": "TBD",
+    "status": "Completed"
+  },
+  {
+    "project": "Crossings",
+    "dept": "MCC",
+    "action": "* A sign post positioned strategically in Lakowe, updated annualy (that captures hospitality footfall)",
+    "explanation": "<strong>Result:</strong> Bill Boards<br><br><strong>Notes:</strong> The billboard should come up immediately after the bolad lights for the park is done.",
+    "due": "2026-04-27",
+    "status": "On -Track"
+  },
+  {
+    "project": "Crossings",
+    "dept": "MCC",
+    "action": "* Board 1 to be ready in 2 weeks (4th May)\n\n* Board 2 and 3 to be ready in 4 weeks (18th May)\n\n* Move current board from the park to the golf estate",
+    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> Placement: At the gold road round about.",
+    "due": "2026-05-04",
+    "status": "On -Track"
+  },
+  {
+    "project": "Crossings",
+    "dept": "MCC",
+    "action": "* Come up with more challenging plans to reflect the scale of the project being built.",
+    "explanation": "<strong>Result:</strong> Improve sales and Brand Visibility<br><br><strong>Notes:</strong> This will be bi-monthly",
+    "due": "2026-04-27",
+    "status": "On -Track"
+  },
+  {
+    "project": "Crossings",
+    "dept": "General",
+    "action": "* Every department should ruminate and think on the following points ahead of the next session.",
+    "explanation": "<strong>Result:</strong> Improve Sales<br><br><strong>Notes:</strong> Bi-monthly task: Everyone to present ideas they observed competitors or similar brands perform to boost marketing or sales.",
+    "due": "Bi - Monthly",
+    "status": "Ongoing"
   }
-  ];
+];
 
   function updateSidebarCounts() {
     document.querySelectorAll('.sidebar-item').forEach(btn => {
@@ -1108,7 +1416,7 @@
   }
 
   // ── CHARTS (Red & Grey Theme) ──
-  // Using responsive true and maintainAspectRatio false explicitly to avoid clogging on small mobile screens
+  // Limiting ticks so graph breathes cleanly on small screens
   const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7'];
   const inflow  = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27];
   const balance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,61.9];
@@ -1119,7 +1427,7 @@
     responsive:true, maintainAspectRatio:false,
     plugins:{legend:{display:false}},
     scales:{
-      x:{ticks:{color:textC,font:{size:11, weight:'bold'},maxRotation:45,autoSkip:true,maxTicksLimit:7},grid:{display:false}},
+      x:{ticks:{color:textC,font:{size:11, weight:'bold'},maxRotation:45,autoSkip:true,maxTicksLimit:5},grid:{display:false}},
       y:{ticks:{color:textC,font:{size:11}},grid:{color:gridC}}
     }
   };
