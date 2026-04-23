@@ -82,12 +82,26 @@
   
   .nav-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
   .nav-date { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  
   .nav-badge {
     font-size: 11px; font-weight: 700; padding: 4px 10px;
     border-radius: 20px; letter-spacing: 0.03em; text-transform: uppercase;
   }
   .badge-cx { background: var(--cx-bg); color: var(--cx-color); }
   .badge-annex { background: var(--annex-bg); color: var(--annex-color); }
+
+  /* Interactive Top Nav Project Badges */
+  .nav-project-btn {
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+  }
+  .nav-project-btn:hover {
+    opacity: 0.8;
+  }
+  .nav-project-btn.active {
+    opacity: 1;
+  }
 
   /* Upload Button */
   .upload-btn {
@@ -124,7 +138,6 @@
   }
   .project-heading h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
 
-  /* Modified grid to flexibly accommodate a 5th element cleanly */
   .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 24px; }
   .metric-card {
     background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
@@ -262,8 +275,8 @@
   </div>
   <div class="nav-right">
     <span class="nav-date" id="last-updated-text">Last updated: Apr 9, 2026</span>
-    <span class="nav-badge badge-cx">Crossings</span>
-    <span class="nav-badge badge-annex">Annexe</span>
+    <span class="nav-badge badge-cx nav-project-btn" id="btn-nav-cx" onclick="selectProject('Crossings')">Crossings</span>
+    <span class="nav-badge badge-annex nav-project-btn" id="btn-nav-annex" onclick="selectProject('Annexe')">Annexe</span>
     <label for="csvUpload" class="upload-btn">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
       Upload Sheet
@@ -285,7 +298,7 @@
 <div id="page-dashboard" class="page">
 <div class="dash-container">
 
-  <div class="project-block" id="block-crossings">
+  <div class="project-block" id="block-crossings" style="display: none;">
     <div class="project-heading">
       <span class="nav-badge badge-cx">Lakowe Crossings</span>
       <h2>Performance Overview</h2>
@@ -342,7 +355,7 @@
     </div>
   </div>
 
-  <div class="project-block" id="block-annexe">
+  <div class="project-block" id="block-annexe" style="display: none;">
     <div class="project-heading">
       <span class="nav-badge badge-annex">Lakowe Annexe</span>
       <h2>Performance Overview</h2>
@@ -403,7 +416,7 @@
   <div class="dept-layout">
     <div class="dept-sidebar">
       
-      <div class="sidebar-section" id="sidebar-crossings">
+      <div class="sidebar-section" id="sidebar-crossings" style="display: none;">
         <div class="sidebar-section-label">Lakowe Crossings</div>
         <button class="sidebar-item" onclick="showDept('cx-design', this, 'Crossings', 'Design')">
           Design <span class="dept-count">4</span>
@@ -437,7 +450,7 @@
         </button>
       </div>
 
-      <div class="sidebar-section" id="sidebar-annexe">
+      <div class="sidebar-section" id="sidebar-annexe" style="display: none;">
         <div class="sidebar-section-label annexe">Lakowe Annexe</div>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-design', this, 'Annexe', 'Design')">
           Design <span class="dept-count">5</span>
@@ -504,30 +517,43 @@
     btn.classList.add('active');
   }
 
-  // ── NEW PROJECT FILTER LOGIC ──
+  // ── UPDATED LOGIC ──
   function showLanding() {
     // Hide all pages, reveal only landing container
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-landing').classList.add('active');
     document.getElementById('nav-tabs-group').style.display = 'none'; // Hide tabs on landing
+    
+    // Clear Active state from Nav Project Buttons
+    document.querySelectorAll('.nav-project-btn').forEach(btn => btn.classList.remove('active'));
   }
 
   function selectProject(proj) {
-    // 1. Toggle visibility of Dashboard Blocks
+    // 1. Highlight Top Navigation Badges cleanly
+    document.querySelectorAll('.nav-project-btn').forEach(btn => btn.classList.remove('active'));
+    if(proj === 'Crossings') document.getElementById('btn-nav-cx').classList.add('active');
+    if(proj === 'Annexe') document.getElementById('btn-nav-annex').classList.add('active');
+
+    // 2. Toggle visibility of Dashboard Blocks
     document.getElementById('block-crossings').style.display = (proj === 'Crossings') ? 'block' : 'none';
     document.getElementById('block-annexe').style.display = (proj === 'Annexe') ? 'block' : 'none';
 
-    // 2. Toggle visibility of Department Sidebar Sections
+    // 3. Toggle visibility of Department Sidebar Sections
     document.getElementById('sidebar-crossings').style.display = (proj === 'Crossings') ? 'block' : 'none';
     document.getElementById('sidebar-annexe').style.display = (proj === 'Annexe') ? 'block' : 'none';
 
-    // 3. Reveal Nav Tabs and switch to Dashboard
+    // 4. Reveal Nav Tabs 
     document.getElementById('nav-tabs-group').style.display = 'flex';
-    const dashTab = document.querySelector('.nav-tab[onclick*="dashboard"]');
-    showPage('dashboard', dashTab);
+    
+    // 5. Check if currently on the Landing Page. If so, move to Dashboard. 
+    // If user is ALREADY inside Departments, do NOT force them to Dashboard.
+    if(document.getElementById('page-landing').classList.contains('active')) {
+      const dashTab = document.querySelector('.nav-tab[onclick*="dashboard"]');
+      showPage('dashboard', dashTab);
+    }
 
-    // 4. Reset Department View State
-    document.getElementById('panel-placeholder').style.display = 'flex'; // Uses flex for centering
+    // 6. Reset Department View State
+    document.getElementById('panel-placeholder').style.display = 'flex'; 
     document.getElementById('dynamic-dept-container').style.display = 'none';
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
   }
@@ -660,7 +686,6 @@
       if(cols.length < 5) continue;
       
       // We will infer project based on a keyword or just assign it based on file upload context
-      // For this demo, we randomly assign Crossings/Annexe or detect keyword if available
       let proj = cols.join(' ').toLowerCase().includes('crossings') ? 'Crossings' : 'Annexe';
       if(!proj) proj = 'Annexe';
 
