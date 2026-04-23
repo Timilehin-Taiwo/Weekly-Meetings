@@ -63,7 +63,7 @@
   .nav-brand {
     font-size: 16px; font-weight: 700; color: var(--text-primary);
     letter-spacing: -0.02em; white-space: nowrap; margin-right: 8px;
-    cursor: pointer; /* Makes logo clickable to return home */
+    cursor: pointer;
     transition: opacity 0.2s;
   }
   .nav-brand:hover {
@@ -96,12 +96,8 @@
     opacity: 0.4;
     transition: opacity 0.2s;
   }
-  .nav-project-btn:hover {
-    opacity: 0.8;
-  }
-  .nav-project-btn.active {
-    opacity: 1;
-  }
+  .nav-project-btn:hover { opacity: 0.8; }
+  .nav-project-btn.active { opacity: 1; }
 
   /* Upload Button */
   .upload-btn {
@@ -174,19 +170,24 @@
     background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
     padding: 20px; box-shadow: var(--shadow);
   }
-  .chart-card h3 { font-size: 13px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
+  
+  /* Target List Styling */
+  .chart-card-header-flex { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;}
+  .chart-card h3 { font-size: 13px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0; }
+  .target-legend { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: flex; gap: 8px;}
+  .legend-red { color: #d32f2f; }
+  .legend-green { color: #2e7d32; }
+
   .chart-wrap { position: relative; height: 200px; width: 100%; }
 
-  .status-card {
-    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px;
-  }
-  .status-card h3 { font-size: 13px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
-  .status-list { display: flex; flex-direction: column; gap: 12px; }
-  .status-item { display: flex; align-items: flex-start; gap: 12px; font-size: 13px; border-bottom: 1px solid var(--brand-grey-light); padding-bottom: 8px;}
-  .status-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .s-dept { font-weight: 700; color: var(--text-primary); min-width: 140px; flex-shrink: 0; }
-  .s-note { color: var(--text-secondary); line-height: 1.5; }
+  .target-list { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+  .target-item { display: flex; align-items: flex-start; gap: 12px; font-size: 13px; border-left: 3px solid transparent; padding-left: 10px; }
+  .target-item.new-target { border-left-color: #4caf50; }
+  .target-item.new-target .t-name { color: #2e7d32; }
+  .target-item.carryover { border-left-color: #f44336; }
+  .target-item.carryover .t-name { color: #c62828; }
+  .t-name { font-weight: 700; min-width: 140px; flex-shrink: 0; }
+  .t-note { color: var(--text-secondary); line-height: 1.5; }
 
   .alert-strip {
     border-radius: var(--radius-sm); padding: 14px 18px; font-size: 13.5px; line-height: 1.5;
@@ -242,18 +243,32 @@
   .dept-header-text h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
   .dept-header-text p { font-size: 14px; color: var(--text-secondary); }
 
+  /* Interactive Expandable Tasks */
   .next-steps-list { display: flex; flex-direction: column; gap: 16px; }
   .step-card {
     background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
     padding: 20px; box-shadow: var(--shadow);
-    border-left: 4px solid var(--brand-grey);
+    cursor: pointer; position: relative; transition: all 0.2s;
   }
-  .step-card.cx-card { border-left-color: var(--brand-red); }
-  .step-card-top { display: flex; align-items: flex-start; gap: 14px; }
+  .step-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.06); }
+  
+  .step-card.ontrack { border-left: 4px solid #4caf50; background: #fcfdfc; }
+  .step-card.delayed { border-left: 4px solid #f44336; background: #fffaf9; }
+
+  .step-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; width: 100%; }
   .step-text { font-size: 14px; color: var(--text-primary); line-height: 1.6; font-weight: 600; flex: 1; }
-  .step-meta { display: flex; align-items: flex-start; gap: 16px; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border); }
-  .step-result { font-size: 13px; color: var(--text-secondary); line-height: 1.5; flex: 1; }
-  .step-date { font-size: 12px; color: var(--text-primary); white-space: nowrap; font-weight: 700; background: var(--brand-grey-light); padding: 4px 10px; border-radius: 4px;}
+  .step-date { 
+    font-size: 11px; color: var(--text-muted); font-weight: 700; background: rgba(0,0,0,0.04); 
+    padding: 4px 10px; border-radius: 20px; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  .step-details-pane { 
+    display: none; margin-top: 16px; padding-top: 14px; 
+    border-top: 1px dashed var(--border); font-size: 13.5px; 
+    color: var(--text-secondary); line-height: 1.6;
+  }
+  .step-card.expanded .step-details-pane { display: block; animation: fadeIn 0.3s ease; }
+  .pane-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand-grey); margin-bottom: 6px; }
 
   .empty-state {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -308,27 +323,27 @@
     <div class="metrics-grid">
       <div class="metric-card">
         <div class="metric-label">Total Inflow</div>
-        <div class="metric-value">₦1.72B</div>
+        <div class="metric-value" id="val-cx-inflow">₦1.72B</div>
         <div class="metric-delta" style="color:var(--brand-red)">↑ +₦670M since Jan</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Units Sold</div>
-        <div class="metric-value">6</div>
+        <div class="metric-value" id="val-cx-units">6</div>
         <div class="metric-delta" style="color:var(--text-muted)">+2 in Jan; stagnant since</div>
       </div>
       <div class="metric-card highlight">
         <div class="metric-label" style="color:var(--brand-red)">Active Offer Letters</div>
-        <div class="metric-value">4</div>
+        <div class="metric-value" id="val-cx-offers">4</div>
         <div class="metric-delta" style="color:var(--brand-red)">Pending fast conversion</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Value of Sales</div>
-        <div class="metric-value">₦2.07B</div>
+        <div class="metric-value" id="val-cx-sales">₦2.07B</div>
         <div class="metric-delta" style="color:var(--brand-grey)">Adjusted ↓ after product switch</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Budget Spent</div>
-        <div class="metric-value">₦488M</div>
+        <div class="metric-value" id="val-cx-budget">₦488M</div>
         <div class="metric-delta" style="color:var(--text-muted)">of ₦527M monthly budget</div>
       </div>
     </div>
@@ -339,12 +354,18 @@
         <div class="chart-wrap"><canvas id="c3"></canvas></div>
       </div>
       <div class="chart-card">
-        <h3>Construction Status</h3>
-        <div class="status-list" style="margin-top:4px">
-          <div class="status-item"><span class="s-dept">Park / Landscape</span><span class="s-note">Fountain pumps connected; full park target end-April</span></div>
-          <div class="status-item"><span class="s-dept">Sandfilling</span><span class="s-note">6,750 of 7,500 cbm delivered; swamp buggy active</span></div>
-          <div class="status-item"><span class="s-dept">Hospitality Studios</span><span class="s-note">Redesigned from apartments to ~20 studios. Final design pending.</span></div>
-          <div class="status-item"><span class="s-dept">MEP Sign-off</span><span class="s-note">ARUP raised issues — full cross-discipline sign-off required</span></div>
+        <div class="chart-card-header-flex">
+          <h3>Monthly Targets</h3>
+          <div class="target-legend">
+            <span class="legend-red">● Carried Over</span>
+            <span class="legend-green">● New</span>
+          </div>
+        </div>
+        <div class="target-list" id="targets-crossings">
+          <div class="target-item new-target"><span class="t-name">Park / Landscape</span><span class="t-note">Fountain pumps connected; full park target end-April</span></div>
+          <div class="target-item carryover"><span class="t-name">Sandfilling</span><span class="t-note">6,750 of 7,500 cbm delivered; swamp buggy active</span></div>
+          <div class="target-item new-target"><span class="t-name">Hospitality Studios</span><span class="t-note">Redesigned from apartments to ~20 studios. Final design pending.</span></div>
+          <div class="target-item carryover"><span class="t-name">MEP Sign-off</span><span class="t-note">ARUP raised issues — full cross-discipline sign-off required</span></div>
         </div>
       </div>
     </div>
@@ -365,22 +386,22 @@
     <div class="metrics-grid">
       <div class="metric-card">
         <div class="metric-label">Total Inflow</div>
-        <div class="metric-value">₦6.27B</div>
+        <div class="metric-value" id="val-annex-inflow">₦6.27B</div>
         <div class="metric-delta" style="color:var(--brand-grey-dark)">↑ +₦300M since Jan</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Units Sold</div>
-        <div class="metric-value">78</div>
+        <div class="metric-value" id="val-annex-units">78</div>
         <div class="metric-delta" style="color:var(--brand-red)">↓ 2 revocations from 80</div>
       </div>
       <div class="metric-card">
         <div class="metric-label">Value of Sales</div>
-        <div class="metric-value">₦6.89B</div>
+        <div class="metric-value" id="val-annex-sales">₦6.89B</div>
         <div class="metric-delta" style="color:var(--text-muted)">Flat since mid-Jan</div>
       </div>
       <div class="metric-card highlight">
         <div class="metric-label" style="color:var(--brand-red)">Account Balance</div>
-        <div class="metric-value" style="color:var(--brand-red)">₦82.8M</div>
+        <div class="metric-value" id="val-annex-balance" style="color:var(--brand-red)">₦82.8M</div>
         <div class="metric-delta" style="color:var(--brand-red)">↓ From ₦388M on Jan 5</div>
       </div>
     </div>
@@ -391,12 +412,18 @@
         <div class="chart-wrap"><canvas id="c1"></canvas></div>
       </div>
       <div class="chart-card">
-        <h3>Construction Status</h3>
-        <div class="status-list" style="margin-top:4px">
-          <div class="status-item"><span class="s-dept">Internal Roads</span><span class="s-note">Jay Jay Okocha compaction ongoing. Finidi George complete.</span></div>
-          <div class="status-item"><span class="s-dept">Drainage</span><span class="s-note">Second-lane drainage active. BAFF ahead of schedule.</span></div>
-          <div class="status-item"><span class="s-dept">Layout Approval</span><span class="s-note">Blocked since Aug 2025. File with Commissioner.</span></div>
-          <div class="status-item"><span class="s-dept">Gate House</span><span class="s-note">Complete — touch-ups and final inspection pending.</span></div>
+        <div class="chart-card-header-flex">
+          <h3>Monthly Targets</h3>
+          <div class="target-legend">
+            <span class="legend-red">● Carried Over</span>
+            <span class="legend-green">● New</span>
+          </div>
+        </div>
+        <div class="target-list" id="targets-annexe">
+          <div class="target-item new-target"><span class="t-name">Internal Roads</span><span class="t-note">Jay Jay Okocha compaction ongoing. Finidi George complete.</span></div>
+          <div class="target-item new-target"><span class="t-name">Drainage</span><span class="t-note">Second-lane drainage active. BAFF ahead of schedule.</span></div>
+          <div class="target-item carryover"><span class="t-name">Layout Approval</span><span class="t-note">Blocked since Aug 2025. File with Commissioner.</span></div>
+          <div class="target-item carryover"><span class="t-name">Gate House</span><span class="t-note">Complete — touch-ups and final inspection pending.</span></div>
         </div>
       </div>
     </div>
@@ -419,65 +446,65 @@
       <div class="sidebar-section" id="sidebar-crossings" style="display: none;">
         <div class="sidebar-section-label">Lakowe Crossings</div>
         <button class="sidebar-item" onclick="showDept('cx-design', this, 'Crossings', 'Design')">
-          Design <span class="dept-count">4</span>
+          Design <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item" onclick="showDept('cx-costing', this, 'Crossings', 'Costing')">
-          Costing <span class="dept-count">6</span>
+          Costing <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item" onclick="showDept('cx-finplanning', this, 'Crossings', 'Fin Planning')">
-          Fin Planning <span class="dept-count">1</span>
+          Fin Planning <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item" onclick="showDept('cx-ipd', this, 'Crossings', 'IPD')">
-          IPD <span class="dept-count">6</span>
+          IPD <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item" onclick="showDept('cx-landscape', this, 'Crossings', 'Landscape')">
-          Landscape <span class="dept-count">5</span>
+          Landscape <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item" onclick="showDept('cx-operations', this, 'Crossings', 'Operations')">
-          Operations <span class="dept-count">1</span>
+          Operations <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item" onclick="showDept('cx-fincon', this, 'Crossings', 'Fincon')">
-          Fincon <span class="dept-count">1</span>
+          Fincon <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item" onclick="showDept('cx-sales', this, 'Crossings', 'Sales')">
-          Sales <span class="dept-count">1</span>
+          Sales <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item" onclick="showDept('cx-mcc', this, 'Crossings', 'MCC')">
-          MCC <span class="dept-count">2</span>
+          MCC <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item" onclick="showDept('cx-general', this, 'Crossings', 'General')">
-          General <span class="dept-count">1</span>
+          General <span class="dept-count">0</span>
         </button>
       </div>
 
       <div class="sidebar-section" id="sidebar-annexe" style="display: none;">
         <div class="sidebar-section-label annexe">Lakowe Annexe</div>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-design', this, 'Annexe', 'Design')">
-          Design <span class="dept-count">5</span>
+          Design <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-costing', this, 'Annexe', 'Costing')">
-          Costing <span class="dept-count">4</span>
+          Costing <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-ipd', this, 'Annexe', 'IPD')">
-          IPD <span class="dept-count">6</span>
+          IPD <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-operations', this, 'Annexe', 'Operations')">
-          Operations <span class="dept-count">2</span>
+          Operations <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-fincon', this, 'Annexe', 'Fincon')">
-          Fincon <span class="dept-count">2</span>
+          Fincon <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-telemarketing', this, 'Annexe', 'Telemarketing')">
-          Telemarketing <span class="dept-count">1</span>
+          Telemarketing <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-mcc', this, 'Annexe', 'MCC')">
-          MCC <span class="dept-count">2</span>
+          MCC <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-sales', this, 'Annexe', 'Sales')">
-          Sales <span class="dept-count">1</span>
+          Sales <span class="dept-count">0</span>
         </button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-legal', this, 'Annexe', 'Legal')">
-          Legal <span class="dept-count">1</span>
+          Legal <span class="dept-count">0</span>
         </button>
       </div>
 
@@ -517,82 +544,93 @@
     btn.classList.add('active');
   }
 
-  // ── UPDATED LOGIC ──
   function showLanding() {
-    // Hide all pages, reveal only landing container
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-landing').classList.add('active');
-    document.getElementById('nav-tabs-group').style.display = 'none'; // Hide tabs on landing
-    
-    // Clear Active state from Nav Project Buttons
+    document.getElementById('nav-tabs-group').style.display = 'none';
     document.querySelectorAll('.nav-project-btn').forEach(btn => btn.classList.remove('active'));
   }
 
   function selectProject(proj) {
-    // 1. Highlight Top Navigation Badges cleanly
     document.querySelectorAll('.nav-project-btn').forEach(btn => btn.classList.remove('active'));
     if(proj === 'Crossings') document.getElementById('btn-nav-cx').classList.add('active');
     if(proj === 'Annexe') document.getElementById('btn-nav-annex').classList.add('active');
 
-    // 2. Toggle visibility of Dashboard Blocks
     document.getElementById('block-crossings').style.display = (proj === 'Crossings') ? 'block' : 'none';
     document.getElementById('block-annexe').style.display = (proj === 'Annexe') ? 'block' : 'none';
-
-    // 3. Toggle visibility of Department Sidebar Sections
     document.getElementById('sidebar-crossings').style.display = (proj === 'Crossings') ? 'block' : 'none';
     document.getElementById('sidebar-annexe').style.display = (proj === 'Annexe') ? 'block' : 'none';
 
-    // 4. Reveal Nav Tabs 
     document.getElementById('nav-tabs-group').style.display = 'flex';
     
-    // 5. Check if currently on the Landing Page. If so, move to Dashboard. 
-    // If user is ALREADY inside Departments, do NOT force them to Dashboard.
     if(document.getElementById('page-landing').classList.contains('active')) {
       const dashTab = document.querySelector('.nav-tab[onclick*="dashboard"]');
       showPage('dashboard', dashTab);
     }
 
-    // 6. Reset Department View State
     document.getElementById('panel-placeholder').style.display = 'flex'; 
     document.getElementById('dynamic-dept-container').style.display = 'none';
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
   }
 
-  // Pre-load default static tasks for demo purposes so it works without uploading
+  // Database Array
   let taskDatabase = [
-    // Crossings Data
-    { project: 'Crossings', dept: 'Design', action: 'Finalise design for hospitality initiative', explanation: 'Redesigned from apartments to studios.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'Design', action: 'Assess economic viability of eliminating road', explanation: 'Decision deferred for economic option.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'Costing', action: 'Update on sandfilling progress vs actuals', explanation: 'Diesel price spike affecting budget.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'IPD', action: 'Clear road alignment into Phase 1 with swamp buggy', explanation: 'Buggy active; pushing mindset shift.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'Landscape', action: 'Finalise park sculptures with Mrs H', explanation: 'Steel and mixed metal. Faceless and joyful.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'Operations', action: 'Provide weekly updates on sales metrics', explanation: 'Inflow: ₦1.72B. 1 active offer.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'Fincon', action: 'Process contractor mobilisation payments', explanation: '₦488M paid of ₦527M budget.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'Sales', action: 'Present clear pathway to ₦1B cumulative target', explanation: 'Pending offers to convert.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'MCC', action: 'Present bold marketing ideas to reflect scale', explanation: 'Visually striking image of activity needed.', due: 'Apr 13' },
-    { project: 'Crossings', dept: 'General', action: 'Scale visual impression for ₦50B raise', explanation: 'All depts to brainstorm on visual scale.', due: 'Next session' },
-    // Annexe Data
-    { project: 'Annexe', dept: 'Design', action: 'Escalate layout approval delay', explanation: 'File with Commissioner; blocked since Aug 2025.', due: 'Apr 9' },
-    { project: 'Annexe', dept: 'Design', action: 'Finalise gate house inspection', explanation: 'Touchups and IPD check required.', due: 'Apr 9' },
-    { project: 'Annexe', dept: 'Costing', action: 'Contractor valuation and April disbursements', explanation: '~₦600M requested for internal roads.', due: 'Apr 9' },
-    { project: 'Annexe', dept: 'IPD', action: 'Complete 1.3km drainage to Ibudo Wura', explanation: 'BAFF ahead of schedule.', due: 'May 29' },
-    { project: 'Annexe', dept: 'Operations', action: 'Sales inflow reporting and revs update', explanation: 'Balance at ₦82M vs burn rate risk.', due: 'Apr 9' },
-    { project: 'Annexe', dept: 'Fincon', action: 'Repayment of inter-project loans', explanation: '₦150M owed to Elms Gardens overdue.', due: 'Overdue' },
-    { project: 'Annexe', dept: 'Telemarketing', action: 'Weekly leads report', explanation: '42 leads generated; 5 qualified.', due: 'Apr 9' },
-    { project: 'Annexe', dept: 'MCC', action: 'Implement LinkedIn strategy for C-Suite', explanation: 'Storytelling gap identified.', due: 'Apr 9' },
-    { project: 'Annexe', dept: 'Sales', action: 'Strategy to push balance to ₦1B+', explanation: 'Sales stuck at 78 units.', due: 'Apr 9' },
-    { project: 'Annexe', dept: 'Legal', action: 'Monitor LNT Trademark publication', explanation: 'Publication expected Aug 21.', due: 'Aug 21' }
+    // Crossings Tasks
+    { project: 'Crossings', dept: 'Design', action: 'Finalise design for hospitality initiative', explanation: 'Redesigned from apartments to studios. Awaiting final mechanical specs before print.', due: 'Apr 13' },
+    { project: 'Crossings', dept: 'Design', action: 'Assess economic viability of eliminating road', explanation: 'Decision deferred for economic option to reduce paving costs across layout.', due: 'Overdue' },
+    { project: 'Crossings', dept: 'Costing', action: 'Update on sandfilling progress vs actuals', explanation: 'Diesel price spike affecting budget. Negotiation with swamp buggy operators needed.', due: 'Apr 13' },
+    { project: 'Crossings', dept: 'IPD', action: 'Clear road alignment into Phase 1 with swamp buggy', explanation: 'Buggy active; pushing mindset shift among ground contractors.', due: 'Apr 13' },
+    { project: 'Crossings', dept: 'Landscape', action: 'Finalise park sculptures with Mrs H', explanation: 'Steel and mixed metal structures selected. Faceless and joyful. Installation next week.', due: 'Apr 13' },
+    { project: 'Crossings', dept: 'Operations', action: 'Provide weekly updates on sales metrics', explanation: 'Inflow at ₦1.72B. 1 active offer pending signature clearance.', due: 'Apr 13' },
+    { project: 'Crossings', dept: 'Fincon', action: 'Process contractor mobilisation payments', explanation: '₦488M paid of ₦527M monthly budget. Remaining to be cleared by Friday.', due: 'Apr 13' },
+    { project: 'Crossings', dept: 'Sales', action: 'Present clear pathway to ₦1B cumulative target', explanation: 'Pending offers to convert. Follow-up sequences triggered.', due: 'Delayed' },
+    { project: 'Crossings', dept: 'MCC', action: 'Present bold marketing ideas to reflect scale', explanation: 'Visually striking image of activity needed to capture investor imaginations.', due: 'Apr 13' },
+    { project: 'Crossings', dept: 'General', action: 'Scale visual impression for ₦50B raise', explanation: 'All departments to brainstorm on visual scale requirements.', due: 'Next session' },
+    
+    // Annexe Tasks
+    { project: 'Annexe', dept: 'Design', action: 'Escalate layout approval delay', explanation: 'File stuck with the Commissioner; blocked since Aug 2025. Needs director intervention.', due: 'Overdue' },
+    { project: 'Annexe', dept: 'Design', action: 'Finalise gate house inspection', explanation: 'Touchups and IPD check required before full handover.', due: 'Apr 9' },
+    { project: 'Annexe', dept: 'Costing', action: 'Contractor valuation and April disbursements', explanation: '~₦600M requested for internal roads completion cycle.', due: 'Apr 9' },
+    { project: 'Annexe', dept: 'IPD', action: 'Complete 1.3km drainage to Ibudo Wura', explanation: 'BAFF contractors are slightly ahead of schedule. Need quality checks.', due: 'May 29' },
+    { project: 'Annexe', dept: 'Operations', action: 'Sales inflow reporting and revs update', explanation: 'Balance at ₦82M vs burn rate risk. Escalation sent to finance.', due: 'Apr 9' },
+    { project: 'Annexe', dept: 'Fincon', action: 'Repayment of inter-project loans', explanation: '₦150M owed to Elms Gardens overdue. Requesting 30-day extension.', due: 'Past Due' },
+    { project: 'Annexe', dept: 'Telemarketing', action: 'Weekly leads report', explanation: '42 leads generated; 5 qualified. Passing to sales closers.', due: 'Apr 9' },
+    { project: 'Annexe', dept: 'MCC', action: 'Implement LinkedIn strategy for C-Suite', explanation: 'Storytelling gap identified. Creating thought-leadership articles.', due: 'Apr 9' },
+    { project: 'Annexe', dept: 'Sales', action: 'Strategy to push balance to ₦1B+', explanation: 'Sales stuck at 78 units. Needs urgent promotional drive.', due: 'Apr 9' },
+    { project: 'Annexe', dept: 'Legal', action: 'Monitor LNT Trademark publication', explanation: 'Publication expected Aug 21. No action required right now.', due: 'Aug 21' }
   ];
 
+  // ── Intelligent Sidebar Counter Logic ──
+  function updateSidebarCounts() {
+    document.querySelectorAll('.sidebar-item').forEach(btn => {
+      const onClickAttr = btn.getAttribute('onclick');
+      if (onClickAttr) {
+        // Parse the embedded project and department name natively from the onclick logic
+        const match = onClickAttr.match(/showDept\([^,]+,\s*this,\s*'([^']+)',\s*'([^']+)'\)/);
+        if (match) {
+          const proj = match[1];
+          const dept = match[2];
+          // Count active items
+          const count = taskDatabase.filter(t => t.project === proj && t.dept === dept).length;
+          const span = btn.querySelector('.dept-count');
+          if(span) span.textContent = count;
+        }
+      }
+    });
+  }
+
+  // Automatically count on initial load
+  window.onload = function() {
+    updateSidebarCounts();
+  };
+
+  // ── Render Tasks ──
   function showDept(panelId, btn, projName, deptName) {
-    // Hide placeholder
     document.getElementById('panel-placeholder').style.display = 'none';
     
-    // Update sidebar buttons
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
-    // Render Data
     const container = document.getElementById('dynamic-dept-container');
     const title = document.getElementById('dynamic-dept-title');
     const badge = document.getElementById('dynamic-dept-badge');
@@ -602,7 +640,6 @@
     badge.textContent = projName;
     badge.className = 'nav-badge ' + (projName === 'Crossings' ? 'badge-cx' : 'badge-annex');
     
-    // Filter tasks
     const filtered = taskDatabase.filter(t => t.project === projName && t.dept === deptName);
     
     list.innerHTML = '';
@@ -610,16 +647,23 @@
       list.innerHTML = `<div style="padding:20px; color:#888;">No active tasks found for ${deptName}.</div>`;
     } else {
       filtered.forEach(task => {
-        const cardClass = projName === 'Crossings' ? 'cx-card' : '';
-        const badgeClass = projName === 'Crossings' ? 'badge-cx' : 'badge-annex';
+        // Color Status Logic based on 'due' keyword and timing
+        let dueStr = (task.due || '').toLowerCase();
+        let statusClass = 'ontrack'; // Default to green
+        
+        if (dueStr.includes('overdue') || dueStr.includes('delay') || dueStr.includes('past') || dueStr.match(/jan|feb|mar|2025/)) {
+          statusClass = 'delayed'; // Set to red
+        }
+
         list.innerHTML += `
-          <div class="step-card ${cardClass}">
+          <div class="step-card ${statusClass}" onclick="this.classList.toggle('expanded')">
             <div class="step-card-top">
               <div class="step-text">${task.action}</div>
-            </div>
-            <div class="step-meta">
-              <div class="step-result">${task.explanation}</div>
               <span class="step-date">Due: ${task.due}</span>
+            </div>
+            <div class="step-details-pane" onclick="event.stopPropagation();">
+              <div class="pane-title">Task Description / Details</div>
+              ${task.explanation}
             </div>
           </div>
         `;
@@ -629,7 +673,7 @@
     container.style.display = 'block';
   }
 
-  // ── CSV PARSING & UPLOAD (Vanilla JS Implementation) ──
+  // ── Intelligent Excel / CSV PARSING ──
   function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -639,9 +683,8 @@
       const text = e.target.result;
       processCSV(text);
       document.getElementById('last-updated-text').textContent = 'Last updated: ' + new Date().toLocaleDateString();
-      alert('Spreadsheet data loaded and dashboard updated successfully!');
+      alert('Data successfully parsed! UI Metrics, Targets, and Task Counters updated.');
       
-      // If a department is currently open, refresh it
       const activeBtn = document.querySelector('.sidebar-item.active');
       if(activeBtn) activeBtn.click();
     };
@@ -649,7 +692,7 @@
   }
 
   function processCSV(csvText) {
-    // Basic CSV parser to handle standard quotes
+    // Parser config to navigate Quotes natively
     const rows = [];
     let currentRow = [];
     let curString = '';
@@ -658,7 +701,7 @@
     for (let i = 0; i < csvText.length; i++) {
       const char = csvText[i];
       if (char === '"' && csvText[i+1] === '"') {
-        curString += '"'; i++; // skip escaped quote
+        curString += '"'; i++; 
       } else if (char === '"') {
         inQuotes = !inQuotes;
       } else if (char === ',' && !inQuotes) {
@@ -676,19 +719,48 @@
     if (curString !== '') currentRow.push(curString.trim());
     if (currentRow.length > 0) rows.push(currentRow);
 
-    // Empty old DB
+    // Empty Task DB so we can populate from new file securely
     taskDatabase = [];
     
-    // Map CSV rows to JS objects. 
-    // Assuming CSV columns: S/N, Department, Next Steps/Action, Explanation/Result, Due Date
+    // Arrays for dynamic targets
+    let cxTargets = [];
+    let annexTargets = [];
+
+    // Parse loop using intelligent extraction mapping to earlier HTML structure
     for(let i=1; i<rows.length; i++) {
       const cols = rows[i];
-      if(cols.length < 5) continue;
+      if(cols.length < 3) continue;
       
-      // We will infer project based on a keyword or just assign it based on file upload context
-      let proj = cols.join(' ').toLowerCase().includes('crossings') ? 'Crossings' : 'Annexe';
-      if(!proj) proj = 'Annexe';
+      let strRow = cols.join(' ').toLowerCase();
+      let proj = strRow.includes('crossings') ? 'Crossings' : 'Annexe';
+      
+      // LOGIC 1: Detect Metrics 
+      if (strRow.includes('metric') || cols[0].toLowerCase().includes('inflow') || cols[0].toLowerCase().includes('sold') || cols[0].toLowerCase().includes('balance')) {
+        let key = cols[0].toLowerCase();
+        let val = cols[1] || cols[2]; // Assumes value is in col B or C
+        
+        // Map natively to the element ID created earlier
+        if(key.includes('inflow')) document.getElementById(proj === 'Crossings' ? 'val-cx-inflow' : 'val-annex-inflow').textContent = val;
+        if(key.includes('units') || key.includes('sold')) document.getElementById(proj === 'Crossings' ? 'val-cx-units' : 'val-annex-units').textContent = val;
+        if(key.includes('sales')) document.getElementById(proj === 'Crossings' ? 'val-cx-sales' : 'val-annex-sales').textContent = val;
+        if(key.includes('budget')) document.getElementById('val-cx-budget').textContent = val;
+        if(key.includes('offer')) document.getElementById('val-cx-offers').textContent = val;
+        if(key.includes('balance')) document.getElementById('val-annex-balance').textContent = val;
+        continue;
+      }
 
+      // LOGIC 2: Detect Monthly Targets
+      if (strRow.includes('target') || cols[0].toLowerCase() === 'target') {
+        let name = cols[2];
+        let desc = cols[3];
+        let state = (cols[4] || '').toLowerCase().includes('carry') ? 'carryover' : 'new-target';
+        
+        let htmlStr = `<div class="target-item ${state}"><span class="t-name">${name}</span><span class="t-note">${desc}</span></div>`;
+        if (proj === 'Crossings') cxTargets.push(htmlStr); else annexTargets.push(htmlStr);
+        continue;
+      }
+
+      // LOGIC 3: Default is Department Task (Standard 5 Col: SN, Dept, Action, Explanation, Due Date)
       taskDatabase.push({
         project: proj,
         dept: cols[1] || 'General',
@@ -697,8 +769,13 @@
         due: cols[4] || 'TBD'
       });
     }
-    
-    console.log("Updated Task DB via CSV:", taskDatabase);
+
+    // Refresh Target UI if new targets found
+    if(cxTargets.length > 0) document.getElementById('targets-crossings').innerHTML = cxTargets.join('');
+    if(annexTargets.length > 0) document.getElementById('targets-annexe').innerHTML = annexTargets.join('');
+
+    // Trigger calculation of sidebar totals
+    updateSidebarCounts();
   }
 
   // ── CHARTS (Red & Grey Theme) ──
@@ -730,4 +807,4 @@
   ]},options:{...base}});
 </script>
 </body>
-</html>
+</html></html>
