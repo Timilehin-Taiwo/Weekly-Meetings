@@ -414,7 +414,7 @@
         <button class="sidebar-item" onclick="showDept('cx-ipd', this, 'Crossings', 'IPD')">IPD <span class="dept-count">0</span></button>
         <button class="sidebar-item" onclick="showDept('cx-landscape', this, 'Crossings', 'Landscape')">Landscape <span class="dept-count">0</span></button>
         <button class="sidebar-item" onclick="showDept('cx-operations', this, 'Crossings', 'Operations')">Operations <span class="dept-count">0</span></button>
-        <button class="sidebar-item" onclick="showDept('cx-fincon', this, 'Crossings', 'FINCON')">Fincon <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept('cx-fincon', this, 'Crossings', 'Fincon')">Fincon <span class="dept-count">0</span></button>
         <button class="sidebar-item" onclick="showDept('cx-sales', this, 'Crossings', 'Sales')">Sales <span class="dept-count">0</span></button>
         <button class="sidebar-item" onclick="showDept('cx-mcc', this, 'Crossings', 'MCC')">MCC <span class="dept-count">0</span></button>
         <button class="sidebar-item" onclick="showDept('cx-amc', this, 'Crossings', 'AMC')">AMC <span class="dept-count">0</span></button>
@@ -425,7 +425,7 @@
         <div class="sidebar-section-label annexe">Lakowe Annexe</div>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-design', this, 'Annexe', 'Design')">Design <span class="dept-count">0</span></button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-costing', this, 'Annexe', 'Costing')">Costing <span class="dept-count">0</span></button>
-        <button class="sidebar-item annexe-btn" onclick="showDept('annex-ipd', this, 'Annexe', 'IPD/PMO')">IPD / PMO <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept('annex-ipd', this, 'Annexe', 'IPD')">IPD / PMO <span class="dept-count">0</span></button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-operations', this, 'Annexe', 'Operations')">Operations <span class="dept-count">0</span></button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-fincon', this, 'Annexe', 'Fincon')">Fincon <span class="dept-count">0</span></button>
         <button class="sidebar-item annexe-btn" onclick="showDept('annex-telemarketing', this, 'Annexe', 'Telemarketing')">Telemarketing <span class="dept-count">0</span></button>
@@ -500,7 +500,30 @@
     document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
   }
 
-  // ── HARDCODED APRIL 20TH DATA EXTRACTION ──
+  // ── DEPARTMENT NORMALIZER ──
+  function normalizeDept(deptStr) {
+    if (!deptStr) return 'General';
+    let d = deptStr.toUpperCase();
+    
+    // Catch all variations of IPD/PMO/PDU/PMU
+    if (d.includes('IPD') || d.includes('PMO') || d.includes('PMU') || d.includes('PDU')) return 'IPD';
+    
+    if (d.includes('FINCON') || d.includes('FINANCIAL')) return 'Fincon';
+    if (d.includes('COSTING')) return 'Costing';
+    if (d.includes('DESIGN')) return 'Design';
+    if (d.includes('OPERATION')) return 'Operations';
+    if (d.includes('SALES')) return 'Sales';
+    if (d.includes('MCC')) return 'MCC';
+    if (d.includes('LEGAL')) return 'Legal';
+    if (d.includes('LANDSCAPE')) return 'Landscape';
+    if (d.includes('AMC')) return 'AMC';
+    if (d.includes('TELEMARKETING') || d.includes('MARKETING')) return 'Telemarketing';
+    if (d.includes('FIN PLAN') || d.includes('FINANCIAL PLAN')) return 'Fin Planning';
+    
+    return 'General'; 
+  }
+
+  // ── HARDCODED APRIL 20TH DATA (Normalized Names) ──
   let taskDatabase = [
     {
       "project": "Annexe",
@@ -576,7 +599,7 @@
     },
     {
       "project": "Annexe",
-      "dept": "IPD/PMO",
+      "dept": "IPD",
       "action": "* Confirm BAFF remobilized after ₦32M payment. \n\n* Segun Odegbami clearing to commence immediately",
       "explanation": "<strong>Result:</strong> Clear the site for the road<br><br><strong>Notes:</strong> STILL NOT STARTED — site activities still severely slowed.",
       "due": "2026-04-23",
@@ -712,7 +735,7 @@
     },
     {
       "project": "Crossings",
-      "dept": "FINCON",
+      "dept": "Fincon",
       "action": "Process Payments - N141 Mn for next tranche of sand filling",
       "explanation": "<strong>Result:</strong> Mobilize Contractors and Vendors<br><br><strong>Notes:</strong> No notes provided.",
       "due": "2026-04-27",
@@ -809,7 +832,7 @@
     container.style.display = 'block';
   }
 
-  // ── CSV & EXCEL PARSING FALLBACK (Kept just in case you need to upload future weeks) ──
+  // ── CSV & EXCEL PARSING (With Department Normalizer Included) ──
   function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -937,7 +960,7 @@
       let statusVal = colMap.status !== -1 && cols[colMap.status] ? String(cols[colMap.status]).trim() : '';
 
       if (deptVal && deptVal !== '' && deptVal.toLowerCase() !== 'department' && !deptVal.toLowerCase().includes('s/n')) {
-        currentDept = deptVal;
+        currentDept = normalizeDept(deptVal);
       }
 
       if (actionVal && actionVal !== '' && !actionVal.toLowerCase().includes('next steps') && !actionVal.toLowerCase().includes('action point')) {
