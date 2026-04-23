@@ -1,1159 +1,1550 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Lakowe Portfolio — Performance Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --white: #ffffff;
+  --bg: #f8f8f8;
+  --border: rgba(0,0,0,0.10);
+  --border-md: rgba(0,0,0,0.16);
+  --text-primary: #1a1a1a;
+  --text-secondary: #555;
+  --text-muted: #999;
+  --brand-red: #D32F2F;
+  --brand-red-light: #fff0f0;
+  --brand-red-hover: #B71C1C;
+  --brand-grey: #616161;
+  --brand-grey-light: #f2f2f2;
+  --brand-grey-dark: #424242;
+  --cx-color: var(--brand-red);
+  --cx-bg: #fff0f0;
+  --annex-color: var(--brand-grey-dark);
+  --annex-bg: var(--brand-grey-light);
+  --status-green: #2e7d32;
+  --status-green-bg: #f0faf0;
+  --status-green-border: #4caf50;
+  --status-red: #c62828;
+  --status-red-bg: #fff5f5;
+  --status-red-border: #ef5350;
+  --status-amber: #e65100;
+  --status-amber-bg: #fffbf0;
+  --status-amber-border: #ff9800;
+  --status-blue: #1565c0;
+  --status-blue-bg: #f0f6ff;
+  --status-blue-border: #42a5f5;
+  --metric-green: #2e7d32;
+  --metric-amber: #e65100;
+  --metric-red: #c62828;
+  --nav-h: 60px;
+  --bottom-nav-h: 64px;
+  --sidebar-w: 220px;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-pill: 100px;
+  --shadow: 0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+}
 
-  :root {
-    --white: #ffffff;
-    --bg: #ffffff; 
-    --border: rgba(0,0,0,0.12);
-    --border-md: rgba(0,0,0,0.18);
-    
-    --text-primary: #222222;
-    --text-secondary: #555555;
-    --text-muted: #888888;
-    
-    --brand-red: #D32F2F;
-    --brand-red-light: #FFEBEE;
-    --brand-red-hover: #B71C1C;
+body {
+font-family: ‘DM Sans’, -apple-system, BlinkMacSystemFont, sans-serif;
+background: var(–bg);
+color: var(–text-primary);
+font-size: 14px;
+line-height: 1.55;
+-webkit-font-smoothing: antialiased;
+overscroll-behavior: none;
+}
 
-    --brand-grey: #616161;
-    --brand-grey-light: #F5F5F5;
-    --brand-grey-dark: #424242;
+/* ── NAV ── */
+nav {
+position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+height: var(–nav-h);
+background: var(–white);
+border-bottom: 1px solid var(–border);
+display: flex; align-items: center; padding: 0 20px;
+gap: 20px;
+}
+.nav-brand {
+font-size: 15px; font-weight: 800; color: var(–text-primary);
+letter-spacing: -0.03em; white-space: nowrap; cursor: pointer;
+transition: opacity 0.2s; user-select: none;
+}
+.nav-brand:hover { opacity: 0.7; }
+.nav-brand span { color: var(–brand-red); }
+.nav-tabs { display: flex; gap: 6px; }
+.nav-tab {
+padding: 7px 16px; border-radius: var(–radius-pill);
+font-size: 13px; font-weight: 600; cursor: pointer;
+color: var(–text-secondary); border: 1px solid transparent; background: none;
+transition: all 0.2s; font-family: inherit;
+}
+.nav-tab:hover { background: var(–brand-grey-light); color: var(–text-primary); }
+.nav-tab.active { background: var(–brand-red); color: #fff; border-color: var(–brand-red); }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.nav-date { font-size: 11px; color: var(–text-muted); font-weight: 600; white-space: nowrap; }
+.nav-badge {
+font-size: 10px; font-weight: 800; padding: 3px 10px;
+border-radius: var(–radius-pill); letter-spacing: 0.04em; text-transform: uppercase;
+}
+.badge-cx { background: var(–cx-bg); color: var(–cx-color); }
+.badge-annex { background: var(–annex-bg); color: var(–annex-color); }
+.nav-project-btn { cursor: pointer; opacity: 0.35; transition: opacity 0.2s; }
+.nav-project-btn:hover { opacity: 0.7; }
+.nav-project-btn.active { opacity: 1; }
+.upload-btn {
+background: var(–brand-grey-dark); color: white;
+font-size: 11px; font-weight: 700; padding: 7px 12px;
+border-radius: var(–radius-sm); cursor: pointer;
+transition: background 0.2s; border: none;
+display: inline-flex; align-items: center; gap: 5px;
+font-family: inherit;
+}
+.upload-btn:hover { background: var(–text-primary); }
+.upload-btn-text { display: inline; }
 
-    --cx-color: var(--brand-red);
-    --cx-bg: var(--brand-red-light);
-    --annex-color: var(--brand-grey-dark);
-    --annex-bg: var(--brand-grey-light);
+/* ── MOBILE BOTTOM NAV ── */
+.bottom-nav {
+display: none;
+position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+height: var(–bottom-nav-h);
+background: var(–white);
+border-top: 1px solid var(–border);
+box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+}
+.bottom-nav-inner {
+display: flex; height: 100%; align-items: stretch;
+}
+.bottom-nav-btn {
+flex: 1; display: flex; flex-direction: column; align-items: center;
+justify-content: center; gap: 4px; cursor: pointer;
+background: none; border: none; font-family: inherit;
+color: var(–text-muted); transition: color 0.2s;
+padding-bottom: env(safe-area-inset-bottom, 0px);
+-webkit-tap-highlight-color: transparent;
+}
+.bottom-nav-btn.active { color: var(–brand-red); }
+.bottom-nav-btn.active .bnav-dot { display: block; }
+.bnav-icon { font-size: 20px; line-height: 1; }
+.bnav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
+.bnav-dot { display: none; width: 4px; height: 4px; border-radius: 50%; background: var(–brand-red); position: absolute; top: 8px; }
 
-    --accent: var(--brand-red);
-    
-    --nav-h: 65px;
-    --sidebar-w: 240px;
-    --radius: 8px;
-    --radius-sm: 4px;
-    --shadow: 0 2px 5px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
-  }
+/* ── PAGES ── */
+.page { display: none; margin-top: var(–nav-h); min-height: calc(100vh - var(–nav-h)); padding-top: 16px; }
+.page.active { display: block; }
 
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg);
-    color: var(--text-primary);
-    font-size: 14px;
-    line-height: 1.55;
-  }
+/* ── LANDING PAGE ── */
+.landing-container {
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+min-height: calc(100vh - var(–nav-h));
+padding: 24px;
+text-align: center;
+}
+.landing-logo-mark {
+width: 56px; height: 56px; background: var(–brand-red);
+border-radius: 14px; display: flex; align-items: center; justify-content: center;
+font-size: 24px; margin-bottom: 24px;
+box-shadow: 0 8px 24px rgba(211,47,47,0.3);
+}
+.landing-container h2 {
+font-size: 22px; font-weight: 800; margin-bottom: 8px;
+letter-spacing: -0.03em;
+}
+.landing-container p { font-size: 14px; color: var(–text-muted); margin-bottom: 36px; }
+.landing-buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.landing-btn {
+padding: 18px 40px; font-size: 15px; font-weight: 700;
+border: none; border-radius: var(–radius); cursor: pointer;
+transition: all 0.25s; color: white; letter-spacing: 0.01em;
+font-family: inherit; box-shadow: var(–shadow-md);
+display: flex; flex-direction: column; align-items: center; gap: 4px;
+min-width: 180px;
+}
+.landing-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+.landing-btn:active { transform: translateY(0); }
+.landing-btn small { font-size: 11px; font-weight: 500; opacity: 0.75; }
+.btn-cx { background: var(–brand-red); }
+.btn-cx:hover { background: var(–brand-red-hover); }
+.btn-annex { background: var(–brand-grey-dark); }
+.btn-annex:hover { background: #1a1a1a; }
 
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    height: var(--nav-h);
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; padding: 0 28px;
-    gap: 32px;
-  }
-  .nav-brand {
-    font-size: 16px; font-weight: 700; color: var(--text-primary);
-    letter-spacing: -0.02em; white-space: nowrap; margin-right: 8px;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-  .nav-brand:hover { opacity: 0.7; }
-  .nav-brand span { color: var(--brand-red); }
-  .nav-tabs { display: flex; gap: 8px; }
-  .nav-tab {
-    padding: 8px 18px; border-radius: var(--radius-sm);
-    font-size: 13px; font-weight: 600; cursor: pointer;
-    color: var(--text-secondary); border: 1px solid transparent; background: none;
-    transition: all 0.2s;
-  }
-  .nav-tab:hover { background: var(--brand-grey-light); color: var(--text-primary); }
-  .nav-tab.active { background: var(--accent); color: #fff; }
-  
-  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
-  .nav-date { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-  
-  .nav-badge {
-    font-size: 11px; font-weight: 700; padding: 4px 10px;
-    border-radius: 20px; letter-spacing: 0.03em; text-transform: uppercase;
-  }
-  .badge-cx { background: var(--cx-bg); color: var(--cx-color); }
-  .badge-annex { background: var(--annex-bg); color: var(--annex-color); }
+/* ── DASHBOARD ── */
+.dash-container { max-width: 1060px; margin: 0 auto; padding: 0 20px 48px; }
+.project-block { margin-bottom: 48px; }
+.project-heading {
+display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+padding-bottom: 12px; border-bottom: 2px solid var(–brand-grey-light);
+flex-wrap: wrap; gap: 8px;
+}
+.project-heading h2 { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+.project-heading .ph-date { font-size: 11px; color: var(–text-muted); margin-left: auto; font-weight: 600; }
 
-  .nav-project-btn { cursor: pointer; opacity: 0.4; transition: opacity 0.2s; }
-  .nav-project-btn:hover { opacity: 0.8; }
-  .nav-project-btn.active { opacity: 1; }
+/* Metric Cards */
+.metrics-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+gap: 12px; margin-bottom: 20px;
+}
+.metric-card {
+background: var(–white); border: 1px solid var(–border); border-radius: var(–radius);
+padding: 18px; box-shadow: var(–shadow); position: relative; overflow: hidden;
+transition: box-shadow 0.2s;
+}
+.metric-card:hover { box-shadow: var(–shadow-md); }
+.metric-card.priority-card { border: 2px solid; }
+.metric-card.priority-card.color-red { border-color: var(–brand-red); background: var(–status-red-bg); }
+.metric-card.priority-card.color-amber { border-color: var(–status-amber-border); background: var(–status-amber-bg); }
+.metric-card.priority-card.color-green { border-color: var(–status-green-border); background: var(–status-green-bg); }
+.priority-tag {
+position: absolute; top: -1px; right: 12px;
+font-size: 9px; font-weight: 800; padding: 3px 7px;
+border-radius: 0 0 6px 6px; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.color-red .priority-tag { background: var(–brand-red); color: white; }
+.color-amber .priority-tag { background: var(–status-amber-border); color: white; }
+.color-green .priority-tag { background: var(–status-green-border); color: white; }
+.metric-label { font-size: 10px; color: var(–text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.metric-value {
+font-size: 22px; font-weight: 800; letter-spacing: -0.03em;
+color: var(–text-primary);
+font-family: ‘DM Mono’, monospace;
+}
+.metric-value.color-red { color: var(–metric-red); }
+.metric-value.color-amber { color: var(–metric-amber); }
+.metric-value.color-green { color: var(–metric-green); }
+.metric-delta { font-size: 11px; margin-top: 6px; font-weight: 600; color: var(–text-muted); }
 
-  .upload-btn {
-    background: var(--brand-grey-dark); color: white;
-    font-size: 12px; font-weight: 600; padding: 8px 14px;
-    border-radius: var(--radius-sm); cursor: pointer;
-    transition: background 0.2s; border: none;
-    display: inline-flex; align-items: center; gap: 6px;
-  }
-  .upload-btn:hover { background: var(--text-primary); }
+/* Overdue Panel */
+.overdue-panel {
+background: var(–status-red-bg); border: 1px solid var(–status-red-border);
+border-radius: var(–radius); margin-bottom: 16px; overflow: hidden;
+}
+.overdue-header {
+display: flex; align-items: center; justify-content: space-between;
+padding: 12px 16px; cursor: pointer; user-select: none;
+font-size: 13px; font-weight: 700; color: var(–status-red);
+gap: 8px;
+}
+.overdue-header:hover { background: rgba(211,47,47,0.05); }
+.overdue-toggle-icon { font-size: 10px; transition: transform 0.2s; }
+.overdue-panel.expanded .overdue-toggle-icon { transform: rotate(180deg); }
+.overdue-list { display: none; border-top: 1px solid var(–status-red-border); }
+.overdue-panel.expanded .overdue-list { display: block; }
+.overdue-item {
+display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+border-bottom: 1px solid rgba(211,47,47,0.08); font-size: 12px;
+flex-wrap: wrap;
+}
+.overdue-item:last-child { border-bottom: none; }
+.overdue-dept {
+background: var(–brand-red); color: white;
+font-size: 9px; font-weight: 800; padding: 2px 7px;
+border-radius: var(–radius-pill); text-transform: uppercase;
+letter-spacing: 0.04em; white-space: nowrap; flex-shrink: 0;
+}
+.overdue-action { color: var(–text-primary); font-weight: 600; flex: 1; min-width: 120px; }
+.overdue-due { color: var(–status-red); font-size: 10px; font-weight: 700; white-space: nowrap; }
 
-  .page { display: none; margin-top: var(--nav-h); min-height: calc(100vh - var(--nav-h)); padding-top: 20px; }
-  .page.active { display: block; }
+/* Charts */
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.chart-card {
+background: var(–white); border: 1px solid var(–border); border-radius: var(–radius);
+padding: 18px; box-shadow: var(–shadow);
+}
+.chart-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
+.chart-card h3 { font-size: 11px; font-weight: 800; color: var(–text-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
+.chart-wrap { position: relative; height: 190px; width: 100%; }
+.target-legend { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: flex; gap: 8px; }
+.legend-red { color: #d32f2f; }
+.legend-green { color: #2e7d32; }
+.target-list { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+.target-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; border-left: 3px solid transparent; padding-left: 10px; }
+.target-item.new-target { border-left-color: #4caf50; }
+.target-item.new-target .t-name { color: #2e7d32; }
+.target-item.carryover { border-left-color: #f44336; }
+.target-item.carryover .t-name { color: #c62828; }
+.t-name { font-weight: 800; min-width: 120px; flex-shrink: 0; font-size: 11px; }
+.t-note { color: var(–text-secondary); line-height: 1.5; }
 
-  .landing-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - var(--nav-h) - 40px); text-align: center; }
-  .landing-container h2 { font-size: 24px; margin-bottom: 32px; color: var(--text-primary); letter-spacing: -0.02em; }
-  .landing-buttons { display: flex; gap: 24px; }
-  .landing-btn { padding: 20px 48px; font-size: 16px; font-weight: 700; border: none; border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: white; letter-spacing: 0.02em; }
-  .landing-btn:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-  .btn-cx { background: var(--brand-red); }
-  .btn-cx:hover { background: var(--brand-red-hover); }
-  .btn-annex { background: var(--brand-grey-dark); }
-  .btn-annex:hover { background: #222; }
+/* Alert Strip */
+.alert-strip {
+border-radius: var(–radius-sm); padding: 12px 16px; font-size: 13px; line-height: 1.5;
+margin-bottom: 20px; display: flex; align-items: flex-start; gap: 10px; font-weight: 500;
+}
+.alert-red { background: var(–status-red-bg); border-left: 4px solid var(–brand-red); color: #7f1d1d; }
+.alert-grey { background: var(–brand-grey-light); border-left: 4px solid var(–brand-grey-dark); color: #222; }
 
-  .dash-container { max-width: 1100px; margin: 0 auto; padding: 10px 24px 48px; }
+/* ── DEPARTMENTS PAGE ── */
+.dept-container { max-width: 1060px; margin: 0 auto; padding: 0 20px 48px; }
+.dept-layout { display: grid; grid-template-columns: var(–sidebar-w) 1fr; gap: 24px; align-items: start; }
 
-  .project-block { margin-bottom: 48px; }
-  .project-heading {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-    padding-bottom: 12px; border-bottom: 2px solid var(--brand-grey-light);
-  }
-  .project-heading h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+.dept-sidebar {
+background: var(–white); border: 1px solid var(–border); border-radius: var(–radius);
+box-shadow: var(–shadow); position: sticky; top: calc(var(–nav-h) + 20px); overflow: hidden;
+}
+.sidebar-section { padding: 14px 0; }
+.sidebar-section:not(:last-child) { border-bottom: 1px solid var(–border); }
+.sidebar-section-label {
+font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+color: var(–brand-red); padding: 0 16px 8px;
+}
+.sidebar-section-label.annexe { color: var(–brand-grey-dark); }
+.sidebar-item {
+display: flex; align-items: center; gap: 10px;
+padding: 9px 16px; cursor: pointer; font-size: 12px; font-weight: 700;
+color: var(–text-secondary); border-radius: 0; transition: all 0.15s;
+border: none; background: none; width: 100%; text-align: left; font-family: inherit;
+min-height: 40px;
+}
+.sidebar-item:hover { background: var(–brand-grey-light); color: var(–text-primary); }
+.sidebar-item.active { background: var(–brand-red); color: #fff; }
+.sidebar-item.active.annexe-btn { background: var(–brand-grey-dark); }
+.sidebar-item.active .dept-count { background: rgba(255,255,255,0.25); color: #fff; }
+.dept-count {
+margin-left: auto; font-size: 10px; font-weight: 800;
+background: var(–brand-grey-light); color: var(–text-muted);
+padding: 2px 8px; border-radius: var(–radius-pill);
+}
 
-  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 24px; }
-  .metric-card {
-    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 20px; box-shadow: var(--shadow); position: relative;
-  }
-  
-  .metric-card.highlight { border: 2px solid var(--brand-red); background: var(--brand-red-light); }
-  .metric-card.highlight::before {
-    content: "★ Priority"; position: absolute; top: -10px; right: 12px;
-    background: var(--brand-red); color: white; font-size: 10px; font-weight: bold;
-    padding: 3px 8px; border-radius: 12px; letter-spacing: 0.05em;
-    text-transform: uppercase; box-shadow: var(--shadow);
-  }
+/* Dept Main */
+.dept-main { min-height: 500px; }
+.dept-panel { display: none; animation: fadeIn 0.25s ease; }
+.dept-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-  .metric-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-  .metric-value { font-size: 24px; font-weight: 700; letter-spacing: -0.03em; color: var(--text-primary); }
-  .metric-delta { font-size: 12px; margin-top: 6px; font-weight: 500; }
+/* History Selector */
+.dept-history-bar {
+display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+overflow-x: auto; padding-bottom: 4px;
+scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.dept-history-bar::-webkit-scrollbar { display: none; }
+.history-pill {
+flex-shrink: 0; padding: 6px 14px; border-radius: var(–radius-pill);
+font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+border: 1.5px solid var(–border); background: var(–white); color: var(–text-muted);
+font-family: inherit;
+}
+.history-pill:hover { border-color: var(–brand-red); color: var(–brand-red); }
+.history-pill.active { background: var(–brand-red); border-color: var(–brand-red); color: white; }
+.history-label {
+font-size: 10px; font-weight: 700; color: var(–text-muted); text-transform: uppercase;
+letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0;
+}
 
-  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-  .chart-card {
-    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 20px; box-shadow: var(--shadow);
-  }
-  
-  .chart-card-header-flex { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;}
-  .chart-card h3 { font-size: 13px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0; }
-  .target-legend { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: flex; gap: 8px;}
-  .legend-red { color: #d32f2f; }
-  .legend-green { color: #2e7d32; }
+/* Dept Header */
+.dept-header {
+background: var(–white); border: 1px solid var(–border); border-radius: var(–radius);
+padding: 18px; margin-bottom: 16px; box-shadow: var(–shadow);
+display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+}
+.dept-header-text h2 { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+.dept-header-text p { font-size: 13px; color: var(–text-secondary); }
+.dept-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
-  .chart-wrap { position: relative; height: 200px; width: 100%; }
+/* Filter Tabs */
+.filter-tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-tab {
+padding: 6px 14px; border-radius: var(–radius-pill); font-size: 11px; font-weight: 700;
+cursor: pointer; border: 1.5px solid var(–border); background: var(–white);
+color: var(–text-muted); transition: all 0.2s; font-family: inherit;
+}
+.filter-tab:hover { border-color: var(–brand-grey); color: var(–text-primary); }
+.filter-tab.active { background: var(–text-primary); border-color: var(–text-primary); color: white; }
+.filter-tab[data-filter=“ontrack”].active { background: var(–status-green); border-color: var(–status-green); }
+.filter-tab[data-filter=“delayed”].active { background: var(–status-red); border-color: var(–status-red); }
+.filter-tab[data-filter=“onhold”].active { background: var(–status-amber); border-color: var(–status-amber); }
+.filter-tab[data-filter=“done”].active { background: var(–status-blue); border-color: var(–status-blue); }
 
-  .target-list { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
-  .target-item { display: flex; align-items: flex-start; gap: 12px; font-size: 13px; border-left: 3px solid transparent; padding-left: 10px; }
-  .target-item.new-target { border-left-color: #4caf50; }
-  .target-item.new-target .t-name { color: #2e7d32; }
-  .target-item.carryover { border-left-color: #f44336; }
-  .target-item.carryover .t-name { color: #c62828; }
-  .target-item.achieved { border-left-color: #2196f3; }
-  .target-item.achieved .t-name { color: #0277bd; }
-  .t-name { font-weight: 700; min-width: 140px; flex-shrink: 0; }
-  .t-note { color: var(--text-secondary); line-height: 1.5; }
+/* Task Cards */
+.next-steps-list { display: flex; flex-direction: column; gap: 12px; }
+.step-card {
+background: var(–white); border: 1px solid var(–border); border-radius: var(–radius);
+padding: 16px; box-shadow: var(–shadow); cursor: pointer;
+position: relative; transition: all 0.2s; border-left-width: 4px;
+}
+.step-card:hover { box-shadow: var(–shadow-md); transform: translateY(-1px); }
+.step-card:active { transform: translateY(0); }
+.step-card.s-ontrack { border-left-color: var(–status-green-border); background: var(–status-green-bg); }
+.step-card.s-delayed { border-left-color: var(–status-red-border); background: var(–status-red-bg); }
+.step-card.s-onhold { border-left-color: var(–status-amber-border); background: var(–status-amber-bg); }
+.step-card.s-done { border-left-color: var(–status-blue-border); background: var(–status-blue-bg); opacity: 0.75; }
 
-  .alert-strip {
-    border-radius: var(--radius-sm); padding: 14px 18px; font-size: 13.5px; line-height: 1.5;
-    margin-bottom: 20px; display: flex; align-items: flex-start; gap: 12px; font-weight: 500;
-  }
-  .alert-red { background: var(--brand-red-light); border-left: 4px solid var(--brand-red); color: #7f1d1d; }
-  .alert-grey { background: var(--brand-grey-light); border-left: 4px solid var(--brand-grey-dark); color: #222; }
+/* Context Line */
+.step-context {
+font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+color: var(–text-muted); margin-bottom: 5px;
+}
+.s-ontrack .step-context { color: var(–status-green); }
+.s-delayed .step-context { color: var(–status-red); }
+.s-onhold .step-context { color: var(–status-amber); }
+.s-done .step-context { color: var(–status-blue); }
 
-  .dept-container { max-width: 1100px; margin: 0 auto; padding: 10px 24px 48px; }
-  .dept-layout { display: grid; grid-template-columns: var(--sidebar-w) 1fr; gap: 32px; align-items: start; }
+.step-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.step-text { font-size: 13.5px; color: var(–text-primary); line-height: 1.55; font-weight: 700; flex: 1; }
+.step-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+.step-date {
+font-size: 10px; color: var(–text-muted); font-weight: 700;
+background: rgba(0,0,0,0.05); padding: 3px 8px; border-radius: var(–radius-pill);
+white-space: nowrap; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.step-date.overdue { background: var(–status-red-bg); color: var(–status-red); }
+.status-badge {
+font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: var(–radius-pill);
+letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
+}
+.sb-ontrack { background: rgba(46,125,50,0.12); color: var(–status-green); }
+.sb-delayed { background: rgba(198,40,40,0.12); color: var(–status-red); }
+.sb-onhold { background: rgba(230,81,0,0.12); color: var(–status-amber); }
+.sb-done { background: rgba(21,101,192,0.12); color: var(–status-blue); }
 
-  .dept-sidebar {
-    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
-    box-shadow: var(--shadow); position: sticky; top: calc(var(--nav-h) + 24px);
-    overflow: hidden;
-  }
-  .sidebar-section { padding: 16px 0; }
-  .sidebar-section:not(:last-child) { border-bottom: 1px solid var(--border); }
-  .sidebar-section-label {
-    font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--brand-red); padding: 0 18px 10px;
-  }
-  .sidebar-section-label.annexe { color: var(--brand-grey-dark); }
-  .sidebar-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 18px; cursor: pointer; font-size: 13px; font-weight: 600;
-    color: var(--text-secondary); border-radius: 0; transition: all 0.15s;
-    border: none; background: none; width: 100%; text-align: left;
-  }
-  .sidebar-item:hover { background: var(--brand-grey-light); color: var(--text-primary); }
-  .sidebar-item.active { background: var(--brand-red); color: #fff; }
-  .sidebar-item.active.annexe-btn { background: var(--brand-grey-dark); }
-  .sidebar-item.active .dept-count { background: rgba(255,255,255,0.3); color: #fff; }
-  
-  .dept-count {
-    margin-left: auto; font-size: 11px; font-weight: 700;
-    background: var(--brand-grey-light); color: var(--text-muted);
-    padding: 2px 8px; border-radius: 20px;
-  }
+.step-details-pane {
+display: none; margin-top: 14px; padding-top: 12px;
+border-top: 1px dashed var(–border-md); font-size: 13px;
+color: var(–text-secondary); line-height: 1.65;
+}
+.step-card.expanded .step-details-pane { display: block; animation: fadeIn 0.2s ease; }
+.pane-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(–brand-grey); margin-bottom: 6px; }
+.status-actions {
+display: flex; gap: 8px; margin-top: 14px; padding-top: 12px;
+border-top: 1px solid var(–border); flex-wrap: wrap;
+}
+.status-btn {
+padding: 6px 14px; border-radius: var(–radius-pill); font-size: 11px; font-weight: 700;
+cursor: pointer; border: 1.5px solid; transition: all 0.2s; font-family: inherit;
+display: inline-flex; align-items: center; gap: 5px;
+}
+.status-btn:hover { transform: scale(1.03); }
+.status-btn:active { transform: scale(0.97); }
+.btn-done { border-color: var(–status-blue-border); color: var(–status-blue); background: var(–status-blue-bg); }
+.btn-done:hover { background: var(–status-blue); color: white; }
+.btn-delayed { border-color: var(–status-red-border); color: var(–status-red); background: var(–status-red-bg); }
+.btn-delayed:hover { background: var(–status-red); color: white; }
+.btn-onhold { border-color: var(–status-amber-border); color: var(–status-amber); background: var(–status-amber-bg); }
+.btn-onhold:hover { background: var(–status-amber); color: white; }
+.btn-ontrack { border-color: var(–status-green-border); color: var(–status-green); background: var(–status-green-bg); }
+.btn-ontrack:hover { background: var(–status-green); color: white; }
 
-  .dept-main { min-height: 500px; }
-  .dept-panel { display: none; animation: fadeIn 0.3s ease; }
-  .dept-panel.active { display: block; }
-  
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+/* Empty State */
+.empty-state {
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+text-align: center; padding: 60px 24px; color: var(–text-muted);
+background: var(–white); border: 1px dashed var(–border-md); border-radius: var(–radius);
+}
+.empty-state h3 { font-size: 16px; color: var(–text-secondary); margin-bottom: 8px; font-weight: 700; }
+.empty-state p { font-size: 13px; }
 
-  .dept-header {
-    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow);
-    display: flex; align-items: center; gap: 18px;
-  }
-  .dept-header-text h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
-  .dept-header-text p { font-size: 14px; color: var(--text-secondary); }
+/* Mobile Dept Pills (shown on mobile instead of sidebar) */
+.mobile-dept-scroller {
+display: none;
+overflow-x: auto; -webkit-overflow-scrolling: touch;
+scrollbar-width: none; padding: 0 4px 8px;
+gap: 8px;
+}
+.mobile-dept-scroller::-webkit-scrollbar { display: none; }
+.mobile-dept-pill {
+flex-shrink: 0; padding: 8px 16px; border-radius: var(–radius-pill);
+font-size: 12px; font-weight: 700; cursor: pointer;
+border: 1.5px solid var(–border); background: var(–white);
+color: var(–text-muted); transition: all 0.2s; white-space: nowrap;
+font-family: inherit; display: inline-flex; align-items: center; gap: 6px;
+-webkit-tap-highlight-color: transparent;
+}
+.mobile-dept-pill.active-cx { background: var(–brand-red); border-color: var(–brand-red); color: white; }
+.mobile-dept-pill.active-annex { background: var(–brand-grey-dark); border-color: var(–brand-grey-dark); color: white; }
+.mobile-dept-pill .pill-count {
+background: rgba(255,255,255,0.25); color: inherit;
+font-size: 9px; padding: 1px 6px; border-radius: var(–radius-pill);
+}
+.mobile-dept-pill:not(.active-cx):not(.active-annex) .pill-count {
+background: var(–brand-grey-light); color: var(–text-muted);
+}
 
-  .next-steps-list { display: flex; flex-direction: column; gap: 16px; }
-  .step-card {
-    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 20px; box-shadow: var(--shadow);
-    cursor: pointer; position: relative; transition: all 0.2s;
-  }
-  .step-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.06); }
-  
-  .step-card.ontrack { border-left: 4px solid #4caf50; background: #fcfdfc; }
-  .step-card.delayed { border-left: 4px solid #f44336; background: #fffaf9; }
-  .step-card.achieved { border-left: 4px solid #2196f3; background: #f4faff; }
-  .step-card.achieved .step-date { background: #2196f3; color: white; }
-  .step-card.update { border-left: 4px solid #ff9800; background: #fffcf5; }
-  .step-card.update .step-date { background: #ff9800; color: white; }
+/* Utility */
+.show-done-toggle {
+display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
+color: var(–text-muted); cursor: pointer; user-select: none; padding: 0 2px;
+}
+.show-done-toggle input { accent-color: var(–brand-red); width: 14px; height: 14px; cursor: pointer; }
 
-  .step-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; width: 100%; }
-  .step-text { font-size: 14px; color: var(--text-primary); line-height: 1.6; font-weight: 600; flex: 1; }
-  .step-date { 
-    font-size: 11px; color: var(--text-muted); font-weight: 700; background: rgba(0,0,0,0.04); 
-    padding: 4px 10px; border-radius: 20px; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.05em;
-  }
+/* ── RESPONSIVE / MOBILE ── */
+@media (max-width: 768px) {
+:root { –nav-h: 56px; }
 
-  .step-details-pane { 
-    display: none; margin-top: 16px; padding-top: 14px; 
-    border-top: 1px dashed var(--border); font-size: 13.5px; 
-    color: var(--text-secondary); line-height: 1.6;
-  }
-  .step-card.expanded .step-details-pane { display: block; animation: fadeIn 0.3s ease; }
-  .pane-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand-grey); margin-bottom: 6px; }
+/* Show bottom nav */
+.bottom-nav { display: block; }
+.page.active { padding-bottom: calc(var(–bottom-nav-h) + env(safe-area-inset-bottom, 8px)); }
 
-  .empty-state {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 80px 24px; color: var(--text-muted);
-    background: var(--brand-grey-light); border: 1px dashed var(--border-md); border-radius: var(--radius);
-    height: 100%;
-  }
-  .empty-state h3 { font-size: 18px; color: var(--text-secondary); margin-bottom: 8px;}
-  .empty-state p { font-size: 14px; }
+/* Hide desktop tabs */
+#nav-tabs-group { display: none !important; }
+.nav-date { display: none; }
+.upload-btn-text { display: none; }
+
+/* Nav compact */
+nav { padding: 0 14px; gap: 12px; }
+.nav-brand { font-size: 14px; }
+
+/* Landing */
+.landing-buttons { flex-direction: column; width: 100%; max-width: 320px; }
+.landing-btn { width: 100%; justify-content: center; }
+
+/* Dashboard */
+.dash-container { padding: 0 12px 24px; }
+.metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.metric-card { padding: 14px; }
+.metric-value { font-size: 18px; }
+.charts-row { grid-template-columns: 1fr; gap: 10px; }
+.chart-wrap { height: 170px; }
+
+/* Departments */
+.dept-container { padding: 0 12px 24px; }
+.dept-layout { grid-template-columns: 1fr !important; gap: 12px; }
+.dept-sidebar { display: none; }
+.mobile-dept-scroller { display: flex; }
+
+/* Task cards */
+.step-card { padding: 14px; }
+.step-text { font-size: 13px; }
+
+/* Alert strip */
+.alert-strip { font-size: 12px; padding: 10px 12px; }
+
+/* Overdue items */
+.overdue-action { font-size: 11px; }
+}
+
+@media (max-width: 400px) {
+.metrics-grid { grid-template-columns: 1fr; }
+}
 </style>
+
 </head>
 <body>
 
+<!-- TOP NAV -->
+
 <nav>
-  <div class="nav-brand" onclick="showLanding()" title="Return to Dashboard Selection">Lakowe <span>Portfolio</span></div>
+  <div class="nav-brand" onclick="showLanding()" title="Return to selection">Lakowe <span>Portfolio</span></div>
   <div class="nav-tabs" id="nav-tabs-group" style="display:none;">
-    <button class="nav-tab active" onclick="showPage('dashboard', this)">Dashboard</button>
-    <button class="nav-tab" onclick="showPage('departments', this)">Departments Tasks</button>
+    <button class="nav-tab active" onclick="showPage('dashboard',this)">Dashboard</button>
+    <button class="nav-tab" onclick="showPage('departments',this)">Departments</button>
   </div>
   <div class="nav-right">
     <span class="nav-date" id="last-updated-text">Last updated: Apr 20, 2026</span>
     <span class="nav-badge badge-cx nav-project-btn" id="btn-nav-cx" onclick="selectProject('Crossings')">Crossings</span>
     <span class="nav-badge badge-annex nav-project-btn" id="btn-nav-annex" onclick="selectProject('Annexe')">Annexe</span>
-    <label for="fileUpload" class="upload-btn">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-      Upload Sheet
+    <label for="fileUpload" class="upload-btn" title="Upload Excel or Transcript">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span class="upload-btn-text">Upload</span>
     </label>
-    <input type="file" id="fileUpload" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display:none;" onchange="handleFileUpload(event)">
+    <input type="file" id="fileUpload" accept=".csv,.xlsx,.xls,.txt" style="display:none;" onchange="handleFileUpload(event)">
   </div>
 </nav>
 
+<!-- MOBILE BOTTOM NAV -->
+
+<div class="bottom-nav" id="bottom-nav" style="display:none;">
+  <div class="bottom-nav-inner">
+    <button class="bottom-nav-btn active" id="bnav-dashboard" onclick="mobileNavClick('dashboard',this)">
+      <span class="bnav-dot"></span>
+      <span class="bnav-icon">📊</span>
+      <span class="bnav-label">Overview</span>
+    </button>
+    <button class="bottom-nav-btn" id="bnav-departments" onclick="mobileNavClick('departments',this)">
+      <span class="bnav-dot"></span>
+      <span class="bnav-icon">📋</span>
+      <span class="bnav-label">Tasks</span>
+    </button>
+    <button class="bottom-nav-btn" id="bnav-upload" onclick="document.getElementById('fileUpload').click()">
+      <span class="bnav-icon">⬆️</span>
+      <span class="bnav-label">Upload</span>
+    </button>
+  </div>
+</div>
+
+<!-- LANDING PAGE -->
+
 <div id="page-landing" class="page active">
   <div class="landing-container">
-    <h2>Select Project Dashboard</h2>
+    <div class="landing-logo-mark">🏙</div>
+    <h2>Lakowe Portfolio</h2>
+    <p>Select a project to view its live performance dashboard</p>
     <div class="landing-buttons">
-      <button class="landing-btn btn-cx" onclick="selectProject('Crossings')">Lakowe Crossings</button>
-      <button class="landing-btn btn-annex" onclick="selectProject('Annexe')">Lakowe Annex</button>
+      <button class="landing-btn btn-cx" onclick="selectProject('Crossings')">
+        Lakowe Crossings
+        <small>6 units · ₦1.72B inflow</small>
+      </button>
+      <button class="landing-btn btn-annex" onclick="selectProject('Annexe')">
+        Lakowe Annex
+        <small>78 units · ₦6.27B inflow</small>
+      </button>
     </div>
   </div>
 </div>
+
+<!-- DASHBOARD PAGE -->
 
 <div id="page-dashboard" class="page">
 <div class="dash-container">
 
-  <div class="project-block" id="block-crossings" style="display: none;">
+  <!-- CROSSINGS BLOCK -->
+
+  <div class="project-block" id="block-crossings" style="display:none;">
     <div class="project-heading">
       <span class="nav-badge badge-cx">Lakowe Crossings</span>
       <h2>Performance Overview</h2>
-      <span style="font-size:12px;color:var(--text-muted);margin-left:auto">As of Apr 20, 2026</span>
+      <span class="ph-date">Jan 5 – Apr 20, 2026</span>
     </div>
 
-    <div class="metrics-grid">
-      <div class="metric-card">
-        <div class="metric-label">Total Inflow</div>
-        <div class="metric-value" id="val-cx-inflow">₦1.72B</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Units Sold</div>
-        <div class="metric-value" id="val-cx-units">6</div>
-      </div>
-      <div class="metric-card highlight">
-        <div class="metric-label" style="color:var(--brand-red)">Active Offer Letters</div>
-        <div class="metric-value" id="val-cx-offers">0</div>
-        <div class="metric-delta" style="color:var(--brand-red)">Pending fast conversion</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Value of Sales</div>
-        <div class="metric-value" id="val-cx-sales">₦2.07B</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Account Balance</div>
-        <div class="metric-value" id="val-cx-budget">₦40M</div>
+```
+<div class="metrics-grid">
+  <div class="metric-card">
+    <div class="metric-label">Total Inflow</div>
+    <div class="metric-value" id="val-cx-inflow">₦1.72B</div>
+    <div class="metric-delta">↑ +₦670M since Jan</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Units Sold</div>
+    <div class="metric-value" id="val-cx-units">6</div>
+    <div class="metric-delta">+2 in Jan; stagnant since</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Value of Sales</div>
+    <div class="metric-value" id="val-cx-sales">₦2.07B</div>
+    <div class="metric-delta">Adjusted after product switch</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Budget Spent</div>
+    <div class="metric-value" id="val-cx-budget">₦488M</div>
+    <div class="metric-delta">of ₦527M monthly budget</div>
+  </div>
+  <!-- PRIORITY: Offer Letters -->
+  <div class="metric-card priority-card" id="card-cx-offers">
+    <div class="priority-tag">★ Priority</div>
+    <div class="metric-label">Active Offer Letters</div>
+    <div class="metric-value" id="val-cx-offers">0</div>
+    <div class="metric-delta" id="delta-cx-offers">No active offer letters</div>
+  </div>
+  <!-- PRIORITY: Account Balance -->
+  <div class="metric-card priority-card" id="card-cx-balance">
+    <div class="priority-tag">★ Priority</div>
+    <div class="metric-label">Account Balance</div>
+    <div class="metric-value" id="val-cx-balance">₦40M</div>
+    <div class="metric-delta" id="delta-cx-balance">Civil mobilisation tied to ₦800M raise</div>
+  </div>
+</div>
+
+<div id="overdue-cx"></div>
+
+<div class="charts-row">
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <h3>Cumulative Sales Inflow</h3>
+    </div>
+    <div class="chart-wrap"><canvas id="c3"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <h3>Monthly Targets</h3>
+      <div class="target-legend">
+        <span class="legend-red">● Carried</span>
+        <span class="legend-green">● New</span>
       </div>
     </div>
-
-    <div class="charts-row">
-      <div class="chart-card">
-        <h3>Cumulative Sales Inflow (₦B)</h3>
-        <div class="chart-wrap"><canvas id="c3"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-card-header-flex">
-          <h3>April Targets</h3>
-          <div class="target-legend">
-            <span class="legend-red">● Pending/Delayed</span>
-            <span class="legend-green">● On-Track</span>
-          </div>
-        </div>
-        <div class="target-list" id="targets-crossings">
-          <div class="target-item new-target"><span class="t-name">Civil Mobilization</span><span class="t-note">Mobilization of the contractor - civil (Tied to sales raising at least ₦800Mln)</span></div>
-          <div class="target-item new-target"><span class="t-name">MEP Process</span><span class="t-note">MEP: Tender & Prequalification process.</span></div>
-          <div class="target-item new-target"><span class="t-name">Complete Park</span><span class="t-note">Complete the park and cart away debris.</span></div>
-          <div class="target-item carryover"><span class="t-name">BOLAD Lights</span><span class="t-note">Conclude the BOLAD Lights Installation</span></div>
-        </div>
-      </div>
+    <div class="target-list" id="targets-crossings">
+      <div class="target-item new-target"><span class="t-name">Park Completion</span><span class="t-note">Full park end-April; fountain Apr 30. Mosaic tiles + marble underway.</span></div>
+      <div class="target-item carryover"><span class="t-name">BOLAD Lights</span><span class="t-note">Contractor elusive; vendor decision pending design sign-off.</span></div>
+      <div class="target-item new-target"><span class="t-name">Sandfilling</span><span class="t-note">8,130 cbm delivered; +8,000 cbm funded. CX9+CX10 tranche ₦137M.</span></div>
+      <div class="target-item carryover"><span class="t-name">MEP Sign-off</span><span class="t-note">Civil closed by ARUP ✓; MEP electrical pending schedule-of-manuals update.</span></div>
     </div>
   </div>
+</div>
 
-  <div class="project-block" id="block-annexe" style="display: none;">
+<div class="alert-strip alert-red">
+  ⚠ <span><strong>Major redesign:</strong> Hospitality site moved CX9 → CX10. New: 6 commercial + 68 residential units. Render + "coming soon" billboard pending design freeze. Civil mobilisation gated on ₦800M sales milestone.</span>
+</div>
+```
+
+  </div>
+
+  <!-- ANNEXE BLOCK -->
+
+  <div class="project-block" id="block-annexe" style="display:none;">
     <div class="project-heading">
       <span class="nav-badge badge-annex">Lakowe Annexe</span>
       <h2>Performance Overview</h2>
-      <span style="font-size:12px;color:var(--text-muted);margin-left:auto">As of Apr 20, 2026</span>
+      <span class="ph-date">Jan 5 – Apr 20, 2026</span>
     </div>
 
-    <div class="metrics-grid">
-      <div class="metric-card">
-        <div class="metric-label">Total Inflow</div>
-        <div class="metric-value" id="val-annex-inflow">₦6.27B</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Units Sold</div>
-        <div class="metric-value" id="val-annex-units">78</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Value of Sales</div>
-        <div class="metric-value" id="val-annex-sales">₦6.89B</div>
-      </div>
-      <div class="metric-card highlight">
-        <div class="metric-label" style="color:var(--brand-red)">Account Balance</div>
-        <div class="metric-value" id="val-annex-balance" style="color:var(--brand-red)">₦61.9M</div>
-        <div class="metric-delta" style="color:var(--brand-red)">Burn rate urgency flagged</div>
-      </div>
-    </div>
+```
+<div class="metrics-grid">
+  <div class="metric-card">
+    <div class="metric-label">Total Inflow</div>
+    <div class="metric-value" id="val-annex-inflow">₦6.27B</div>
+    <div class="metric-delta">↑ +₦300M since Jan</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Units Sold</div>
+    <div class="metric-value" id="val-annex-units">78</div>
+    <div class="metric-delta">↓ 2 revocations from 80</div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-label">Value of Sales</div>
+    <div class="metric-value" id="val-annex-sales">₦6.89B</div>
+    <div class="metric-delta">Flat since mid-January</div>
+  </div>
+  <!-- PRIORITY: Offer Letters -->
+  <div class="metric-card priority-card" id="card-annex-offers">
+    <div class="priority-tag">★ Priority</div>
+    <div class="metric-label">Active Offer Letters</div>
+    <div class="metric-value" id="val-annex-offers">0</div>
+    <div class="metric-delta" id="delta-annex-offers">No active offer letters</div>
+  </div>
+  <!-- PRIORITY: Account Balance -->
+  <div class="metric-card priority-card" id="card-annex-balance">
+    <div class="priority-tag">★ Priority</div>
+    <div class="metric-label">Account Balance</div>
+    <div class="metric-value" id="val-annex-balance">₦61.9M</div>
+    <div class="metric-delta" id="delta-annex-balance">After ₦32M BAFF + ₦50M Elms repayment</div>
+  </div>
+</div>
 
-    <div class="charts-row">
-      <div class="chart-card">
-        <h3>Inflow & Balance Trend</h3>
-        <div class="chart-wrap"><canvas id="c1"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-card-header-flex">
-          <h3>April Targets</h3>
-          <div class="target-legend">
-            <span class="legend-green">● Achieved</span>
-            <span class="legend-red">● Pending</span>
-          </div>
-        </div>
-        <div class="target-list" id="targets-annexe">
-          <div class="target-item achieved"><span class="t-name">Finidi Drainage</span><span class="t-note">✓ DONE — 480m completed.</span></div>
-          <div class="target-item achieved"><span class="t-name">Rufai Drainage 2</span><span class="t-note">✓ DONE — bends cast, formwork removed.</span></div>
-          <div class="target-item achieved"><span class="t-name">Connected Pipeworks</span><span class="t-note">✓ DONE — eastern section completed Apr 6.</span></div>
-          <div class="target-item carryover"><span class="t-name">Road Stabilisation</span><span class="t-note">Compaction, stabilisation and stone base: Adokiye, Ilerika, Amunike</span></div>
-          <div class="target-item carryover"><span class="t-name">Sunday Oliseh</span><span class="t-note">Clear access constraints on Sunday Oliseh and complete sandfilling</span></div>
-        </div>
-      </div>
-    </div>
+<div id="overdue-annex"></div>
 
-    <div class="alert-strip alert-grey">
-      <span class="alert-icon">ℹ</span>
-      <span><strong>Approval Risk:</strong> Provisional Layout Approval is critically delayed. 2-week window given to consultant expires Wed Apr 22; failing this, direct escalation to Commissioner is required.</span>
+<div class="charts-row">
+  <div class="chart-card">
+    <div class="chart-card-header"><h3>Inflow &amp; Balance Trend</h3></div>
+    <div class="chart-wrap"><canvas id="c1"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <h3>Monthly Targets</h3>
+      <div class="target-legend">
+        <span class="legend-red">● Carried</span>
+        <span class="legend-green">● New</span>
+      </div>
     </div>
+    <div class="target-list" id="targets-annexe">
+      <div class="target-item new-target"><span class="t-name">Manholes</span><span class="t-note">96/140 done. 44 remaining. Base+wall+cover standard confirmed.</span></div>
+      <div class="target-item new-target"><span class="t-name">Internal Roads</span><span class="t-note">Finidi George ✓ done. Peter Rufai S2 ✓ bends cast. Sunday Oliseh pending BAFF remob.</span></div>
+      <div class="target-item carryover"><span class="t-name">Layout Approval</span><span class="t-note">2-week window expires Apr 22. Direct to Commissioner if no response from Uncle P.</span></div>
+      <div class="target-item new-target"><span class="t-name">Drainage 400m+</span><span class="t-note">ARUP sign-off on new section due Apr 24. 60-day target 90% viable.</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="alert-strip alert-grey">
+  ℹ <span><strong>Cash-construction risk:</strong> Balance ₦61.9M after two large disbursements. No active ad campaign or offer letters. Target ₦1B+ to sustain BAFF momentum. QS onboarding must close by Apr 23.</span>
+</div>
+```
+
   </div>
 
 </div>
 </div>
 
+<!-- DEPARTMENTS PAGE -->
+
 <div id="page-departments" class="page">
 <div class="dept-container">
+  <!-- Mobile dept pills (hidden on desktop) -->
+  <div class="mobile-dept-scroller" id="mobile-dept-pills"></div>
 
   <div class="dept-layout">
+    <!-- Sidebar (desktop only) -->
     <div class="dept-sidebar">
-      
-      <div class="sidebar-section" id="sidebar-crossings" style="display: none;">
+      <div class="sidebar-section" id="sidebar-crossings" style="display:none;">
         <div class="sidebar-section-label">Lakowe Crossings</div>
-        <button class="sidebar-item" onclick="showDept('cx-design', this, 'Crossings', 'Design')">Design <span class="dept-count">0</span></button>
-        <button class="sidebar-item" onclick="showDept('cx-costing', this, 'Crossings', 'Costing')">Costing <span class="dept-count">0</span></button>
-        <button class="sidebar-item" onclick="showDept('cx-ipd', this, 'Crossings', 'IPD')">IPD <span class="dept-count">0</span></button>
-        <button class="sidebar-item" onclick="showDept('cx-landscape', this, 'Crossings', 'Landscape')">Landscape <span class="dept-count">0</span></button>
-        <button class="sidebar-item" onclick="showDept('cx-operations', this, 'Crossings', 'Operations')">Operations <span class="dept-count">0</span></button>
-        <button class="sidebar-item" onclick="showDept('cx-fincon', this, 'Crossings', 'Fincon')">Fincon <span class="dept-count">0</span></button>
-        <button class="sidebar-item" onclick="showDept('cx-sales', this, 'Crossings', 'Sales')">Sales <span class="dept-count">0</span></button>
-        <button class="sidebar-item" onclick="showDept('cx-mcc', this, 'Crossings', 'MCC')">MCC <span class="dept-count">0</span></button>
-        <button class="sidebar-item" onclick="showDept('cx-amc', this, 'Crossings', 'AMC')">AMC <span class="dept-count">0</span></button>
-        <button class="sidebar-item" onclick="showDept('cx-general', this, 'Crossings', 'General')">General <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Design')">Design <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Costing')">Costing <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','AMC')">AMC <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','IPD')">IPD <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Landscape')">Landscape <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Operations')">Operations <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Fincon')">Fincon <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Sales')">Sales <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','MCC')">MCC <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','General')">General <span class="dept-count">0</span></button>
       </div>
-
-      <div class="sidebar-section" id="sidebar-annexe" style="display: none;">
+      <div class="sidebar-section" id="sidebar-annexe" style="display:none;">
         <div class="sidebar-section-label annexe">Lakowe Annexe</div>
-        <button class="sidebar-item annexe-btn" onclick="showDept('annex-design', this, 'Annexe', 'Design')">Design <span class="dept-count">0</span></button>
-        <button class="sidebar-item annexe-btn" onclick="showDept('annex-costing', this, 'Annexe', 'Costing')">Costing <span class="dept-count">0</span></button>
-        <button class="sidebar-item annexe-btn" onclick="showDept('annex-ipd', this, 'Annexe', 'IPD')">IPD <span class="dept-count">0</span></button>
-        <button class="sidebar-item annexe-btn" onclick="showDept('annex-operations', this, 'Annexe', 'Operations')">Operations <span class="dept-count">0</span></button>
-        <button class="sidebar-item annexe-btn" onclick="showDept('annex-fincon', this, 'Annexe', 'Fincon')">Fincon <span class="dept-count">0</span></button>
-        <button class="sidebar-item annexe-btn" onclick="showDept('annex-telemarketing', this, 'Annexe', 'Telemarketing')">Telemarketing <span class="dept-count">0</span></button>
-        <button class="sidebar-item annexe-btn" onclick="showDept('annex-mcc', this, 'Annexe', 'MCC')">MCC <span class="dept-count">0</span></button>
-        <button class="sidebar-item annexe-btn" onclick="showDept('annex-sales', this, 'Annexe', 'Sales')">Sales <span class="dept-count">0</span></button>
-        <button class="sidebar-item annexe-btn" onclick="showDept('annex-legal', this, 'Annexe', 'Legal')">Legal <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Design')">Design <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Costing')">Costing <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','IPD')">IPD <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Operations')">Operations <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Fincon')">Fincon <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Telemarketing')">Telemarketing <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','MCC')">MCC <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Sales')">Sales <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Legal')">Legal <span class="dept-count">0</span></button>
       </div>
-
     </div>
 
-    <div class="dept-main">
-      <div id="panel-placeholder" class="dept-panel active">
-        <div class="empty-state">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-          <h3>Select a Department</h3>
-          <p>Click on a department from the sidebar to view its latest tasks and next steps.</p>
-        </div>
-      </div>
+```
+<!-- Main content -->
+<div class="dept-main">
+  <div id="panel-placeholder" class="dept-panel active">
+    <div class="empty-state">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin-bottom:12px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <h3>Select a Department</h3>
+      <p>Use the sidebar or pills above to view department tasks</p>
+    </div>
+  </div>
 
-      <div id="dynamic-dept-container" style="display:none;">
-        <div class="dept-header">
-          <div class="dept-header-text">
-            <h2 id="dynamic-dept-title">Department Name</h2>
-            <p>Active tasks and deliverables for the current cycle.</p>
-            <div class="dept-project-tags">
-              <span id="dynamic-dept-badge" class="nav-badge">Project</span>
-            </div>
-          </div>
-        </div>
-        <div class="next-steps-list" id="dynamic-tasks-list">
-          </div>
+  <div id="dynamic-dept-container" style="display:none;">
+    <!-- History bar -->
+    <div class="dept-history-bar" id="history-bar">
+      <span class="history-label">History:</span>
+    </div>
+    <!-- Dept header -->
+    <div class="dept-header">
+      <div class="dept-header-text">
+        <h2 id="dynamic-dept-title">Department</h2>
+        <p>Active tasks and deliverables · <span id="viewing-date-label">Current</span></p>
+        <span id="dynamic-dept-badge" class="nav-badge" style="margin-top:6px;display:inline-block;">Project</span>
       </div>
+      <div class="dept-controls">
+        <label class="show-done-toggle">
+          <input type="checkbox" id="show-done-toggle" onchange="renderCurrentDept()"> Show completed
+        </label>
+      </div>
+    </div>
+    <!-- Filter tabs -->
+    <div class="filter-tabs" id="filter-tabs">
+      <button class="filter-tab active" data-filter="all" onclick="setFilter('all',this)">All</button>
+      <button class="filter-tab" data-filter="ontrack" onclick="setFilter('ontrack',this)">● On Track</button>
+      <button class="filter-tab" data-filter="delayed" onclick="setFilter('delayed',this)">● Delayed</button>
+      <button class="filter-tab" data-filter="onhold" onclick="setFilter('onhold',this)">⏸ On Hold</button>
+      <button class="filter-tab" data-filter="done" onclick="setFilter('done',this)">✓ Done</button>
+    </div>
+    <!-- Task list -->
+    <div class="next-steps-list" id="dynamic-tasks-list"></div>
+  </div>
+</div>
+```
 
-    </div></div></div></div>
+  </div>
+</div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
 <script>
-  // ── UI NAVIGATION ──
-  function showPage(id, btn) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('page-' + id).classList.add('active');
-    btn.classList.add('active');
-  }
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let currentProject = null;
+let currentDept = null;
+let currentFilter = 'all';
+let viewingSessionDate = 'current'; // 'current' or a date string
+let chartsInitialized = false;
 
-  function showLanding() {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-landing').classList.add('active');
-    document.getElementById('nav-tabs-group').style.display = 'none';
-    document.querySelectorAll('.nav-project-btn').forEach(btn => btn.classList.remove('active'));
-  }
+// ═══════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════
+const SESSION_KEY = 'lakowe_sessions_v2';
+const STATUS_KEY = 'lakowe_status_v2';
 
-  function selectProject(proj) {
-    document.querySelectorAll('.nav-project-btn').forEach(btn => btn.classList.remove('active'));
-    if(proj === 'Crossings') document.getElementById('btn-nav-cx').classList.add('active');
-    if(proj === 'Annexe') document.getElementById('btn-nav-annex').classList.add('active');
+function getSessions() {
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY)) || []; } catch { return []; }
+}
+function saveSessions(s) {
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch(e) { console.warn('Storage full'); }
+}
+function getStatusOverrides() {
+  try { return JSON.parse(localStorage.getItem(STATUS_KEY)) || {}; } catch { return {}; }
+}
+function saveStatus(taskId, status) {
+  const o = getStatusOverrides();
+  o[taskId] = status;
+  localStorage.setItem(STATUS_KEY, JSON.stringify(o));
+}
+function taskId(t) {
+  return (t.project + '_' + t.dept + '_' + t.action).replace(/\W+/g,'_').substring(0, 60);
+}
 
-    document.getElementById('block-crossings').style.display = (proj === 'Crossings') ? 'block' : 'none';
-    document.getElementById('block-annexe').style.display = (proj === 'Annexe') ? 'block' : 'none';
-    document.getElementById('sidebar-crossings').style.display = (proj === 'Crossings') ? 'block' : 'none';
-    document.getElementById('sidebar-annexe').style.display = (proj === 'Annexe') ? 'block' : 'none';
-
-    document.getElementById('nav-tabs-group').style.display = 'flex';
-    
-    if(document.getElementById('page-landing').classList.contains('active')) {
-      const dashTab = document.querySelector('.nav-tab[onclick*="dashboard"]');
-      showPage('dashboard', dashTab);
+function archiveSession(label) {
+  const sessions = getSessions();
+  const today = label || new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'});
+  const snap = {
+    date: today,
+    ts: Date.now(),
+    tasks: JSON.parse(JSON.stringify(taskDatabase)),
+    metrics: {
+      'val-cx-inflow': document.getElementById('val-cx-inflow').textContent,
+      'val-cx-units': document.getElementById('val-cx-units').textContent,
+      'val-cx-offers': document.getElementById('val-cx-offers').textContent,
+      'val-cx-sales': document.getElementById('val-cx-sales').textContent,
+      'val-cx-budget': document.getElementById('val-cx-budget').textContent,
+      'val-cx-balance': document.getElementById('val-cx-balance').textContent,
+      'val-annex-inflow': document.getElementById('val-annex-inflow').textContent,
+      'val-annex-units': document.getElementById('val-annex-units').textContent,
+      'val-annex-offers': document.getElementById('val-annex-offers').textContent,
+      'val-annex-sales': document.getElementById('val-annex-sales').textContent,
+      'val-annex-balance': document.getElementById('val-annex-balance').textContent,
     }
+  };
+  // Replace if same date label
+  const idx = sessions.findIndex(s => s.date === today);
+  if (idx >= 0) sessions[idx] = snap; else sessions.unshift(snap);
+  saveSessions(sessions.slice(0, 30));
+}
 
-    document.getElementById('panel-placeholder').style.display = 'flex'; 
-    document.getElementById('dynamic-dept-container').style.display = 'none';
-    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
-  }
+// ═══════════════════════════════════════════════
+// TASK DATABASE — Apr 20, 2026
+// ═══════════════════════════════════════════════
+let taskDatabase = [
+  // ── CROSSINGS ──
+  {project:'Crossings',dept:'Design',result:'Hospitality Block Redesign',action:'Send CX10 redesign proposal to Olamide (Costing) for cost estimate',explanation:'MAJOR REDESIGN: site moved from CX9→CX10. New inventory: 6 commercial + 68 residential units (Floors 1–2: 32×1-bed; Floors 3–4: 36 units). Terraces face park; roof garden deferred. Previous deadline Apr 7 — now Apr 23.',due:'Apr 23',status:'delayed'},
+  {project:'Crossings',dept:'Design',result:'Coming Soon Billboard',action:'Prepare render/elevation images and share with MCC for "coming soon" graphic',explanation:'Render output is a blocker for the MCC campaign. Design freeze required before billboard can go to print. Deadline pushed from Apr 7 to Apr 27.',due:'Apr 27',status:'delayed'},
+  {project:'Crossings',dept:'Design',result:'Roundabout Alignment Decision',action:'Share final decision on roundabout (most economic option) by Apr 23',explanation:'Team to refine and share update independently. Decision pending between full roundabout vs cost-reducing road elimination option.',due:'Apr 27',status:'ontrack'},
+  {project:'Crossings',dept:'Design',result:'Layout Approval',action:'Follow up with Costing & Procurement on layout approval — name discrepancy on survey plan',explanation:'On hold for 6 weeks. Project Link sent cost and assessment for Lagos State. Issue: discrepancy in name on survey plan — must resolve before resubmission.',due:'May 4',status:'onhold'},
 
-  // ── DEPARTMENT NORMALIZER ──
-  function normalizeDept(deptStr) {
-    if (!deptStr) return 'General';
-    let d = deptStr.toUpperCase();
-    
-    // Catch all variations of IPD/PMO/PDU/PMU
-    if (d.includes('IPD') || d.includes('PMO') || d.includes('PMU') || d.includes('PDU')) return 'IPD';
-    
-    if (d.includes('FINCON') || d.includes('FINANCIAL')) return 'Fincon';
-    if (d.includes('COSTING')) return 'Costing';
-    if (d.includes('DESIGN')) return 'Design';
-    if (d.includes('OPERATION')) return 'Operations';
-    if (d.includes('SALES')) return 'Sales';
-    if (d.includes('MCC')) return 'MCC';
-    if (d.includes('LEGAL')) return 'Legal';
-    if (d.includes('LANDSCAPE')) return 'Landscape';
-    if (d.includes('AMC')) return 'AMC';
-    if (d.includes('TELEMARKETING') || d.includes('MARKETING')) return 'Telemarketing';
-    if (d.includes('FIN PLAN') || d.includes('FINANCIAL PLAN')) return 'Fin Planning';
-    
-    return 'General'; 
-  }
+  {project:'Crossings',dept:'Costing',result:'Sandfilling Progress',action:'Update on sandfilling progress vs. budget actuals',explanation:'8,130 cbm delivered to date; completing this initial allocation is the priority. Additional 8,000 cbm funded to reach "Green Block RB" milestone. CX9+CX10 requirement: 7,733 cbm / ₦137M separate tranche. Total requirement: ~₦626M (₦489M roads + ₦137M CX areas).',due:'Apr 27',status:'ontrack'},
+  {project:'Crossings',dept:'Costing',result:'BOLAD Lights Vendor',action:'Finalize vendor selection for bollad lights — final design sign-off on samples',explanation:'Hazel: terminated (pricing). Wemsel: sample on-site, design inspection pending. Mr. Obidong (3rd): physical samples arriving. Final vendor decision on hold until design team provides official sign-off on samples.',due:'Apr 27',status:'ontrack'},
+  {project:'Crossings',dept:'Costing',result:'Contractor Outreach',action:'Get in touch with Chinese contractor that worked on the Lekki road',explanation:'Team tried; will give update at next meeting. Being explored as alternative road contractor.',due:'Apr 27',status:'ontrack'},
+  {project:'Crossings',dept:'Costing',result:'Infrastructure Contractor',action:'Follow up with AMC on decision between BAFF or FUNKUS',explanation:'Confirmed to share decision at next meeting. Tied to civil mobilisation timeline.',due:'Apr 27',status:'delayed'},
 
-  // ── HARDCODED APRIL 20TH DATA (Using Normalized Names for Accuracy) ──
-  let taskDatabase = [
-  {
-    "project": "Annexe",
-    "dept": "Design",
-    "action": "* Report with an overlay of the current progress of work over the main layout - Every 3 Weeks",
-    "explanation": "<strong>Result:</strong> Align current progress with initial layout<br><br><strong>Notes:</strong> Updates from last 4 weeks",
-    "due": "2026-04-23",
-    "status": "On -Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Design",
-    "action": "* Design to contact Uncle P TODAY (Apr 20). If no provisional layout by Apr 22, proceed directly to Commissioner.",
-    "explanation": "<strong>Result:</strong> Leveraging Layout Approvals to define construction phases and clear clients for site mobilization.<br><br><strong>Notes:</strong> 2-WEEK WINDOW EXPIRES IN 2 DAYS (Wed Apr 22).",
-    "due": "2026-04-22",
-    "status": "Delayed"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Design",
-    "action": "*Share Detailed Design of the Gate House",
-    "explanation": "<strong>Result:</strong> Boundary Fence<br><br><strong>Notes:</strong> Architect has been asked \u2014 needs to draft. Reason: second gate identified along the fence line.\nTIMELINE: ~2 weeks from Apr 20 = by May 4 for detailed gatehouse design (Akinwale confirmed).",
-    "due": "2026-05-04",
-    "status": "On -Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Design",
-    "action": "Completed Tasks for the month",
-    "explanation": "<strong>Result:</strong> * Gatehouse snags resolved.\n* Received gatehouse signage designs.<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "Completed"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Costing",
-    "action": "*Picture Updates - work progress on second lane of LNT road - (Concrete).",
-    "explanation": "<strong>Result:</strong> Show visual progress updates<br><br><strong>Notes:</strong> Presented stringing of wires video.",
-    "due": "2026-04-23",
-    "status": "Update Expected"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Costing",
-    "action": "* Costing to present negotiated signage cost by Thursday Apr 23",
-    "explanation": "<strong>Result:</strong> Signage Design<br><br><strong>Notes:</strong> Vendors being contacted \u2014 feedback expected THIS WEEK.\nREVISED TIMELINE: Negotiated cost to be presented by THURSDAY Apr 23 (not Monday).\nProcess: get vendor quotes \u2192 compare \u2192 negotiate \u2192 present final cost Thursday.",
-    "due": "2026-04-23",
-    "status": "On -Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Costing",
-    "action": "* Provide Cost for the boundary fence along Finidi George",
-    "explanation": "<strong>Result:</strong> Boundary Fence<br><br><strong>Notes:</strong> Expecting detailed gatehouse design from the design team",
-    "due": "2026-05-04",
-    "status": "On - Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Costing",
-    "action": "* Report HFP production timeline today (Apr 21).",
-    "explanation": "<strong>Result:</strong> Speed bumps<br><br><strong>Notes:</strong> PRODUCTION RISK \u2014 NOT A PAYMENT ISSUE.\nHFP pavers are non-standard (special colour) \u2014 not regularly produced by HFP.\nContractor spoke with HFP on Saturday and again this morning (Apr 20).\nHFP to respond with availability BEFORE CLOSE OF BUSINESS TODAY.",
-    "due": "2026-04-23",
-    "status": "On - Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Costing",
-    "action": "* Include LNT second lane (250 metres of concrete road) - Once Funding formula is concluded",
-    "explanation": "<strong>Result:</strong> Road Construction<br><br><strong>Notes:</strong> ON HOLD",
-    "due": "TBD",
-    "status": "On Hold"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Costing",
-    "action": "* Reassess solar solution for gatehouse \u2014 July 2026",
-    "explanation": "<strong>Result:</strong> Insert solar to the gate house.<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "2026-07-08",
-    "status": "On Hold"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Costing",
-    "action": "* Revisit the cost to stone base the road (After the drainage is concluded) - Focus on drainages for now due to the rains",
-    "explanation": "<strong>Result:</strong> Annexe second lane stone base CONTRACT IS ACTIVE.\nComplete drainage FIRST before focusing on stone base<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "2026-05-06",
-    "status": "On Hold"
-  },
-  {
-    "project": "Annexe",
-    "dept": "IPD",
-    "action": "* Confirm BAFF remobilized after \u20a632M payment. \n\n* Segun Odegbami clearing to commence immediately - bring forward POW",
-    "explanation": "<strong>Result:</strong> Clear the site for the road<br><br><strong>Notes:</strong> STILL NOT STARTED \u2014 site activities still severely slowed.",
-    "due": "2026-04-23",
-    "status": "Delayed"
-  },
-  {
-    "project": "Annexe",
-    "dept": "IPD",
-    "action": "Tasks on Hold",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "Sandfilling of Lakowe Annex second lane on hold till drainage is concluded",
-    "status": "ON HOLD"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Operations",
-    "action": "Provide update on sales offer letters, Inflow and Total Value of sales",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "2026-04-23",
-    "status": "Update Expected"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Operations",
-    "action": "* CRM tool to aid telemarketing to help message unreachable leads.",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "On-Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Fincon",
-    "action": "Process Payments - N32Mln to BAFF and N50M refund to Elms Garden",
-    "explanation": "<strong>Result:</strong> Facilitate work on site<br><br><strong>Notes:</strong> \u20a632M PAYMENT: Confirmed sent to BAFF",
-    "due": "2026-04-23",
-    "status": "Update Expected"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Fincon",
-    "action": "Annex Borrowed N100M from Elms Gardens -  29 Jan\n\nAnnexe repaid N50M to Elms Gardens",
-    "explanation": "<strong>Result:</strong> Repayment<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "On-Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Telemarketing",
-    "action": "Share weekly Leads Report on Lakowe Annex promotional campaign.",
-    "explanation": "<strong>Result:</strong> Assess the quality of leads<br><br><strong>Notes:</strong> NO AD CURRENTLY RUNNING \u2014 confirmed by Marketing rep.\nNo leads update provided. Campaign effectively paused.",
-    "due": "2026-04-23",
-    "status": "Update Expected"
-  },
-  {
-    "project": "Annexe",
-    "dept": "MCC",
-    "action": "* Board 1 to be ready in 2 weeks (4th May)",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "2026-05-04",
-    "status": "On -Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "MCC",
-    "action": "* MCC/IPD to scope billboard re-erection as part of Segun Odegbami clearing. Find vendor.",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> Gate billboard has sunk into ground due to sand filling \u2014 now barely visible.\nACTION: Clear immediately + find vendor for re-erection.",
-    "due": "2026-04-23",
-    "status": "On -Track"
-  },
-  {
-    "project": "Annexe",
-    "dept": "Legal",
-    "action": "*Waiting on Publication",
-    "explanation": "<strong>Result:</strong> Secure approval for the LNT name<br><br><strong>Notes:</strong> Obtained acknowledgement slip.\n\nReceived acceptance letter (3 weeks early).\n\nPublication 6 months- Old (9th September), New (Aug 21)\n\nTrademark Certificate: Old (9th November), New (Oct 21)\n\nFinal - March 2027",
-    "due": "2026-08-21",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Design",
-    "action": "* Send Proposal to Olamide (Costing) for cost estimate.\n\n* Render/elevation images to be prepared \u2192 share with MCC for 'coming soon' graphic\n\nPrev Timeline - 7 April - NEW TIMELINE - 20 APR",
-    "explanation": "<strong>Result:</strong> Concept Design<br><br><strong>Notes:</strong> MAJOR REDESIGN PRESENTED \u2014 SITE MOVED FROM CX9 \u2192 CX10.\n\nNEW INVENTORY:\n\u2022 Commercial: 6 units | \n\u2022 Residential: 68 units \n  \u2013 Floors 1 & 2: 32 units of 1-bed apartments \n  \u2013 Floors 3 & 4: 36 units \n\u2022 Unit mix: studios + 1-beds;\n\u2022 Terraces: facing the park\n\u2022 Roof: potential roof garden / events space discussed \u2014 deferred for later detailing",
-    "due": "2026-04-23",
-    "status": "Delayed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Design",
-    "action": "* Render/elevation images to be prepared \u2192 share with MCC for 'coming soon' graphic",
-    "explanation": "<strong>Result:</strong> Coming soon billboard<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "2026-04-27",
-    "status": "Delayed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Design",
-    "action": "* Share update on the final decision (Most economic option) by Thursday - 23 Apr",
-    "explanation": "<strong>Result:</strong> Roundabout alignment<br><br><strong>Notes:</strong> The team to refine and share the update independently",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Design",
-    "action": "* Follow up with costing and procurement for the layout approval",
-    "explanation": "<strong>Result:</strong> Layout approval<br><br><strong>Notes:</strong> On Hold for 6 weeks\n\nProject Link - sent cost and assessmemt for Lagos state.\n\nAn issue noted with discrepancies on the name on the survey plan",
-    "due": "2026-05-04",
-    "status": "On-Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Design",
-    "action": "Completed Tasks for the month",
-    "explanation": "<strong>Result:</strong> * Provisional Approval for a clients plot - CX3<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "Completed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Costing",
-    "action": "* Get in touch with Chinese company that worked on the Lekki road",
-    "explanation": "<strong>Result:</strong> Contractor Outreach<br><br><strong>Notes:</strong> The team tried and will give update by the next meeting.",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Costing",
-    "action": "* Follow up with AMC on the decision between BAFF or FUNKUS",
-    "explanation": "<strong>Result:</strong> General Infrastructure Works<br><br><strong>Notes:</strong> The team confirmed to share in next meeting",
-    "due": "2026-04-27",
-    "status": "Delayed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Costing",
-    "action": "Completed Tasks for the month",
-    "explanation": "<strong>Result:</strong> Payment made for 7,500 cubic meters of sand.<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "Completed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "AMC",
-    "action": "* Decision between BAFF or FUNKUS",
-    "explanation": "<strong>Result:</strong> General Infrastructure Works<br><br><strong>Notes:</strong> The team is waiting on management to decide the contractor.",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "IPD",
-    "action": "* Receive advice from ARUP on sump design by Wed Apr 22",
-    "explanation": "<strong>Result:</strong> Ensure there is a plan to prevent the site from damming<br><br><strong>Notes:</strong> ARUP to come back to us by Wednesday.",
-    "due": "2026-04-22",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "IPD",
-    "action": "* Get ARUP sign off on MEP designs (team to secure full cross-discipline sign-off from consultants at Thursday meeting.)\n\nDeadline: Friday - 17 Apr - Delayed",
-    "explanation": "<strong>Result:</strong> Finalize all sign offs<br><br><strong>Notes:</strong> PARTIAL COMPLETION. Civil designs: SIGNED OFF and CLOSED OUT by ARUP. \u2713\nMEP/Electrical: ARUP requested schedule-of-manuals updates after Friday meeting. Sign-off expected by Friday 17 Apr once updates are submitted. RISK: multi-discipline coordination still needed \u2014 each discipline must sign off all disciplines, not just their own, to ensure clear accountability.",
-    "due": "2026-04-27",
-    "status": "Delayed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "IPD",
-    "action": "* Share site progress pictures",
-    "explanation": "<strong>Result:</strong> Visual Summary<br><br><strong>Notes:</strong> Share images and videos of the site progress",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "IPD",
-    "action": "Completed Tasks for the month",
-    "explanation": "<strong>Result:</strong> Panels installed and park powered up.<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "Completed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Landscape",
-    "action": "* Review more vendors and finalize with Mrs H.",
-    "explanation": "<strong>Result:</strong> Park sculptures and benches<br><br><strong>Notes:</strong> Vision: 4 sculptures telling the story of Lakowe Crossings. Two sculptors engaged \u2014 Sculptor 1 (Stephen): steel works; Sculptor 2 (Basi's apprentice): mixed metal/concrete/fiberglass.\n\nDA's direction: sculptures should be FACELESS, somber yet positive/joyful \u2014 not realistic or scary. Suggestion raised to engage Nike Art Gallery to source additional talent from their network.",
-    "due": "2026-04-27",
-    "status": "Delayed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Landscape",
-    "action": "* Follow up closely on BOLAD lights contractor.\n\nDelay for 2 weeks",
-    "explanation": "<strong>Result:</strong> To light up the park area<br><br><strong>Notes:</strong> No furher updates, contractor still elusive",
-    "due": "2026-04-27",
-    "status": "Delayed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Landscape",
-    "action": "* To receive samples of work from both contractors and select a contractor.",
-    "explanation": "<strong>Result:</strong> Base for Bollad Lights<br><br><strong>Notes:</strong> Decide on which contractor and share with costing",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Landscape",
-    "action": "* Updates on the cladding",
-    "explanation": "<strong>Result:</strong> Finish up the park area<br><br><strong>Notes:</strong> Contractor paid - Fabrication and installation - 9 -10 days - Apr 28th",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Landscape",
-    "action": "* Engage Bravo gate to secure the park.",
-    "explanation": "<strong>Result:</strong> Security for the park area.<br><br><strong>Notes:</strong> The park is complete and needs security",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Landscape",
-    "action": "Completed Tasks for the month",
-    "explanation": "<strong>Result:</strong> Main gate for clearview fence completed<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "Completed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Operations",
-    "action": "Provide weekly updates",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> Sales- 6",
-    "due": "2026-04-27",
-    "status": "Update Expected"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Fincon",
-    "action": "Process Payments - N141 Mn for next tranche of sand \nfilling",
-    "explanation": "<strong>Result:</strong> Mobilize Contractors and Vendors<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "2026-04-27",
-    "status": "Update Expected"
-  },
-  {
-    "project": "Crossings",
-    "dept": "Fincon",
-    "action": "Total budget for the month is N315MN - Including 20,000 cubic metres - N527Mn",
-    "explanation": "<strong>Result:</strong> Paid N488Mn till date<br><br><strong>Notes:</strong> No notes provided.",
-    "due": "TBD",
-    "status": "Completed"
-  },
-  {
-    "project": "Crossings",
-    "dept": "MCC",
-    "action": "* A sign post positioned strategically in Lakowe, updated annualy (that captures hospitality footfall)",
-    "explanation": "<strong>Result:</strong> Bill Boards<br><br><strong>Notes:</strong> The billboard should come up immediately after the bolad lights for the park is done.",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "MCC",
-    "action": "* Board 1 to be ready in 2 weeks (4th May)\n\n* Board 2 and 3 to be ready in 4 weeks (18th May)\n\n* Move current board from the park to the golf estate",
-    "explanation": "<strong>Result:</strong> N/A<br><br><strong>Notes:</strong> Placement: At the gold road round about.",
-    "due": "2026-05-04",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "MCC",
-    "action": "* Come up with more challenging plans to reflect the scale of the project being built.",
-    "explanation": "<strong>Result:</strong> Improve sales and Brand Visibility<br><br><strong>Notes:</strong> This will be bi-monthly",
-    "due": "2026-04-27",
-    "status": "On -Track"
-  },
-  {
-    "project": "Crossings",
-    "dept": "General",
-    "action": "* Every department should ruminate and think on the following points ahead of the next session.",
-    "explanation": "<strong>Result:</strong> Improve Sales<br><br><strong>Notes:</strong> Bi-monthly task: Everyone to present ideas they observed competitors or similar brands perform to boost marketing or sales.",
-    "due": "Bi - Monthly",
-    "status": "Ongoing"
-  }
+  {project:'Crossings',dept:'AMC',result:'Contractor Selection',action:'Decide between BAFF or FUNKUS for General Infrastructure Works',explanation:'Management decision pending. AMC waiting on direction before issuing instruction. Tied to civil mobilisation timeline for internal roads.',due:'Apr 27',status:'ontrack'},
+
+  {project:'Crossings',dept:'IPD',result:'Phase 1 Completion Target',action:'Sandfilling progress update — target Phase 1 (clearing & filling) complete by May 18',explanation:'8,130 cbm delivered as of Apr 19. Additional 8,000 cbm issued to contractor. CX9+CX10 volumes: 7,733 cbm / ₦137M separate funded tranche to be added.',due:'Apr 27',status:'delayed'},
+  {project:'Crossings',dept:'IPD',result:'Completion Percentage',action:'PM team to provide properly substantiated completion % before next meeting',explanation:'DA challenged 27% — suggested actual closer to 5%. PM team mandated to supply new figure based on a detailed programme of works.',due:'Apr 27',status:'ontrack'},
+  {project:'Crossings',dept:'IPD',result:'Debris Clearing',action:'Debris clearing — communicate new timeline; swamp buggy on site from Mar 26',explanation:'~13 more days needed for Phase 1 clearing. Described as continuous and ongoing as of Apr 13 meeting.',due:'Apr 30',status:'delayed'},
+  {project:'Crossings',dept:'IPD',result:'Flood Water Management',action:'Receive ARUP advice on sump design by Apr 22',explanation:'ARUP to respond by Wed Apr 22. Required to prevent site damming during sandfilling operations.',due:'Apr 22',status:'ontrack'},
+  {project:'Crossings',dept:'IPD',result:'MEP Sign-off',action:'Secure full ARUP multi-discipline MEP/electrical sign-off',explanation:'Civil designs: SIGNED OFF ✓. MEP/Electrical: ARUP requested schedule-of-manuals updates after Apr 17 meeting. Risk: each discipline must sign off all others — full coordination still outstanding.',due:'Apr 27',status:'delayed'},
+  {project:'Crossings',dept:'IPD',result:'Site Visibility',action:'Share site progress pictures and videos at next meeting',explanation:'Visual summary of site activity — images and videos of current progress to be shared at every session.',due:'Apr 27',status:'ontrack'},
+
+  {project:'Crossings',dept:'Landscape',result:'Park Sculptures',action:'Review additional vendors with Mrs H — finalise sculpture selection',explanation:'Vision: 4 sculptures telling the story of Lakowe Crossings. Sculptor 1 (Stephen): steel works. Sculptor 2 (Basi\'s apprentice): mixed metal/concrete/fiberglass. DA direction: FACELESS, somber yet joyful. Nike Art Gallery flagged as additional talent source.',due:'Apr 27',status:'delayed'},
+  {project:'Crossings',dept:'Landscape',result:'Park Completion',action:'Provide park progress update — full park completion target end of April (exc. BOLAD lights)',explanation:'Mosaic tiles commenced. Marble top concluding this week. Fountain commissioning target: Apr 30. Main gate clearview fence completed ✓.',due:'Apr 27',status:'delayed'},
+  {project:'Crossings',dept:'Landscape',result:'BOLAD Lights',action:'Follow up closely on BOLAD lights contractor — 2-week delay confirmed',explanation:'No further updates. Contractor remains elusive. Billboard should go up immediately after BOLAD lights are installed.',due:'Apr 27',status:'delayed'},
+  {project:'Crossings',dept:'Landscape',result:'Water Tank Cladding',action:'Cladding update — water tanks fabrication and installation (target Apr 28)',explanation:'Contractor paid. Fabrication + installation: 9–10 days from Apr 19, targeting Apr 28 completion.',due:'Apr 27',status:'ontrack'},
+  {project:'Crossings',dept:'Landscape',result:'Park Security',action:'Engage Bravo Gate to secure the park area',explanation:'Park largely complete and requires security perimeter. Bravo Gate to be formally engaged this week.',due:'Apr 27',status:'ontrack'},
+
+  {project:'Crossings',dept:'Operations',result:'Sales & Finance Update',action:'Provide weekly updates on all sales metrics',explanation:'Sales: 6. Value of Sales: ₦2.07B. Inflow: ₦1.72B. Account Balance: ₦40M. No active offer letters as of Apr 20. Pipeline challenge and pricing objections continuing from Apr 13.',due:'Apr 27',status:'ontrack'},
+
+  {project:'Crossings',dept:'Fincon',result:'Contractor Mobilisation',action:'Process ₦141M payment for next sandfilling tranche',explanation:'Payment required to keep contractor mobilised. Monthly budget: ₦315M (20,000 cbm) = ₦527M total. ₦488M paid to date.',due:'Apr 27',status:'ontrack'},
+
+  {project:'Crossings',dept:'Sales',result:'₦1B Inflow Target',action:'Present clear pathway to ₦1B cumulative inflow target',explanation:'No new inflow figures at Apr 20 meeting. Pipeline challenge and pricing objections continue. ₦800M sales milestone is the trigger for civil contractor mobilisation — critical dependency.',due:'Apr 27',status:'delayed'},
+
+  {project:'Crossings',dept:'MCC',result:'Billboard Rollout',action:'3-board rollout: Board 1 by May 4, Boards 2&3 by May 18 — move park board to golf estate',explanation:'Placement: gold road roundabout. Board should go up immediately after BOLAD lights are done. Also: a strategic sign post in Lakowe capturing hospitality footfall to be updated annually.',due:'May 4',status:'ontrack'},
+  {project:'Crossings',dept:'MCC',result:'Brand Visibility at Scale',action:'Come up with challenging plans to reflect the ₦50B project scale — bi-monthly',explanation:'Each department to present bold ideas observed from competitors/similar brands to boost marketing and sales. DA: needs a visually striking impression of scale and activity.',due:'Apr 27',status:'ontrack'},
+
+  {project:'Crossings',dept:'General',result:'Competitive Intelligence',action:'Every department: present competitive intelligence ideas at next session (bi-monthly)',explanation:'DA raised: need for visually striking impression of project scale (₦50B context). Team tasked to observe competitors and present findings bi-monthly.',due:'Bi-Monthly',status:'ontrack'},
+
+  // ── ANNEXE ──
+  {project:'Annexe',dept:'Design',result:'Layout Progress Overlay',action:'Provide layout progress overlay report — current work vs. main layout (every 3 weeks)',explanation:'Progress overlay showing current construction status against approved layout. Updates covering last 4 weeks required. Next report due Apr 23.',due:'Apr 23',status:'ontrack'},
+  {project:'Annexe',dept:'Design',result:'Provisional Layout Approval',action:'Contact Uncle P TODAY (Apr 20) — if no provisional layout by Apr 22, go directly to Commissioner',explanation:'2-WEEK WINDOW EXPIRES APR 22. Provisional layout for 19 hectares (Dondemmy) blocked since Oct 2025. Needed to define construction phases + clear clients for site mobilisation.',due:'Apr 22',status:'delayed'},
+  {project:'Annexe',dept:'Design',result:'Gate House Detailed Design',action:'Share Detailed Design of the Gate House by May 4',explanation:'Architect asked to draft. Reason: second gate identified along fence line. ~2 weeks from Apr 20 = May 4. Akinwale confirmed. Gatehouse snags resolved ✓ + signage designs received ✓.',due:'May 4',status:'ontrack'},
+
+  {project:'Annexe',dept:'Costing',result:'Road Progress Visibility',action:'Share picture updates on LNT road second lane (concrete) work progress',explanation:'Stringing of wires video already presented. Full visual update on concrete road second lane expected for Apr 23 session.',due:'Apr 23',status:'ontrack'},
+  {project:'Annexe',dept:'Costing',result:'Signage Cost',action:'Present negotiated signage cost by Thursday Apr 23',explanation:'Vendors being contacted. Process: get quotes → compare → negotiate → present Thursday. Revised from Monday deadline. Relevant to boundary fence signage.',due:'Apr 23',status:'ontrack'},
+  {project:'Annexe',dept:'Costing',result:'Boundary Fence',action:'Provide cost for boundary fence along Finidi George',explanation:'Cost estimate required once detailed gatehouse design received from Design team (expected May 4). Boundary fence project active.',due:'May 4',status:'ontrack'},
+  {project:'Annexe',dept:'Costing',result:'Speed Bumps — Production Risk',action:'Report HFP paver production timeline — non-standard colour flagged',explanation:'PRODUCTION RISK (not payment). HFP pavers are non-standard special colour — not regularly produced. Contractor spoke with HFP Apr 19. HFP to respond with availability by close of business Apr 21.',due:'Apr 23',status:'ontrack'},
+  {project:'Annexe',dept:'Costing',result:'QS Onboarding',action:'Complete QS onboarding by Apr 23; first BAFF valuation by Apr 25–30',explanation:'Legal to clear engagement letter by Apr 22. QS virtual briefing before Thursday Apr 24. Target: close out engagement between Apr 20–22. BAFF to submit first valuation once QS is onboarded. BAFF ₦32M paid ✓.',due:'Apr 23',status:'ontrack'},
+
+  {project:'Annexe',dept:'IPD',result:'BAFF Remobilisation',action:'Confirm BAFF remobilised after ₦32M payment — Segun Odegbami clearing to commence immediately',explanation:'STILL NOT STARTED as of Apr 20 — site activities severely slowed. ₦32M payment confirmed sent ✓. Clearing must commence on remobilisation. Bring forward programme of works.',due:'Apr 23',status:'delayed'},
+  {project:'Annexe',dept:'IPD',result:'60-Day Drainage Target',action:'Monitor drainage target — 140m excavated; 400m + 120m culvert section planned. ARUP sign-off due Apr 24',explanation:'Still ~90% viable if BAFF fully mobilised. Steel being tied at ~100m mark. New section: 400m + 120m culvert. ARUP sign-off on new section before casting (expected Apr 24). Physical measurement by Thursday.',due:'Apr 23',status:'ontrack'},
+  {project:'Annexe',dept:'IPD',result:'Internal Roads',action:'Confirm BAFF remob and execute road targets: Sunday Oliseh, Peter Rufai 2, Tunde-5 sandfilling',explanation:'MANHOLES: 96 completed (up from 94–95). Target: 140. Remaining: 44. INTERNAL ROADS: NO PROGRESS confirmed. Plan if BAFF remobilises: Sunday Oliseh 140m closeout; Tunde-5 (179m) turn completion.',due:'Apr 23',status:'delayed'},
+  {project:'Annexe',dept:'IPD',result:'Monthly Targets',action:'Present formal written April targets and share with Taiwo',explanation:'Monthly targets due but not formally shared in writing. Delayed since Mar 26. Must be formalised and presented at next session.',due:'Apr 23',status:'delayed'},
+
+  {project:'Annexe',dept:'Operations',result:'Sales & Finance Update',action:'Provide update on sales metrics, offer letters, inflow and account balance',explanation:'Apr 20 figures: Total Inflow ₦6.27Bn | Units Sold: 78 | Value of Sales: ₦6.89Bn | Account Balance: ₦61.9M | No active offer letters. No active ad campaign running. CRM tool requested to aid telemarketing.',due:'Apr 23',status:'ontrack'},
+
+  {project:'Annexe',dept:'Fincon',result:'Contractor Payments',action:'Manage ₦32M BAFF payment and ₦50M Elms Gardens repayment',explanation:'₦32M PAYMENT: Confirmed sent to BAFF ✓. Elms Gardens loan: Annex borrowed ₦100M on Jan 29; ₦50M repaid ✓. ₦50M balance still outstanding.',due:'Apr 23',status:'ontrack'},
+
+  {project:'Annexe',dept:'Telemarketing',result:'Lead Generation',action:'Share weekly leads report on Lakowe Annex promotional campaign',explanation:'NO AD CURRENTLY RUNNING — confirmed by Marketing. No leads update this week. Campaign effectively paused. CRM tool to be implemented for unreachable leads.',due:'Apr 23',status:'onhold'},
+
+  {project:'Annexe',dept:'MCC',result:'Billboard Locations',action:'Present formal billboard designs + Lekki-Epe location options at next meeting',explanation:'Topics: (1) Gate billboard sunk due to sandfilling — needs clearing + re-erection + vendor. (2) June 12 Road board: move to right side of road. (3) New locations: secondary market area / Lekki-Epe / near gate. Consensus: external market-facing content on Lekki-Epe.',due:'Apr 23',status:'ontrack'},
+  {project:'Annexe',dept:'MCC',result:'Board 1 Production',action:'Board 1 to be ready by May 4',explanation:'Billboard production timeline: Board 1 ready in 2 weeks (May 4). Design direction agreed: external approach view (not interior). Replace existing image with what is actually being built inside.',due:'May 4',status:'ontrack'},
+  {project:'Annexe',dept:'MCC',result:'Gate Billboard',action:'Scope gate billboard re-erection with IPD as part of Segun Odegbami clearing — find vendor',explanation:'Gate billboard has sunk into ground due to sandfilling — now barely visible. Structure can be reused once Segun Odegbami is cleared. Billboard re-erection to be scoped jointly with IPD.',due:'Apr 23',status:'ontrack'},
+  {project:'Annexe',dept:'MCC',result:'Joint Sales Strategy',action:'Share Sales + MCC joint strategy report before Thursday Apr 23',explanation:'Joint strategy session required with Sales to improve conversion and drive account balance toward ₦1Bn+. Report to be sent before Thursday meeting.',due:'Apr 23',status:'delayed'},
+
+  {project:'Annexe',dept:'Sales',result:'₦1B Account Target',action:'Share Sales + MCC joint strategy report — present strategy to push account to ₦1B+',explanation:'No active offer letters as of Apr 20. 6-plot group buy still in discussion — client being taken to site, no decision confirmed. No active ad campaign. Joint strategy session with MCC not yet held.',due:'Apr 23',status:'delayed'},
+
+  {project:'Annexe',dept:'Legal',result:'LNT Trademark',action:'Monitor LNT Trademark publication — waiting on Aug 21 publication date',explanation:'Acceptance letter received (3 weeks early). New publication date: Aug 21. Trademark certificate expected Oct 21. Final registration: March 2027. No action required at this stage.',due:'Aug 21',status:'ontrack'},
 ];
 
-  function updateSidebarCounts() {
-    document.querySelectorAll('.sidebar-item').forEach(btn => {
-      const onClickAttr = btn.getAttribute('onclick');
-      if (onClickAttr) {
-        const match = onClickAttr.match(/showDept\([^,]+,\s*this,\s*'([^']+)',\s*'([^']+)'\)/);
-        if (match) {
-          const proj = match[1];
-          const dept = match[2];
-          const count = taskDatabase.filter(t => t.project === proj && t.dept === dept).length;
-          const span = btn.querySelector('.dept-count');
-          if(span) span.textContent = count;
-        }
-      }
+// ═══════════════════════════════════════════════
+// APPLY STORED STATUS OVERRIDES
+// ═══════════════════════════════════════════════
+function applyStoredStatuses() {
+  const overrides = getStatusOverrides();
+  taskDatabase.forEach(t => {
+    const id = taskId(t);
+    if (overrides[id]) t.status = overrides[id];
+  });
+}
+
+// ═══════════════════════════════════════════════
+// DATE PARSING & OVERDUE DETECTION
+// ═══════════════════════════════════════════════
+const MONTHS = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+function parseDueDate(due) {
+  if (!due) return null;
+  const s = due.toLowerCase();
+  if (/overdue|past due|past|delayed/.test(s)) return new Date(2000, 0, 1);
+  const m = s.match(/([a-z]+)\s+(\d+)/);
+  if (m && MONTHS[m[1].substring(0,3)] !== undefined) {
+    return new Date(2026, MONTHS[m[1].substring(0,3)], parseInt(m[2]));
+  }
+  return null;
+}
+function isOverdue(task) {
+  if (task.status === 'done') return false;
+  const due = parseDueDate(task.due);
+  if (!due) return false;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return due < today;
+}
+
+// ═══════════════════════════════════════════════
+// COLOR CODING
+// ═══════════════════════════════════════════════
+function parseMillions(str) {
+  if (!str) return null;
+  const s = str.replace(/[₦,\s]/g,'').toUpperCase();
+  const numMatch = s.match(/([\d.]+)([BMK]?)/);
+  if (!numMatch) return null;
+  let val = parseFloat(numMatch[1]);
+  if (numMatch[2] === 'B') val *= 1000;
+  else if (numMatch[2] === 'K') val /= 1000;
+  return val; // in millions
+}
+function balanceColorClass(valStr) {
+  const m = parseMillions(valStr);
+  if (m === null) return 'color-green';
+  if (m < 50) return 'color-red';
+  if (m < 100) return 'color-amber';
+  return 'color-green';
+}
+function offersColorClass(valStr) {
+  const n = parseInt(valStr) || 0;
+  if (n === 0) return 'color-red';
+  if (n < 2) return 'color-amber';
+  return 'color-green';
+}
+function applyPriorityColors() {
+  // CX Balance
+  const cxBal = document.getElementById('val-cx-balance').textContent;
+  const cxBalCard = document.getElementById('card-cx-balance');
+  const cxBalVal = document.getElementById('val-cx-balance');
+  const cxBalC = balanceColorClass(cxBal);
+  cxBalCard.className = 'metric-card priority-card ' + cxBalC;
+  cxBalVal.className = 'metric-value ' + cxBalC;
+  // CX Offers
+  const cxOff = document.getElementById('val-cx-offers').textContent;
+  const cxOffCard = document.getElementById('card-cx-offers');
+  const cxOffVal = document.getElementById('val-cx-offers');
+  const cxOffC = offersColorClass(cxOff);
+  cxOffCard.className = 'metric-card priority-card ' + cxOffC;
+  cxOffVal.className = 'metric-value ' + cxOffC;
+  // Annex Balance
+  const aBal = document.getElementById('val-annex-balance').textContent;
+  const aBalCard = document.getElementById('card-annex-balance');
+  const aBalVal = document.getElementById('val-annex-balance');
+  const aBalC = balanceColorClass(aBal);
+  aBalCard.className = 'metric-card priority-card ' + aBalC;
+  aBalVal.className = 'metric-value ' + aBalC;
+  // Annex Offers
+  const aOff = document.getElementById('val-annex-offers').textContent;
+  const aOffCard = document.getElementById('card-annex-offers');
+  const aOffVal = document.getElementById('val-annex-offers');
+  const aOffC = offersColorClass(aOff);
+  aOffCard.className = 'metric-card priority-card ' + aOffC;
+  aOffVal.className = 'metric-value ' + aOffC;
+}
+
+// ═══════════════════════════════════════════════
+// OVERDUE PANEL ON DASHBOARD
+// ═══════════════════════════════════════════════
+function renderOverduePanels() {
+  ['Crossings','Annexe'].forEach(proj => {
+    const el = document.getElementById('overdue-' + proj.toLowerCase());
+    if (!el) return;
+    const overdue = taskDatabase.filter(t => t.project === proj && isOverdue(t));
+    if (overdue.length === 0) { el.innerHTML = ''; return; }
+    let html = `<div class="overdue-panel" onclick="this.classList.toggle('expanded')">
+      <div class="overdue-header">
+        <span>⚠ ${overdue.length} Overdue Task${overdue.length > 1?'s':''} — Click to review</span>
+        <span class="overdue-toggle-icon">▼</span>
+      </div>
+      <div class="overdue-list">`;
+    overdue.forEach(t => {
+      html += `<div class="overdue-item">
+        <span class="overdue-dept">${t.dept}</span>
+        <span class="overdue-action">${t.action.length > 85 ? t.action.substring(0,82)+'...' : t.action}</span>
+        <span class="overdue-due">Due: ${t.due}</span>
+      </div>`;
+    });
+    html += '</div></div>';
+    el.innerHTML = html;
+  });
+}
+
+// ═══════════════════════════════════════════════
+// SIDEBAR COUNTS
+// ═══════════════════════════════════════════════
+function updateSidebarCounts() {
+  document.querySelectorAll('.sidebar-item').forEach(btn => {
+    const oc = btn.getAttribute('onclick') || '';
+    const m = oc.match(/showDept\(this,'([^']+)','([^']+)'\)/);
+    if (!m) return;
+    const count = taskDatabase.filter(t => t.project === m[1] && t.dept === m[2]).length;
+    const span = btn.querySelector('.dept-count');
+    if (span) span.textContent = count;
+  });
+  // Mobile pills
+  rebuildMobilePills();
+}
+
+// ═══════════════════════════════════════════════
+// MOBILE DEPT PILLS
+// ═══════════════════════════════════════════════
+const CX_DEPTS = ['Design','Costing','AMC','IPD','Landscape','Operations','Fincon','Sales','MCC','General'];
+const ANNEX_DEPTS = ['Design','Costing','IPD','Operations','Fincon','Telemarketing','MCC','Sales','Legal'];
+
+function rebuildMobilePills() {
+  const container = document.getElementById('mobile-dept-pills');
+  if (!container || !currentProject) { if(container) container.innerHTML=''; return; }
+  const depts = currentProject === 'Crossings' ? CX_DEPTS : ANNEX_DEPTS;
+  const activeClass = currentProject === 'Crossings' ? 'active-cx' : 'active-annex';
+  container.innerHTML = depts.map(d => {
+    const count = taskDatabase.filter(t => t.project === currentProject && t.dept === d).length;
+    const isActive = currentDept === d ? activeClass : '';
+    return `<button class="mobile-dept-pill ${isActive}" onclick="showDeptMobile('${d}')">${d} <span class="pill-count">${count}</span></button>`;
+  }).join('');
+}
+
+function showDeptMobile(dept) {
+  currentDept = dept;
+  viewingSessionDate = 'current';
+  rebuildMobilePills();
+  renderDeptContent(currentProject, dept);
+}
+
+// ═══════════════════════════════════════════════
+// HISTORY BAR
+// ═══════════════════════════════════════════════
+function buildHistoryBar() {
+  const bar = document.getElementById('history-bar');
+  const sessions = getSessions();
+  let html = '<span class="history-label">History:</span>';
+  html += `<button class="history-pill ${viewingSessionDate==='current'?'active':''}" onclick="switchSession('current')">Current</button>`;
+  sessions.forEach(s => {
+    const isActive = viewingSessionDate === s.date ? 'active' : '';
+    html += `<button class="history-pill ${isActive}" onclick="switchSession('${s.date}')">${s.date}</button>`;
+  });
+  bar.innerHTML = html;
+}
+
+function switchSession(dateStr) {
+  viewingSessionDate = dateStr;
+  buildHistoryBar();
+  const dateLabel = document.getElementById('viewing-date-label');
+  dateLabel.textContent = dateStr === 'current' ? 'Current' : dateStr;
+  renderCurrentDept();
+}
+
+// ═══════════════════════════════════════════════
+// DEPT RENDERING
+// ═══════════════════════════════════════════════
+function showDept(btn, proj, dept) {
+  currentDept = dept;
+  viewingSessionDate = 'current';
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDeptContent(proj, dept);
+}
+
+function renderDeptContent(proj, dept) {
+  document.getElementById('panel-placeholder').style.display = 'none';
+  const container = document.getElementById('dynamic-dept-container');
+  container.style.display = 'block';
+
+  document.getElementById('dynamic-dept-title').textContent = dept;
+  const badge = document.getElementById('dynamic-dept-badge');
+  badge.textContent = proj;
+  badge.className = 'nav-badge ' + (proj==='Crossings' ? 'badge-cx' : 'badge-annex');
+
+  buildHistoryBar();
+  document.getElementById('viewing-date-label').textContent = viewingSessionDate === 'current' ? 'Current' : viewingSessionDate;
+  renderCurrentDept();
+}
+
+function renderCurrentDept() {
+  if (!currentProject || !currentDept) return;
+  const showDone = document.getElementById('show-done-toggle') && document.getElementById('show-done-toggle').checked;
+
+  // Get tasks from current or historical session
+  let tasks;
+  if (viewingSessionDate === 'current') {
+    tasks = taskDatabase.filter(t => t.project === currentProject && t.dept === currentDept);
+  } else {
+    const sessions = getSessions();
+    const session = sessions.find(s => s.date === viewingSessionDate);
+    tasks = session ? session.tasks.filter(t => t.project === currentProject && t.dept === currentDept) : [];
+  }
+
+  // Apply status overrides to current tasks
+  if (viewingSessionDate === 'current') {
+    const overrides = getStatusOverrides();
+    tasks = tasks.map(t => ({ ...t, status: overrides[taskId(t)] || t.status }));
+  }
+
+  // Auto-flag overdue tasks as delayed
+  if (viewingSessionDate === 'current') {
+    tasks = tasks.map(t => {
+      if (isOverdue(t) && t.status === 'ontrack') return { ...t, status: 'delayed' };
+      return t;
     });
   }
 
-  window.onload = function() {
-    updateSidebarCounts();
-  };
+  // Filter by bucket
+  let filtered = tasks;
+  if (!showDone) filtered = filtered.filter(t => t.status !== 'done');
+  if (currentFilter !== 'all') filtered = filtered.filter(t => t.status === currentFilter);
 
-  function showDept(panelId, btn, projName, deptName) {
-    document.getElementById('panel-placeholder').style.display = 'none';
-    
-    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  const list = document.getElementById('dynamic-tasks-list');
+  if (filtered.length === 0) {
+    list.innerHTML = `<div style="padding:20px;color:#999;text-align:center;font-size:13px">No tasks match this filter.</div>`;
+    return;
+  }
 
-    const container = document.getElementById('dynamic-dept-container');
-    const title = document.getElementById('dynamic-dept-title');
-    const badge = document.getElementById('dynamic-dept-badge');
-    const list = document.getElementById('dynamic-tasks-list');
+  const isHistory = viewingSessionDate !== 'current';
+  const overrides = getStatusOverrides();
 
-    title.textContent = deptName;
-    badge.textContent = projName;
-    badge.className = 'nav-badge ' + (projName === 'Crossings' ? 'badge-cx' : 'badge-annex');
-    
-    const filtered = taskDatabase.filter(t => t.project === projName && t.dept === deptName);
-    
-    list.innerHTML = '';
-    if(filtered.length === 0) {
-      list.innerHTML = `<div style="padding:20px; color:#888;">No active tasks found for ${deptName}.</div>`;
-    } else {
-      filtered.forEach(task => {
-        let statStr = (task.status || '').toLowerCase();
-        let dueStr = (task.due || '').toLowerCase();
-        
-        let statusClass = 'ontrack'; // Default to green
-        
-        if (statStr.includes('delay') || dueStr.includes('overdue') || statStr.includes('past due')) {
-          statusClass = 'delayed'; 
-        } else if (statStr.includes('achieved') || statStr.includes('completed') || task.action.toLowerCase().includes('completed') || dueStr.includes('done') || dueStr.includes('achieved')) {
-          statusClass = 'achieved'; 
-        } else if (statStr.includes('update expected')) {
-          statusClass = 'update'; 
-        }
+  list.innerHTML = filtered.map(t => {
+    const id = taskId(t);
+    const status = (viewingSessionDate === 'current' ? (overrides[id] || t.status) : t.status) || 'ontrack';
+    const statusLabel = {ontrack:'On Track',delayed:'Delayed',onhold:'On Hold',done:'Done'}[status] || 'On Track';
+    const dueCls = isOverdue(t) ? 'overdue' : '';
+    const ctxText = t.result || '';
 
-        list.innerHTML += `
-          <div class="step-card ${statusClass}" onclick="this.classList.toggle('expanded')">
-            <div class="step-card-top">
-              <div class="step-text">${task.action}</div>
-              <span class="step-date">Due: ${task.due}</span>
-            </div>
-            <div class="step-details-pane" onclick="event.stopPropagation();">
-              <div class="pane-title">Task Description / Details</div>
-              ${task.explanation}
-            </div>
-          </div>
-        `;
-      });
+    const actionButtons = !isHistory ? `
+      <div class="status-actions" onclick="event.stopPropagation()">
+        <button class="status-btn btn-done" onclick="setTaskStatus('${id}','done')">✓ Done</button>
+        <button class="status-btn btn-delayed" onclick="setTaskStatus('${id}','delayed')">⚠ Delayed</button>
+        <button class="status-btn btn-onhold" onclick="setTaskStatus('${id}','onhold')">⏸ On Hold</button>
+        <button class="status-btn btn-ontrack" onclick="setTaskStatus('${id}','ontrack')">▲ On Track</button>
+      </div>` : '';
+
+    return `<div class="step-card s-${status}" onclick="this.classList.toggle('expanded')" id="card-${id}">
+      ${ctxText ? `<div class="step-context">${ctxText}</div>` : ''}
+      <div class="step-card-top">
+        <div class="step-text">${t.action}</div>
+        <div class="step-meta">
+          <span class="step-date ${dueCls}">Due: ${t.due}</span>
+          <span class="status-badge sb-${status}">${statusLabel}</span>
+        </div>
+      </div>
+      <div class="step-details-pane" onclick="event.stopPropagation()">
+        <div class="pane-title">Details</div>
+        <div style="margin-bottom:8px">${t.explanation}</div>
+        ${actionButtons}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setTaskStatus(id, status) {
+  saveStatus(id, status);
+  // Update in-memory too
+  const overrides = getStatusOverrides();
+  taskDatabase.forEach(t => { if (taskId(t) === id) t.status = overrides[id]; });
+  renderCurrentDept();
+  renderOverduePanels();
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCurrentDept();
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  // Sync bottom nav
+  document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+  const bnav = document.getElementById('bnav-' + id);
+  if (bnav) bnav.classList.add('active');
+}
+
+function mobileNavClick(id, btn) {
+  const fakeBtn = document.querySelector(`.nav-tab[onclick*="${id}"]`);
+  showPage(id, fakeBtn);
+  document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function showLanding() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-landing').classList.add('active');
+  document.getElementById('nav-tabs-group').style.display = 'none';
+  document.getElementById('bottom-nav').style.display = 'none';
+  document.querySelectorAll('.nav-project-btn').forEach(b => b.classList.remove('active'));
+  currentProject = null; currentDept = null;
+}
+
+function selectProject(proj) {
+  currentProject = proj;
+  currentDept = null;
+  viewingSessionDate = 'current';
+  currentFilter = 'all';
+
+  document.querySelectorAll('.nav-project-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(proj === 'Crossings' ? 'btn-nav-cx' : 'btn-nav-annex').classList.add('active');
+
+  document.getElementById('block-crossings').style.display = proj === 'Crossings' ? 'block' : 'none';
+  document.getElementById('block-annexe').style.display = proj === 'Annexe' ? 'block' : 'none';
+  document.getElementById('sidebar-crossings').style.display = proj === 'Crossings' ? 'block' : 'none';
+  document.getElementById('sidebar-annexe').style.display = proj === 'Annexe' ? 'block' : 'none';
+
+  document.getElementById('nav-tabs-group').style.display = 'flex';
+  document.getElementById('bottom-nav').style.display = 'block';
+
+  const dashTab = document.querySelector('.nav-tab');
+  showPage('dashboard', dashTab);
+
+  document.getElementById('panel-placeholder').style.display = '';
+  document.getElementById('dynamic-dept-container').style.display = 'none';
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+
+  updateSidebarCounts();
+  applyPriorityColors();
+  renderOverduePanels();
+  rebuildMobilePills();
+}
+
+// ═══════════════════════════════════════════════
+// FILE UPLOAD — EXCEL & TRANSCRIPT
+// ═══════════════════════════════════════════════
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  // Archive current data first
+  archiveSession(document.getElementById('last-updated-text').textContent.replace('Last updated: ',''));
+
+  if (ext === 'csv') {
+    const reader = new FileReader();
+    reader.onload = e => { processData(parseCSV(e.target.result)); finalizeUpload(file.name); };
+    reader.readAsText(file);
+  } else if (ext === 'xlsx' || ext === 'xls') {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const wb = XLSX.read(e.target.result, {type:'binary'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      processData(XLSX.utils.sheet_to_json(ws, {header:1}));
+      finalizeUpload(file.name);
+    };
+    reader.readAsBinaryString(file);
+  } else if (ext === 'txt') {
+    const reader = new FileReader();
+    reader.onload = e => { parseTranscript(e.target.result); finalizeUpload(file.name); };
+    reader.readAsText(file);
+  } else {
+    alert('Unsupported format. Please upload .xlsx, .csv, or .txt');
+  }
+  event.target.value = '';
+}
+
+function finalizeUpload(fname) {
+  const now = new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('last-updated-text').textContent = 'Last updated: ' + now;
+  updateSidebarCounts();
+  applyPriorityColors();
+  renderOverduePanels();
+  rebuildMobilePills();
+  if (currentDept) renderCurrentDept();
+  alert(`✓ "${fname}" loaded successfully. Previous data archived.`);
+}
+
+function parseCSV(text) {
+  const rows = []; let row = [], cur = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '"' && text[i+1] === '"') { cur += '"'; i++; }
+    else if (c === '"') inQ = !inQ;
+    else if (c === ',' && !inQ) { row.push(cur.trim()); cur = ''; }
+    else if (c === '\n' && !inQ) { row.push(cur.trim()); rows.push(row); row = []; cur = ''; }
+    else cur += c;
+  }
+  if (cur) row.push(cur.trim());
+  if (row.length) rows.push(row);
+  return rows;
+}
+
+function processData(rows) {
+  taskDatabase = [];
+  const cxTargets = [], aTargets = [];
+  for (let i = 1; i < rows.length; i++) {
+    const c = rows[i]; if (!c || c.length < 3) continue;
+    const s = c.join(' ').toLowerCase();
+    const proj = s.includes('crossings') ? 'Crossings' : 'Annexe';
+    const k = String(c[0]).toLowerCase();
+    if (k.includes('inflow')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', c[1]||c[2]); continue; }
+    if (k.includes('units')||k.includes('sold')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', c[1]||c[2]); continue; }
+    if (k.includes('sales')) { setMetric(proj==='Crossings'?'val-cx-sales':'val-annex-sales', c[1]||c[2]); continue; }
+    if (k.includes('budget')) { setMetric('val-cx-budget', c[1]||c[2]); continue; }
+    if (k.includes('offer')) { setMetric(proj==='Crossings'?'val-cx-offers':'val-annex-offers', c[1]||c[2]); continue; }
+    if (k.includes('balance')) { setMetric(proj==='Crossings'?'val-cx-balance':'val-annex-balance', c[1]||c[2]); continue; }
+    if (k === 'target' || s.includes('monthly target')) {
+      const cls = (String(c[4])||'').toLowerCase().includes('carry') ? 'carryover' : 'new-target';
+      const html = `<div class="target-item ${cls}"><span class="t-name">${c[2]}</span><span class="t-note">${c[3]}</span></div>`;
+      (proj === 'Crossings' ? cxTargets : aTargets).push(html); continue;
     }
-
-    container.style.display = 'block';
+    taskDatabase.push({
+      project: proj, dept: c[1]||'General', result: c[2]||'',
+      action: c[3]||'No action', explanation: c[4]||'',
+      due: c[5]||'TBD', status: (c[6]||'ontrack').toLowerCase()
+    });
   }
+  if (cxTargets.length) document.getElementById('targets-crossings').innerHTML = cxTargets.join('');
+  if (aTargets.length) document.getElementById('targets-annexe').innerHTML = aTargets.join('');
+  applyStoredStatuses();
+}
 
-  // ── CSV & EXCEL PARSING (With Department Normalizer Included) ──
-  function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+function setMetric(id, val) {
+  const el = document.getElementById(id);
+  if (el && val) el.textContent = val;
+}
 
-    const fileExt = file.name.split('.').pop().toLowerCase();
+function parseTranscript(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const deptNames = ['Design','Costing','IPD','IPD/PMO','AMC','Operations','Fincon','Sales','MCC','Legal','Telemarketing','Landscape','General'];
+  const newTasks = [];
+  let currentDeptName = 'General', currentProj = currentProject || 'Crossings';
 
-    if (fileExt === 'csv') {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const text = e.target.result;
-            const rows = parseCSV(text);
-            processData(rows);
-            finalizeUpload();
-        };
-        reader.readAsText(file);
-    } else if (fileExt === 'xlsx' || fileExt === 'xls') {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const data = e.target.result;
-            const workbook = XLSX.read(data, { type: 'binary' });
-            
-            // Reads the LAST sheet by default
-            const latestSheetName = workbook.SheetNames[workbook.SheetNames.length - 1];
-            const worksheet = workbook.Sheets[latestSheetName];
-            
-            const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            processData(rows);
-            finalizeUpload();
-        };
-        reader.readAsBinaryString(file);
-    } else {
-        alert("Unsupported file format. Please upload a .csv or .xlsx file.");
+  lines.forEach(line => {
+    // Detect project
+    if (/crossings/i.test(line)) currentProj = 'Crossings';
+    else if (/annex/i.test(line)) currentProj = 'Annexe';
+    // Detect department header
+    const deptMatch = deptNames.find(d => new RegExp(`^${d}[:\\s]`, 'i').test(line));
+    if (deptMatch) { currentDeptName = deptMatch; return; }
+    // Detect action items (lines starting with *, -, •, or numbered)
+    const isAction = /^[\*\-\•]|\d+[\.\)]/.test(line);
+    if (isAction && line.length > 10) {
+      const action = line.replace(/^[\*\-\•\d\.\)]+\s*/, '').trim();
+      // Extract due date if mentioned
+      const dateMatch = action.match(/by\s+([A-Za-z]+\s+\d+)|(\d+\s+[A-Za-z]+)/i);
+      const due = dateMatch ? dateMatch[0].replace(/by\s+/i,'') : 'TBD';
+      newTasks.push({ project: currentProj, dept: currentDeptName, result: 'Transcript Import', action, explanation: 'Imported from meeting transcript.', due, status: 'ontrack' });
     }
-  }
+  });
 
-  function finalizeUpload() {
-      document.getElementById('last-updated-text').textContent = 'Last updated: ' + new Date().toLocaleDateString();
-      alert('Data successfully parsed! Tasks, Departments, and Merged Cells processed.');
-      
-      const activeBtn = document.querySelector('.sidebar-item.active');
-      if(activeBtn) activeBtn.click();
+  if (newTasks.length === 0) {
+    alert('No structured tasks found in transcript. Ensure action items start with *, -, or numbers, and department names appear as headers.');
+    return;
   }
+  // Merge: remove existing tasks that match same dept+project, then add new
+  const affectedDepts = [...new Set(newTasks.map(t => t.project + '_' + t.dept))];
+  taskDatabase = taskDatabase.filter(t => !affectedDepts.includes(t.project + '_' + t.dept));
+  taskDatabase = taskDatabase.concat(newTasks);
+  applyStoredStatuses();
+  alert(`✓ ${newTasks.length} tasks imported from transcript across ${affectedDepts.length} department(s).`);
+}
 
-  function parseCSV(csvText) {
-    const rows = [];
-    let currentRow = [];
-    let curString = '';
-    let inQuotes = false;
-    
-    for (let i = 0; i < csvText.length; i++) {
-      const char = csvText[i];
-      if (char === '"' && csvText[i+1] === '"') {
-        curString += '"'; i++; 
-      } else if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        currentRow.push(curString.trim());
-        curString = '';
-      } else if (char === '\n' && !inQuotes) {
-        currentRow.push(curString.trim());
-        rows.push(currentRow);
-        currentRow = [];
-        curString = '';
+// ═══════════════════════════════════════════════
+// CHARTS — Last-point label plugin + Legend
+// ═══════════════════════════════════════════════
+const lastPointPlugin = {
+  id: 'lastPointLabel',
+  afterDatasetsDraw(chart) {
+    const { ctx, data } = chart;
+    data.datasets.forEach((ds, i) => {
+      const meta = chart.getDatasetMeta(i);
+      if (meta.hidden) return;
+      const lastIdx = ds.data.length - 1;
+      if (lastIdx < 0) return;
+      const pt = meta.data[lastIdx];
+      const val = ds.data[lastIdx];
+      if (val == null) return;
+      // Format
+      let label;
+      if (ds.label && (ds.label.includes('Inflow') || ds.label.includes('₦B'))) {
+        label = '₦' + val.toFixed(2) + 'B';
       } else {
-        curString += char;
+        label = '₦' + (val * 100).toFixed(0) + 'M';
       }
-    }
-    if (curString !== '') currentRow.push(curString.trim());
-    if (currentRow.length > 0) rows.push(currentRow);
-    return rows;
+      ctx.save();
+      ctx.font = 'bold 10px DM Mono, monospace';
+      ctx.fillStyle = ds.borderColor;
+      ctx.textAlign = 'right';
+      ctx.fillText(label, pt.x - 4, pt.y - 10);
+      ctx.restore();
+    });
   }
+};
+Chart.register(lastPointPlugin);
 
-  function processData(rows) {
-    taskDatabase = [];
-    let currentProj = 'Annexe'; 
-    let headerIdx = -1;
-    let colMap = { dept: -1, action: -1, due: -1, result: -1, explanation: -1, status: -1 };
+const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7','Apr 13','Apr 16','Apr 20'];
+const annexInflow = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27,6.27,6.27,6.27];
+const annexBalance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,82.78,150,149.1,61.9];
+const cxInflow = [1.05,1.179,1.3,1.3,1.3,1.415,1.415,1.415,1.415,1.415,2.07,1.68,1.72,1.72,1.72,1.72,1.72,1.72];
 
-    for (let i = 0; i < Math.min(25, rows.length); i++) {
-      if (!rows[i]) continue;
-      let rowStr = rows[i].join(' ').toLowerCase();
-      
-      if (rowStr.includes('lakowe crossings') || rowStr.includes('crossings')) currentProj = 'Crossings';
-      else if (rowStr.includes('lakowe annexe') || rowStr.includes('lakowe annex')) currentProj = 'Annexe';
-
-      if (rowStr.includes('department') && (rowStr.includes('next steps') || rowStr.includes('action'))) {
-        headerIdx = i;
-        for (let c = 0; c < rows[i].length; c++) {
-          let colName = String(rows[i][c]).toLowerCase().replace(/\s+/g, ' ').trim();
-          if (colName.includes('department')) colMap.dept = c;
-          else if (colName.includes('next steps') || colName.includes('action')) colMap.action = c;
-          else if (colName.includes('timeline') || colName.includes('due date')) colMap.due = c;
-          else if (colName === 'result') colMap.result = c;
-          else if (colName.includes('explanation') || colName.includes('notes')) colMap.explanation = c;
-          else if (colName === 'status') colMap.status = c;
-        }
-        break;
-      }
+const gridC = 'rgba(0,0,0,0.06)', textC = '#999';
+const baseOpts = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true, position: 'bottom',
+      labels: { font: { size: 11, weight: '700', family: 'DM Sans' }, color: textC, boxWidth: 14, padding: 12 }
     }
-
-    if (headerIdx === -1) colMap = { dept: 1, action: 2, due: 3, result: 4, explanation: 5, status: 7 };
-
-    let currentDept = 'General';
-
-    for (let i = 0; i < rows.length; i++) {
-      const cols = rows[i];
-      if (!cols || cols.length === 0) continue;
-      
-      let strRow = cols.join(' ').toLowerCase();
-      if (strRow.trim() === '') continue;
-
-      if (strRow.includes('metric') || String(cols[0] || '').toLowerCase().includes('inflow') || String(cols[0] || '').toLowerCase().includes('sold') || String(cols[0] || '').toLowerCase().includes('balance')) {
-        continue;
-      }
-
-      if (strRow.includes('target') && !strRow.includes('department')) continue;
-
-      if (headerIdx !== -1 && i <= headerIdx) continue;
-
-      let deptVal = colMap.dept !== -1 && cols[colMap.dept] ? String(cols[colMap.dept]).trim() : '';
-      let actionVal = colMap.action !== -1 && cols[colMap.action] ? String(cols[colMap.action]).trim() : '';
-      let dueVal = colMap.due !== -1 && cols[colMap.due] ? String(cols[colMap.due]).trim() : '';
-      let resultVal = colMap.result !== -1 && cols[colMap.result] ? String(cols[colMap.result]).trim() : 'N/A';
-      let expVal = colMap.explanation !== -1 && cols[colMap.explanation] ? String(cols[colMap.explanation]).trim() : 'No notes provided.';
-      let statusVal = colMap.status !== -1 && cols[colMap.status] ? String(cols[colMap.status]).trim() : '';
-
-      if (deptVal && deptVal !== '' && deptVal.toLowerCase() !== 'department' && !deptVal.toLowerCase().includes('s/n')) {
-        currentDept = normalizeDept(deptVal);
-      }
-
-      if (actionVal && actionVal !== '' && !actionVal.toLowerCase().includes('next steps') && !actionVal.toLowerCase().includes('action point')) {
-        
-        if (!statusVal || statusVal === '') {
-           statusVal = 'On-Track'; 
-           if (dueVal.toLowerCase().includes('delay') || strRow.includes('delay')) statusVal = 'Delayed';
-        }
-
-        let formatExplanation = `<strong>Result:</strong> ${resultVal}<br><br><strong>Notes:</strong> ${expVal}`;
-
-        taskDatabase.push({
-          project: currentProj,
-          dept: currentDept,
-          action: actionVal,
-          explanation: formatExplanation,
-          due: dueVal || 'TBD',
-          status: statusVal
-        });
-      }
-    }
-    updateSidebarCounts();
+  },
+  scales: {
+    x: { ticks: { color: textC, font: { size: 10, weight: '600' }, maxRotation: 45, autoSkip: true, maxTicksLimit: 6 }, grid: { display: false } },
+    y: { ticks: { color: textC, font: { size: 10 } }, grid: { color: gridC } }
   }
+};
 
-  // ── CHARTS (Red & Grey Theme) ──
-  const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7'];
-  const inflow  = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27];
-  const balance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,61.9];
-  
-  const gridC = 'rgba(0,0,0,0.06)';
-  const textC = '#757575';
-  const base = {
-    responsive:true, maintainAspectRatio:false,
-    plugins:{legend:{display:false}},
-    scales:{
-      x:{ticks:{color:textC,font:{size:11, weight:'bold'},maxRotation:45,autoSkip:true,maxTicksLimit:7},grid:{display:false}},
-      y:{ticks:{color:textC,font:{size:11}},grid:{color:gridC}}
-    }
-  };
+// Annexe chart
+new Chart(document.getElementById('c1'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      { label: 'Inflow (₦B)', data: annexInflow, borderColor: '#616161', backgroundColor: 'rgba(97,97,97,0.08)', borderWidth: 2.5, pointRadius: 2.5, pointBackgroundColor: '#616161', fill: true, tension: 0.4, yAxisID: 'y' },
+      { label: 'Balance (₦100M)', data: annexBalance.map(v => +(v/100).toFixed(2)), borderColor: '#1565c0', backgroundColor: 'rgba(21,101,192,0.05)', borderWidth: 2, pointRadius: 2.5, pointBackgroundColor: '#1565c0', fill: false, tension: 0.4, borderDash: [4, 3], yAxisID: 'y1' }
+    ]
+  },
+  options: { ...baseOpts, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, position: 'left' }, y1: { ...baseOpts.scales.y, position: 'right', grid: { display: false } } } }
+});
 
-  new Chart(document.getElementById('c1'),{type:'line',data:{labels,datasets:[
-    {label:'Inflow (₦B)',data:inflow,borderColor:'#616161',backgroundColor:'rgba(97,97,97,0.1)',borderWidth:3,pointRadius:3,pointBackgroundColor:'#616161',fill:true,tension:0.35,yAxisID:'y'},
-    {label:'Balance (₦100M)',data:balance.map(v=>+(v/100).toFixed(2)),borderColor:'#424242',backgroundColor:'rgba(66,66,66,0.05)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#424242',fill:false,tension:0.35,borderDash:[5,3],yAxisID:'y1'}
-  ]},options:{...base,scales:{...base.scales,y:{...base.scales.y,position:'left'},y1:{...base.scales.y,position:'right',grid:{display:false}}}}});
+// Crossings chart
+new Chart(document.getElementById('c3'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      { label: 'Inflow (₦B)', data: cxInflow, borderColor: '#D32F2F', backgroundColor: 'rgba(211,47,47,0.08)', borderWidth: 2.5, pointRadius: 2.5, pointBackgroundColor: '#D32F2F', fill: true, tension: 0.4 }
+    ]
+  },
+  options: baseOpts
+});
 
-  const cxIn = [1.05,1.179,1.3,1.3,1.3,1.415,1.415,1.415,1.415,1.415,2.07,1.68,1.72,1.72,1.72];
-  new Chart(document.getElementById('c3'),{type:'line',data:{labels,datasets:[
-    {label:'Inflow (₦B)',data:cxIn,borderColor:'#D32F2F',backgroundColor:'rgba(211,47,47,0.1)',borderWidth:3,pointRadius:3,pointBackgroundColor:'#D32F2F',fill:true,tension:0.35}
-  ]},options:{...base}});
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+window.onload = function () {
+  applyStoredStatuses();
+  updateSidebarCounts();
+  applyPriorityColors();
+};
 </script>
+
 </body>
 </html>
