@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lakowe Portfolio — Performance Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -292,11 +293,11 @@
     <span class="nav-date" id="last-updated-text">Last updated: Apr 9, 2026</span>
     <span class="nav-badge badge-cx nav-project-btn" id="btn-nav-cx" onclick="selectProject('Crossings')">Crossings</span>
     <span class="nav-badge badge-annex nav-project-btn" id="btn-nav-annex" onclick="selectProject('Annexe')">Annexe</span>
-    <label for="csvUpload" class="upload-btn">
+    <label for="fileUpload" class="upload-btn">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
       Upload Sheet
     </label>
-    <input type="file" id="csvUpload" accept=".csv" style="display:none;" onchange="handleFileUpload(event)">
+    <input type="file" id="fileUpload" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display:none;" onchange="handleFileUpload(event)">
   </div>
 </nav>
 
@@ -673,25 +674,52 @@
     container.style.display = 'block';
   }
 
-  // ── Intelligent Excel / CSV PARSING ──
+  // ── Intelligent CSV & EXCEL PARSING ──
   function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const text = e.target.result;
-      processCSV(text);
+    const fileExt = file.name.split('.').pop().toLowerCase();
+
+    if (fileExt === 'csv') {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const text = e.target.result;
+            const rows = parseCSV(text);
+            processData(rows);
+            finalizeUpload();
+        };
+        reader.readAsText(file);
+    } else if (fileExt === 'xlsx' || fileExt === 'xls') {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = e.target.result;
+            const workbook = XLSX.read(data, { type: 'binary' });
+            
+            // Assume the first sheet holds the data
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            
+            // Convert to array of arrays (header: 1 forces it to be a 2D array like the CSV output)
+            const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            processData(rows);
+            finalizeUpload();
+        };
+        reader.readAsBinaryString(file);
+    } else {
+        alert("Unsupported file format. Please upload a .csv or .xlsx file.");
+    }
+  }
+
+  function finalizeUpload() {
       document.getElementById('last-updated-text').textContent = 'Last updated: ' + new Date().toLocaleDateString();
       alert('Data successfully parsed! UI Metrics, Targets, and Task Counters updated.');
       
       const activeBtn = document.querySelector('.sidebar-item.active');
       if(activeBtn) activeBtn.click();
-    };
-    reader.readAsText(file);
   }
 
-  function processCSV(csvText) {
+  function parseCSV(csvText) {
     // Parser config to navigate Quotes natively
     const rows = [];
     let currentRow = [];
@@ -718,7 +746,10 @@
     }
     if (curString !== '') currentRow.push(curString.trim());
     if (currentRow.length > 0) rows.push(currentRow);
+    return rows;
+  }
 
+  function processData(rows) {
     // Empty Task DB so we can populate from new file securely
     taskDatabase = [];
     
@@ -729,14 +760,15 @@
     // Parse loop using intelligent extraction mapping to earlier HTML structure
     for(let i=1; i<rows.length; i++) {
       const cols = rows[i];
-      if(cols.length < 3) continue;
+      if(!cols || cols.length < 3) continue;
       
+      // Ensure all cols are strings for the `.includes()` check
       let strRow = cols.join(' ').toLowerCase();
       let proj = strRow.includes('crossings') ? 'Crossings' : 'Annexe';
       
       // LOGIC 1: Detect Metrics 
-      if (strRow.includes('metric') || cols[0].toLowerCase().includes('inflow') || cols[0].toLowerCase().includes('sold') || cols[0].toLowerCase().includes('balance')) {
-        let key = cols[0].toLowerCase();
+      if (strRow.includes('metric') || String(cols[0]).toLowerCase().includes('inflow') || String(cols[0]).toLowerCase().includes('sold') || String(cols[0]).toLowerCase().includes('balance')) {
+        let key = String(cols[0]).toLowerCase();
         let val = cols[1] || cols[2]; // Assumes value is in col B or C
         
         // Map natively to the element ID created earlier
@@ -750,10 +782,10 @@
       }
 
       // LOGIC 2: Detect Monthly Targets
-      if (strRow.includes('target') || cols[0].toLowerCase() === 'target') {
+      if (strRow.includes('target') || String(cols[0]).toLowerCase() === 'target') {
         let name = cols[2];
         let desc = cols[3];
-        let state = (cols[4] || '').toLowerCase().includes('carry') ? 'carryover' : 'new-target';
+        let state = (String(cols[4]) || '').toLowerCase().includes('carry') ? 'carryover' : 'new-target';
         
         let htmlStr = `<div class="target-item ${state}"><span class="t-name">${name}</span><span class="t-note">${desc}</span></div>`;
         if (proj === 'Crossings') cxTargets.push(htmlStr); else annexTargets.push(htmlStr);
@@ -807,4 +839,4 @@
   ]},options:{...base}});
 </script>
 </body>
-</html></html>
+</html>
