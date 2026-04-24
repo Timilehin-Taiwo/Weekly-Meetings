@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -19,275 +18,259 @@
   --text-secondary: #555;
   --text-muted: #999;
 
-/* Brand Theming */
-–brand-red: #D32F2F;
-–brand-red-light: #fff0f0;
-–brand-red-hover: #B71C1C;
-–brand-grey: #616161;
-–brand-grey-light: #f2f2f2;
-–brand-grey-dark: #424242;
+  /* Brand Theming */
+  --brand-red: #D32F2F;
+  --brand-red-light: #fff0f0;
+  --brand-red-hover: #B71C1C;
+  --brand-grey: #616161;
+  --brand-grey-light: #f2f2f2;
+  --brand-grey-dark: #424242;
 
-–cx-color: var(–brand-red);
-–cx-bg: #fff0f0;
-–annex-color: var(–brand-grey-dark);
-–annex-bg: var(–brand-grey-light);
+  --cx-color: var(--brand-red);
+  --cx-bg: #fff0f0;
+  --annex-color: var(--brand-grey-dark);
+  --annex-bg: var(--brand-grey-light);
 
-/* Status Indicators */
-–status-green: #2e7d32;
-–status-green-bg: #f0faf0;
-–status-green-border: #4caf50;
+  /* Status Indicators */
+  --status-green: #2e7d32;
+  --status-green-bg: #f0faf0;
+  --status-green-border: #4caf50;
 
-–status-red: #c62828;
-–status-red-bg: #fff5f5;
-–status-red-border: #ef5350;
+  --status-red: #c62828;
+  --status-red-bg: #fff5f5;
+  --status-red-border: #ef5350;
 
-–status-orange: #ed6c02;
-–status-orange-bg: #fff4e5;
-–status-orange-border: #ff9800;
+  --status-orange: #ed6c02;
+  --status-orange-bg: #fff4e5;
+  --status-orange-border: #ff9800;
 
-–status-blue: #1565c0;
-–status-blue-bg: #f0f6ff;
-–status-blue-border: #42a5f5;
+  --status-blue: #1565c0;
+  --status-blue-bg: #f0f6ff;
+  --status-blue-border: #42a5f5;
 
-–metric-green: #2e7d32;
-–metric-amber: #e65100;
-–metric-red: #c62828;
+  --metric-green: #2e7d32;
+  --metric-amber: #e65100;
+  --metric-red: #c62828;
 
-/* Layout */
-–nav-h: 60px;
-–bottom-nav-h: 64px;
-–sidebar-w: 220px;
-–radius: 10px;
-–radius-sm: 6px;
-–radius-pill: 100px;
-–shadow: 0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
-–shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  /* Layout */
+  --nav-h: 60px;
+  --bottom-nav-h: 64px;
+  --sidebar-w: 220px;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-pill: 100px;
+  --shadow: 0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
 }
 
 body {
-font-family: ‘DM Sans’, -apple-system, BlinkMacSystemFont, sans-serif;
-background: var(–bg);
-color: var(–text-primary);
-font-size: 14px;
-line-height: 1.55;
--webkit-font-smoothing: antialiased;
-overscroll-behavior: none;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
 }
 
 /* ── NAV ── */
 nav {
-position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-height: var(–nav-h);
-background: var(–white);
-border-bottom: 1px solid var(–border);
-display: flex; align-items: center; padding: 0 20px;
-gap: 20px;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: var(--nav-h);
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 20px;
+  gap: 20px;
 }
 .nav-brand {
-font-size: 15px; font-weight: 800; color: var(–text-primary);
-letter-spacing: -0.03em; white-space: nowrap; cursor: pointer;
-transition: opacity 0.2s; user-select: none;
+  font-size: 15px; font-weight: 800; color: var(--text-primary);
+  letter-spacing: -0.03em; white-space: nowrap; cursor: pointer;
+  transition: opacity 0.2s; user-select: none;
+  display: flex; align-items: center; gap: 6px;
 }
 .nav-brand:hover { opacity: 0.7; }
-.nav-brand span { color: var(–brand-red); }
+.nav-brand span { color: var(--brand-red); }
 .nav-tabs { display: flex; gap: 6px; }
 .nav-tab {
-padding: 7px 16px; border-radius: var(–radius-pill);
-font-size: 13px; font-weight: 600; cursor: pointer;
-color: var(–text-secondary); border: 1px solid transparent; background: none;
-transition: all 0.2s; font-family: inherit;
+  padding: 7px 16px; border-radius: var(--radius-pill);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  color: var(--text-secondary); border: 1px solid transparent; background: none;
+  transition: all 0.2s; font-family: inherit;
 }
-.nav-tab:hover { background: var(–brand-grey-light); color: var(–text-primary); }
-.nav-tab.active { background: var(–brand-red); color: #fff; border-color: var(–brand-red); }
+.nav-tab:hover { background: var(--brand-grey-light); color: var(--text-primary); }
+.nav-tab.active { background: var(--brand-red); color: #fff; border-color: var(--brand-red); }
 .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-.nav-date { font-size: 11px; color: var(–text-muted); font-weight: 600; white-space: nowrap; }
+.nav-date { font-size: 11px; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
 .nav-badge {
-font-size: 10px; font-weight: 800; padding: 3px 10px;
-border-radius: var(–radius-pill); letter-spacing: 0.04em; text-transform: uppercase;
+  font-size: 10px; font-weight: 800; padding: 3px 10px;
+  border-radius: var(--radius-pill); letter-spacing: 0.04em; text-transform: uppercase;
 }
-.badge-cx { background: var(–cx-bg); color: var(–cx-color); }
-.badge-annex { background: var(–annex-bg); color: var(–annex-color); }
+.badge-cx { background: var(--cx-bg); color: var(--cx-color); }
+.badge-annex { background: var(--annex-bg); color: var(--annex-color); }
 .nav-project-btn { cursor: pointer; opacity: 0.35; transition: opacity 0.2s; }
 .nav-project-btn:hover { opacity: 0.7; }
 .nav-project-btn.active { opacity: 1; }
 .upload-btn {
-background: var(–brand-grey-dark); color: white;
-font-size: 11px; font-weight: 700; padding: 7px 12px;
-border-radius: var(–radius-sm); cursor: pointer;
-transition: background 0.2s; border: none;
-display: inline-flex; align-items: center; gap: 5px;
-font-family: inherit;
+  background: var(--brand-grey-dark); color: white;
+  font-size: 11px; font-weight: 700; padding: 7px 12px;
+  border-radius: var(--radius-sm); cursor: pointer;
+  transition: background 0.2s; border: none;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: inherit;
 }
-.upload-btn:hover { background: var(–text-primary); }
+.upload-btn:hover { background: var(--text-primary); }
 .upload-btn-text { display: inline; }
-
-/* Sync status indicator */
-.sync-indicator {
-display: inline-flex; align-items: center; gap: 5px;
-font-size: 10px; font-weight: 700; padding: 4px 10px;
-border-radius: var(–radius-pill); border: 1px solid var(–border);
-background: var(–white); color: var(–text-muted);
-cursor: pointer; transition: all 0.2s; font-family: inherit;
-white-space: nowrap;
-}
-.sync-indicator:hover { border-color: var(–brand-red); color: var(–brand-red); }
-.sync-indicator.syncing { color: var(–status-orange); border-color: var(–status-orange-border); }
-.sync-indicator.success { color: var(–status-green); border-color: var(–status-green-border); }
-.sync-indicator.error { color: var(–status-red); border-color: var(–status-red-border); }
-.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.sync-dot.pulse { animation: pulse 1.2s ease-in-out infinite; }
-@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
 
 /* ── MOBILE BOTTOM NAV ── */
 .bottom-nav {
-display: none;
-position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-height: var(–bottom-nav-h);
-background: var(–white);
-border-top: 1px solid var(–border);
-box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  height: var(--bottom-nav-h);
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
 }
 .bottom-nav-inner {
-display: flex; height: 100%; align-items: stretch;
+  display: flex; height: 100%; align-items: stretch;
 }
 .bottom-nav-btn {
-flex: 1; display: flex; flex-direction: column; align-items: center;
-justify-content: center; gap: 4px; cursor: pointer;
-background: none; border: none; font-family: inherit;
-color: var(–text-muted); transition: color 0.2s;
-padding-bottom: env(safe-area-inset-bottom, 0px);
--webkit-tap-highlight-color: transparent;
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 4px; cursor: pointer;
+  background: none; border: none; font-family: inherit;
+  color: var(--text-muted); transition: color 0.2s;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  -webkit-tap-highlight-color: transparent;
 }
-.bottom-nav-btn.active { color: var(–brand-red); }
+.bottom-nav-btn.active { color: var(--brand-red); }
 .bottom-nav-btn.active .bnav-dot { display: block; }
 .bnav-icon { font-size: 20px; line-height: 1; }
 .bnav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
-.bnav-dot { display: none; width: 4px; height: 4px; border-radius: 50%; background: var(–brand-red); position: absolute; top: 8px; }
+.bnav-dot { display: none; width: 4px; height: 4px; border-radius: 50%; background: var(--brand-red); position: absolute; top: 8px; }
 
 /* ── PAGES ── */
-.page { display: none; margin-top: var(–nav-h); min-height: calc(100vh - var(–nav-h)); padding-top: 16px; }
+.page { display: none; margin-top: var(--nav-h); min-height: calc(100vh - var(--nav-h)); padding-top: 16px; }
 .page.active { display: block; }
 
 /* ── LANDING PAGE ── */
 .landing-container {
-display: flex; flex-direction: column; align-items: center; justify-content: center;
-min-height: calc(100vh - var(–nav-h));
-padding: 24px;
-text-align: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: calc(100vh - var(--nav-h));
+  padding: 24px;
+  text-align: center;
 }
 .landing-logo-mark {
-width: 56px; height: 56px; background: var(–brand-red);
-border-radius: 14px; display: flex; align-items: center; justify-content: center;
-font-size: 24px; margin-bottom: 24px;
-box-shadow: 0 8px 24px rgba(211,47,47,0.3);
+  width: 56px; height: 56px; background: var(--brand-red);
+  border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(211,47,47,0.3);
 }
 .landing-container h2 {
-font-size: 22px; font-weight: 800; margin-bottom: 8px;
-letter-spacing: -0.03em;
+  font-size: 22px; font-weight: 800; margin-bottom: 8px;
+  letter-spacing: -0.03em;
 }
-.landing-container p { font-size: 14px; color: var(–text-muted); margin-bottom: 36px; }
+.landing-container p { font-size: 14px; color: var(--text-muted); margin-bottom: 36px; }
 .landing-buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
 .landing-btn {
-padding: 18px 40px; font-size: 15px; font-weight: 700;
-border: none; border-radius: var(–radius); cursor: pointer;
-transition: all 0.25s; color: white; letter-spacing: 0.01em;
-font-family: inherit; box-shadow: var(–shadow-md);
-display: flex; flex-direction: column; align-items: center; gap: 4px;
-min-width: 180px;
+  padding: 18px 40px; font-size: 15px; font-weight: 700;
+  border: none; border-radius: var(--radius); cursor: pointer;
+  transition: all 0.25s; color: white; letter-spacing: 0.01em;
+  font-family: inherit; box-shadow: var(--shadow-md);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  min-width: 180px;
 }
 .landing-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
 .landing-btn:active { transform: translateY(0); }
 .landing-btn small { font-size: 11px; font-weight: 500; opacity: 0.75; }
-.btn-cx { background: var(–brand-red); }
-.btn-cx:hover { background: var(–brand-red-hover); }
-.btn-annex { background: var(–brand-grey-dark); }
+.btn-cx { background: var(--brand-red); }
+.btn-cx:hover { background: var(--brand-red-hover); }
+.btn-annex { background: var(--brand-grey-dark); }
 .btn-annex:hover { background: #1a1a1a; }
 
 /* ── DASHBOARD ── */
 .dash-container { max-width: 1060px; margin: 0 auto; padding: 0 20px 48px; }
 .project-block { margin-bottom: 48px; }
 .project-heading {
-display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
-padding-bottom: 12px; border-bottom: 2px solid var(–brand-grey-light);
-flex-wrap: wrap; gap: 8px;
+  display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+  padding-bottom: 12px; border-bottom: 2px solid var(--brand-grey-light);
+  flex-wrap: wrap; gap: 8px;
 }
 .project-heading h2 { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
-.project-heading .ph-date { font-size: 11px; color: var(–text-muted); margin-left: auto; font-weight: 600; }
+.project-heading .ph-date { font-size: 11px; color: var(--text-muted); margin-left: auto; font-weight: 600; }
 
 /* Metric Cards */
 .metrics-grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-gap: 12px; margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px; margin-bottom: 20px;
 }
 .metric-card {
-background: var(–white); border: 1px solid var(–border); border-radius: var(–radius);
-padding: 18px; box-shadow: var(–shadow); position: relative; overflow: hidden;
-transition: box-shadow 0.2s;
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+  transition: box-shadow 0.2s;
 }
-.metric-card:hover { box-shadow: var(–shadow-md); }
+.metric-card:hover { box-shadow: var(--shadow-md); }
 .metric-card.priority-card { border: 2px solid; }
-.metric-card.priority-card.color-red { border-color: var(–brand-red); background: var(–status-red-bg); }
-.metric-card.priority-card.color-amber { border-color: var(–status-orange-border); background: var(–status-orange-bg); }
-.metric-card.priority-card.color-green { border-color: var(–status-green-border); background: var(–status-green-bg); }
+.metric-card.priority-card.color-red { border-color: var(--brand-red); background: var(--status-red-bg); }
+.metric-card.priority-card.color-amber { border-color: var(--status-orange-border); background: var(--status-orange-bg); }
+.metric-card.priority-card.color-green { border-color: var(--status-green-border); background: var(--status-green-bg); }
 .priority-tag {
-position: absolute; top: -1px; right: 12px;
-font-size: 9px; font-weight: 800; padding: 3px 7px;
-border-radius: 0 0 6px 6px; letter-spacing: 0.06em; text-transform: uppercase;
+  position: absolute; top: -1px; right: 12px;
+  font-size: 9px; font-weight: 800; padding: 3px 7px;
+  border-radius: 0 0 6px 6px; letter-spacing: 0.06em; text-transform: uppercase;
 }
-.color-red .priority-tag { background: var(–brand-red); color: white; }
-.color-amber .priority-tag { background: var(–status-orange-border); color: white; }
-.color-green .priority-tag { background: var(–status-green-border); color: white; }
-.metric-label { font-size: 10px; color: var(–text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.color-red .priority-tag { background: var(--brand-red); color: white; }
+.color-amber .priority-tag { background: var(--status-orange-border); color: white; }
+.color-green .priority-tag { background: var(--status-green-border); color: white; }
+.metric-label { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
 .metric-value {
-font-size: 22px; font-weight: 800; letter-spacing: -0.03em;
-color: var(–text-primary);
-font-family: ‘DM Mono’, monospace;
+  font-size: 22px; font-weight: 800; letter-spacing: -0.03em;
+  color: var(--text-primary);
+  font-family: 'DM Mono', monospace;
 }
-.metric-value.color-red { color: var(–metric-red); }
-.metric-value.color-amber { color: var(–metric-amber); }
-.metric-value.color-green { color: var(–metric-green); }
-.metric-delta { font-size: 11px; margin-top: 6px; font-weight: 600; color: var(–text-muted); }
+.metric-value.color-red { color: var(--metric-red); }
+.metric-value.color-amber { color: var(--metric-amber); }
+.metric-value.color-green { color: var(--metric-green); }
+.metric-delta { font-size: 11px; margin-top: 6px; font-weight: 600; color: var(--text-muted); }
 
 /* Overdue Panel */
 .overdue-panel {
-background: var(–status-red-bg); border: 1px solid var(–status-red-border);
-border-radius: var(–radius); margin-bottom: 16px; overflow: hidden;
+  background: var(--status-red-bg); border: 1px solid var(--status-red-border);
+  border-radius: var(--radius); margin-bottom: 16px; overflow: hidden;
 }
 .overdue-header {
-display: flex; align-items: center; justify-content: space-between;
-padding: 12px 16px; cursor: pointer; user-select: none;
-font-size: 13px; font-weight: 700; color: var(–status-red);
-gap: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; cursor: pointer; user-select: none;
+  font-size: 13px; font-weight: 700; color: var(--status-red);
+  gap: 8px;
 }
 .overdue-header:hover { background: rgba(211,47,47,0.05); }
 .overdue-toggle-icon { font-size: 10px; transition: transform 0.2s; }
 .overdue-panel.expanded .overdue-toggle-icon { transform: rotate(180deg); }
-.overdue-list { display: none; border-top: 1px solid var(–status-red-border); }
+.overdue-list { display: none; border-top: 1px solid var(--status-red-border); }
 .overdue-panel.expanded .overdue-list { display: block; }
 .overdue-item {
-display: flex; align-items: center; gap: 10px; padding: 10px 16px;
-border-bottom: 1px solid rgba(211,47,47,0.08); font-size: 12px;
-flex-wrap: wrap;
+  display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+  border-bottom: 1px solid rgba(211,47,47,0.08); font-size: 12px;
+  flex-wrap: wrap;
 }
 .overdue-item:last-child { border-bottom: none; }
 .overdue-dept {
-background: var(–brand-red); color: white;
-font-size: 9px; font-weight: 800; padding: 2px 7px;
-border-radius: var(–radius-pill); text-transform: uppercase;
-letter-spacing: 0.04em; white-space: nowrap; flex-shrink: 0;
+  background: var(--brand-red); color: white;
+  font-size: 9px; font-weight: 800; padding: 2px 7px;
+  border-radius: var(--radius-pill); text-transform: uppercase;
+  letter-spacing: 0.04em; white-space: nowrap; flex-shrink: 0;
 }
-.overdue-action { color: var(–text-primary); font-weight: 600; flex: 1; min-width: 120px; }
-.overdue-due { color: var(–status-red); font-size: 10px; font-weight: 700; white-space: nowrap; }
+.overdue-action { color: var(--text-primary); font-weight: 600; flex: 1; min-width: 120px; }
+.overdue-due { color: var(--status-red); font-size: 10px; font-weight: 700; white-space: nowrap; }
 
 /* Charts */
 .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
 .chart-card {
-background: var(–white); border: 1px solid var(–border); border-radius: var(–radius);
-padding: 18px; box-shadow: var(–shadow);
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px; box-shadow: var(--shadow);
 }
 .chart-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-.chart-card h3 { font-size: 11px; font-weight: 800; color: var(–text-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
+.chart-card h3 { font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
 .chart-wrap { position: relative; height: 190px; width: 100%; }
 .target-legend { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: flex; gap: 8px; }
 .legend-red { color: #d32f2f; }
@@ -299,46 +282,46 @@ padding: 18px; box-shadow: var(–shadow);
 .target-item.carryover { border-left-color: #f44336; }
 .target-item.carryover .t-name { color: #c62828; }
 .t-name { font-weight: 800; min-width: 120px; flex-shrink: 0; font-size: 11px; }
-.t-note { color: var(–text-secondary); line-height: 1.5; }
+.t-note { color: var(--text-secondary); line-height: 1.5; }
 
 /* Alert Strip */
 .alert-strip {
-border-radius: var(–radius-sm); padding: 12px 16px; font-size: 13px; line-height: 1.5;
-margin-bottom: 20px; display: flex; align-items: flex-start; gap: 10px; font-weight: 500;
+  border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; line-height: 1.5;
+  margin-bottom: 20px; display: flex; align-items: flex-start; gap: 10px; font-weight: 500;
 }
-.alert-red { background: var(–status-red-bg); border-left: 4px solid var(–brand-red); color: #7f1d1d; }
-.alert-grey { background: var(–brand-grey-light); border-left: 4px solid var(–brand-grey-dark); color: #222; }
+.alert-red { background: var(--status-red-bg); border-left: 4px solid var(--brand-red); color: #7f1d1d; }
+.alert-grey { background: var(--brand-grey-light); border-left: 4px solid var(--brand-grey-dark); color: #222; }
 
 /* ── DEPARTMENTS PAGE ── */
 .dept-container { max-width: 1060px; margin: 0 auto; padding: 0 20px 48px; }
-.dept-layout { display: grid; grid-template-columns: var(–sidebar-w) 1fr; gap: 24px; align-items: start; }
+.dept-layout { display: grid; grid-template-columns: var(--sidebar-w) 1fr; gap: 24px; align-items: start; }
 
 .dept-sidebar {
-background: var(–white); border: 1px solid var(–border); border-radius: var(–radius);
-box-shadow: var(–shadow); position: sticky; top: calc(var(–nav-h) + 20px); overflow: hidden;
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); position: sticky; top: calc(var(--nav-h) + 20px); overflow: hidden;
 }
 .sidebar-section { padding: 14px 0; }
-.sidebar-section:not(:last-child) { border-bottom: 1px solid var(–border); }
+.sidebar-section:not(:last-child) { border-bottom: 1px solid var(--border); }
 .sidebar-section-label {
-font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-color: var(–brand-red); padding: 0 16px 8px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--brand-red); padding: 0 16px 8px;
 }
-.sidebar-section-label.annexe { color: var(–brand-grey-dark); }
+.sidebar-section-label.annexe { color: var(--brand-grey-dark); }
 .sidebar-item {
-display: flex; align-items: center; gap: 10px;
-padding: 9px 16px; cursor: pointer; font-size: 12px; font-weight: 700;
-color: var(–text-secondary); border-radius: 0; transition: all 0.15s;
-border: none; background: none; width: 100%; text-align: left; font-family: inherit;
-min-height: 40px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px; cursor: pointer; font-size: 12px; font-weight: 700;
+  color: var(--text-secondary); border-radius: 0; transition: all 0.15s;
+  border: none; background: none; width: 100%; text-align: left; font-family: inherit;
+  min-height: 40px;
 }
-.sidebar-item:hover { background: var(–brand-grey-light); color: var(–text-primary); }
-.sidebar-item.active { background: var(–brand-red); color: #fff; }
-.sidebar-item.active.annexe-btn { background: var(–brand-grey-dark); }
+.sidebar-item:hover { background: var(--brand-grey-light); color: var(--text-primary); }
+.sidebar-item.active { background: var(--brand-red); color: #fff; }
+.sidebar-item.active.annexe-btn { background: var(--brand-grey-dark); }
 .sidebar-item.active .dept-count { background: rgba(255,255,255,0.25); color: #fff; }
 .dept-count {
-margin-left: auto; font-size: 10px; font-weight: 800;
-background: var(–brand-grey-light); color: var(–text-muted);
-padding: 2px 8px; border-radius: var(–radius-pill);
+  margin-left: auto; font-size: 10px; font-weight: 800;
+  background: var(--brand-grey-light); color: var(--text-muted);
+  padding: 2px 8px; border-radius: var(--radius-pill);
 }
 
 /* Dept Main */
@@ -349,190 +332,213 @@ padding: 2px 8px; border-radius: var(–radius-pill);
 
 /* History Selector */
 .dept-history-bar {
-display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
-overflow-x: auto; padding-bottom: 4px;
-scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+  overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
 }
 .dept-history-bar::-webkit-scrollbar { display: none; }
 .history-pill {
-flex-shrink: 0; padding: 6px 14px; border-radius: var(–radius-pill);
-font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s;
-border: 1.5px solid var(–border); background: var(–white); color: var(–text-muted);
-font-family: inherit;
+  flex-shrink: 0; padding: 6px 14px; border-radius: var(--radius-pill);
+  font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  border: 1.5px solid var(--border); background: var(--white); color: var(--text-muted);
+  font-family: inherit;
 }
-.history-pill:hover { border-color: var(–brand-red); color: var(–brand-red); }
-.history-pill.active { background: var(–brand-red); border-color: var(–brand-red); color: white; }
+.history-pill:hover { border-color: var(--brand-red); color: var(--brand-red); }
+.history-pill.active { background: var(--brand-red); border-color: var(--brand-red); color: white; }
 .history-label {
-font-size: 10px; font-weight: 700; color: var(–text-muted); text-transform: uppercase;
-letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0;
+  font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;
+  letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0;
 }
 
 /* Dept Header */
 .dept-header {
-background: var(–white); border: 1px solid var(–border); border-radius: var(–radius);
-padding: 18px; margin-bottom: 16px; box-shadow: var(–shadow);
-display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px; margin-bottom: 16px; box-shadow: var(--shadow);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
 }
 .dept-header-text h2 { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
-.dept-header-text p { font-size: 13px; color: var(–text-secondary); }
+.dept-header-text p { font-size: 13px; color: var(--text-secondary); }
 .dept-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
-/* Filter Tabs & Task Cards */
+/* Filter Tabs & Task Cards Strict Theming */
 .filter-tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
 .filter-tab {
-padding: 6px 14px; border-radius: var(–radius-pill); font-size: 11px; font-weight: 700;
-cursor: pointer; border: 1.5px solid var(–border); background: var(–white);
-color: var(–text-muted); transition: all 0.2s; font-family: inherit;
+  padding: 6px 14px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700;
+  cursor: pointer; border: 1.5px solid var(--border); background: var(--white);
+  color: var(--text-muted); transition: all 0.2s; font-family: inherit;
 }
-.filter-tab:hover { border-color: var(–brand-grey); color: var(–text-primary); }
-.filter-tab.active { background: var(–text-primary); border-color: var(–text-primary); color: white; }
-.filter-tab[data-filter=“ontrack”].active { background: var(–status-green); border-color: var(–status-green); }
-.filter-tab[data-filter=“delayed”].active { background: var(–status-red); border-color: var(–status-red); }
-.filter-tab[data-filter=“update”].active { background: var(–status-orange); border-color: var(–status-orange); }
-.filter-tab[data-filter=“achieved”].active { background: var(–status-blue); border-color: var(–status-blue); }
+.filter-tab:hover { border-color: var(--brand-grey); color: var(--text-primary); }
+.filter-tab.active { background: var(--text-primary); border-color: var(--text-primary); color: white; }
+.filter-tab[data-filter="ontrack"].active { background: var(--status-green); border-color: var(--status-green); }
+.filter-tab[data-filter="delayed"].active { background: var(--status-red); border-color: var(--status-red); }
+.filter-tab[data-filter="update"].active { background: var(--status-orange); border-color: var(--status-orange); }
+.filter-tab[data-filter="achieved"].active { background: var(--status-blue); border-color: var(--status-blue); }
 
 .next-steps-list { display: flex; flex-direction: column; gap: 12px; }
 .step-card {
-background: var(–white); border: 1px solid var(–border); border-radius: var(–radius);
-padding: 16px; box-shadow: var(–shadow); cursor: pointer;
-position: relative; transition: all 0.2s; border-left-width: 4px;
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px; box-shadow: var(--shadow); cursor: pointer;
+  position: relative; transition: all 0.2s; border-left-width: 4px;
 }
-.step-card:hover { box-shadow: var(–shadow-md); transform: translateY(-1px); }
+.step-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
 .step-card:active { transform: translateY(0); }
 
-.step-card.s-ontrack { border-left-color: var(–status-green-border); background: var(–status-green-bg); }
-.step-card.s-delayed { border-left-color: var(–status-red-border); background: var(–status-red-bg); }
-.step-card.s-update { border-left-color: var(–status-orange-border); background: var(–status-orange-bg); }
-.step-card.s-achieved { border-left-color: var(–status-blue-border); background: var(–status-blue-bg); opacity: 0.75; }
+/* Card Colors applied */
+.step-card.s-ontrack { border-left-color: var(--status-green-border); background: var(--status-green-bg); }
+.step-card.s-delayed { border-left-color: var(--status-red-border); background: var(--status-red-bg); }
+.step-card.s-update { border-left-color: var(--status-orange-border); background: var(--status-orange-bg); }
+.step-card.s-achieved { border-left-color: var(--status-blue-border); background: var(--status-blue-bg); opacity: 0.75; }
 
+/* Context Line */
 .step-context {
-font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
-color: var(–text-muted); margin-bottom: 5px;
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--text-muted); margin-bottom: 5px;
 }
-.s-ontrack .step-context { color: var(–status-green); }
-.s-delayed .step-context { color: var(–status-red); }
-.s-update .step-context { color: var(–status-orange); }
-.s-achieved .step-context { color: var(–status-blue); }
+.s-ontrack .step-context { color: var(--status-green); }
+.s-delayed .step-context { color: var(--status-red); }
+.s-update .step-context { color: var(--status-orange); }
+.s-achieved .step-context { color: var(--status-blue); }
 
 .step-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.step-text { font-size: 13.5px; color: var(–text-primary); line-height: 1.55; font-weight: 700; flex: 1; }
+.step-text { font-size: 13.5px; color: var(--text-primary); line-height: 1.55; font-weight: 700; flex: 1; }
 .step-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
 .step-date {
-font-size: 10px; color: var(–text-muted); font-weight: 700;
-background: rgba(0,0,0,0.05); padding: 3px 8px; border-radius: var(–radius-pill);
-white-space: nowrap; text-transform: uppercase; letter-spacing: 0.05em;
+  font-size: 10px; color: var(--text-muted); font-weight: 700;
+  background: rgba(0,0,0,0.05); padding: 3px 8px; border-radius: var(--radius-pill);
+  white-space: nowrap; text-transform: uppercase; letter-spacing: 0.05em;
 }
-.step-date.overdue { background: var(–status-red-bg); color: var(–status-red); }
+.step-date.overdue { background: var(--status-red-bg); color: var(--status-red); }
 
+/* Status Badges */
 .status-badge {
-font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: var(–radius-pill);
-letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
+  font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: var(--radius-pill);
+  letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
 }
-.sb-ontrack { background: rgba(46,125,50,0.12); color: var(–status-green); }
-.sb-delayed { background: rgba(198,40,40,0.12); color: var(–status-red); }
-.sb-update { background: rgba(237,108,2,0.12); color: var(–status-orange); }
-.sb-achieved { background: rgba(21,101,192,0.12); color: var(–status-blue); }
+.sb-ontrack { background: rgba(46,125,50,0.12); color: var(--status-green); }
+.sb-delayed { background: rgba(198,40,40,0.12); color: var(--status-red); }
+.sb-update { background: rgba(237,108,2,0.12); color: var(--status-orange); }
+.sb-achieved { background: rgba(21,101,192,0.12); color: var(--status-blue); }
 
 .step-details-pane {
-display: none; margin-top: 14px; padding-top: 12px;
-border-top: 1px dashed var(–border-md); font-size: 13px;
-color: var(–text-secondary); line-height: 1.65;
+  display: none; margin-top: 14px; padding-top: 12px;
+  border-top: 1px dashed var(--border-md); font-size: 13px;
+  color: var(--text-secondary); line-height: 1.65;
 }
 .step-card.expanded .step-details-pane { display: block; animation: fadeIn 0.2s ease; }
-.pane-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(–brand-grey); margin-bottom: 6px; }
+.pane-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand-grey); margin-bottom: 6px; }
 
+/* Status Button Actions */
 .status-actions {
-display: flex; gap: 8px; margin-top: 14px; padding-top: 12px;
-border-top: 1px solid var(–border); flex-wrap: wrap;
+  display: flex; gap: 8px; margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid var(--border); flex-wrap: wrap;
 }
 .status-btn {
-padding: 6px 14px; border-radius: var(–radius-pill); font-size: 11px; font-weight: 700;
-cursor: pointer; border: 1.5px solid; transition: all 0.2s; font-family: inherit;
-display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 14px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700;
+  cursor: pointer; border: 1.5px solid; transition: all 0.2s; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 5px;
 }
 .status-btn:hover { transform: scale(1.03); }
 .status-btn:active { transform: scale(0.97); }
 
-.btn-achieved { border-color: var(–status-blue-border); color: var(–status-blue); background: var(–status-blue-bg); }
-.btn-achieved:hover { background: var(–status-blue); color: white; }
-.btn-delayed { border-color: var(–status-red-border); color: var(–status-red); background: var(–status-red-bg); }
-.btn-delayed:hover { background: var(–status-red); color: white; }
-.btn-update { border-color: var(–status-orange-border); color: var(–status-orange); background: var(–status-orange-bg); }
-.btn-update:hover { background: var(–status-orange); color: white; }
-.btn-ontrack { border-color: var(–status-green-border); color: var(–status-green); background: var(–status-green-bg); }
-.btn-ontrack:hover { background: var(–status-green); color: white; }
+.btn-achieved { border-color: var(--status-blue-border); color: var(--status-blue); background: var(--status-blue-bg); }
+.btn-achieved:hover { background: var(--status-blue); color: white; }
+.btn-delayed { border-color: var(--status-red-border); color: var(--status-red); background: var(--status-red-bg); }
+.btn-delayed:hover { background: var(--status-red); color: white; }
+.btn-update { border-color: var(--status-orange-border); color: var(--status-orange); background: var(--status-orange-bg); }
+.btn-update:hover { background: var(--status-orange); color: white; }
+.btn-ontrack { border-color: var(--status-green-border); color: var(--status-green); background: var(--status-green-bg); }
+.btn-ontrack:hover { background: var(--status-green); color: white; }
 
+/* Empty State */
 .empty-state {
-display: flex; flex-direction: column; align-items: center; justify-content: center;
-text-align: center; padding: 60px 24px; color: var(–text-muted);
-background: var(–white); border: 1px dashed var(–border-md); border-radius: var(–radius);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 60px 24px; color: var(--text-muted);
+  background: var(--white); border: 1px dashed var(--border-md); border-radius: var(--radius);
 }
-.empty-state h3 { font-size: 16px; color: var(–text-secondary); margin-bottom: 8px; font-weight: 700; }
+.empty-state h3 { font-size: 16px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 700; }
 .empty-state p { font-size: 13px; }
 
 /* Mobile Dept Pills */
 .mobile-dept-scroller {
-display: none;
-overflow-x: auto; -webkit-overflow-scrolling: touch;
-scrollbar-width: none; padding: 0 4px 8px;
-gap: 8px;
+  display: none;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; padding: 0 4px 8px;
+  gap: 8px;
 }
 .mobile-dept-scroller::-webkit-scrollbar { display: none; }
 .mobile-dept-pill {
-flex-shrink: 0; padding: 8px 16px; border-radius: var(–radius-pill);
-font-size: 12px; font-weight: 700; cursor: pointer;
-border: 1.5px solid var(–border); background: var(–white);
-color: var(–text-muted); transition: all 0.2s; white-space: nowrap;
-font-family: inherit; display: inline-flex; align-items: center; gap: 6px;
--webkit-tap-highlight-color: transparent;
+  flex-shrink: 0; padding: 8px 16px; border-radius: var(--radius-pill);
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  border: 1.5px solid var(--border); background: var(--white);
+  color: var(--text-muted); transition: all 0.2s; white-space: nowrap;
+  font-family: inherit; display: inline-flex; align-items: center; gap: 6px;
+  -webkit-tap-highlight-color: transparent;
 }
-.mobile-dept-pill.active-cx { background: var(–brand-red); border-color: var(–brand-red); color: white; }
-.mobile-dept-pill.active-annex { background: var(–brand-grey-dark); border-color: var(–brand-grey-dark); color: white; }
+.mobile-dept-pill.active-cx { background: var(--brand-red); border-color: var(--brand-red); color: white; }
+.mobile-dept-pill.active-annex { background: var(--brand-grey-dark); border-color: var(--brand-grey-dark); color: white; }
 .mobile-dept-pill .pill-count {
-background: rgba(255,255,255,0.25); color: inherit;
-font-size: 9px; padding: 1px 6px; border-radius: var(–radius-pill);
+  background: rgba(255,255,255,0.25); color: inherit;
+  font-size: 9px; padding: 1px 6px; border-radius: var(--radius-pill);
 }
 .mobile-dept-pill:not(.active-cx):not(.active-annex) .pill-count {
-background: var(–brand-grey-light); color: var(–text-muted);
+  background: var(--brand-grey-light); color: var(--text-muted);
 }
 
+/* Utility */
 .show-done-toggle {
-display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
-color: var(–text-muted); cursor: pointer; user-select: none; padding: 0 2px;
+  display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
+  color: var(--text-muted); cursor: pointer; user-select: none; padding: 0 2px;
 }
-.show-done-toggle input { accent-color: var(–brand-red); width: 14px; height: 14px; cursor: pointer; }
+.show-done-toggle input { accent-color: var(--brand-red); width: 14px; height: 14px; cursor: pointer; }
 
 /* ── RESPONSIVE / MOBILE ── */
 @media (max-width: 768px) {
-:root { –nav-h: 56px; }
-.bottom-nav { display: block; }
-.page.active { padding-bottom: calc(var(–bottom-nav-h) + env(safe-area-inset-bottom, 8px)); }
-#nav-tabs-group { display: none !important; }
-.nav-date { display: none; }
-.upload-btn-text { display: none; }
-.sync-indicator { display: none; }
-nav { padding: 0 14px; gap: 12px; }
-.nav-brand { font-size: 14px; }
-.landing-buttons { flex-direction: column; width: 100%; max-width: 320px; }
-.landing-btn { width: 100%; justify-content: center; }
-.dash-container { padding: 0 12px 24px; }
-.metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.metric-card { padding: 14px; }
-.metric-value { font-size: 18px; }
-.charts-row { grid-template-columns: 1fr; gap: 10px; }
-.chart-wrap { height: 170px; }
-.dept-container { padding: 0 12px 24px; }
-.dept-layout { grid-template-columns: 1fr !important; gap: 12px; }
-.dept-sidebar { display: none; }
-.mobile-dept-scroller { display: flex; }
-.step-card { padding: 14px; }
-.step-text { font-size: 13px; }
-.alert-strip { font-size: 12px; padding: 10px 12px; }
-.overdue-action { font-size: 11px; }
+  :root { --nav-h: 56px; }
+
+  /* Show bottom nav */
+  .bottom-nav { display: block; }
+  .page.active { padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 8px)); }
+
+  /* Hide desktop tabs */
+  #nav-tabs-group { display: none !important; }
+  .nav-date { display: none; }
+  .upload-btn-text { display: none; }
+
+  /* Nav compact */
+  nav { padding: 0 14px; gap: 12px; }
+  .nav-brand { font-size: 14px; }
+
+  /* Landing */
+  .landing-buttons { flex-direction: column; width: 100%; max-width: 320px; }
+  .landing-btn { width: 100%; justify-content: center; }
+
+  /* Dashboard */
+  .dash-container { padding: 0 12px 24px; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .metric-card { padding: 14px; }
+  .metric-value { font-size: 18px; }
+  .charts-row { grid-template-columns: 1fr; gap: 10px; }
+  .chart-wrap { height: 170px; }
+
+  /* Departments */
+  .dept-container { padding: 0 12px 24px; }
+  .dept-layout { grid-template-columns: 1fr !important; gap: 12px; }
+  .dept-sidebar { display: none; }
+  .mobile-dept-scroller { display: flex; }
+
+  /* Task cards */
+  .step-card { padding: 14px; }
+  .step-text { font-size: 13px; }
+
+  /* Alert strip */
+  .alert-strip { font-size: 12px; padding: 10px 12px; }
+
+  /* Overdue items */
+  .overdue-action { font-size: 11px; }
 }
 
 @media (max-width: 400px) {
-.metrics-grid { grid-template-columns: 1fr; }
+  .metrics-grid { grid-template-columns: 1fr; }
 }
 </style>
 
@@ -546,11 +552,7 @@ nav { padding: 0 14px; gap: 12px; }
     <button class="nav-tab" onclick="showPage('departments',this)">Departments</button>
   </div>
   <div class="nav-right">
-    <button class="sync-indicator" id="sync-btn" onclick="syncAllSheets()" title="Sync with Google Sheets">
-      <span class="sync-dot" id="sync-dot"></span>
-      <span id="sync-label">Sync Sheets</span>
-    </button>
-    <span class="nav-date" id="last-updated-text">Last updated: Apr 23, 2026</span>
+    <span class="nav-date" id="last-updated-text">Last updated: Apr 20, 2026</span>
     <span class="nav-badge badge-cx nav-project-btn" id="btn-nav-cx" onclick="selectProject('Crossings')">Crossings</span>
     <span class="nav-badge badge-annex nav-project-btn" id="btn-nav-annex" onclick="selectProject('Annexe')">Annexe</span>
     <label for="fileUpload" class="upload-btn" title="Upload Excel or Transcript">
@@ -582,17 +584,24 @@ nav { padding: 0 14px; gap: 12px; }
 
 <div id="page-landing" class="page active">
   <div class="landing-container">
-    <div class="landing-logo-mark">🏙</div>
+    <div class="landing-logo-mark">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+    </div>
     <h2>Projects Tracker</h2>
     <p>Select a project to view its live performance dashboard</p>
     <div class="landing-buttons">
       <button class="landing-btn btn-cx" onclick="selectProject('Crossings')">
         Lakowe Crossings
-        <small id="landing-cx-sub">6 units · ₦1.72B inflow</small>
+        <small>6 units · ₦1.72B inflow</small>
       </button>
       <button class="landing-btn btn-annex" onclick="selectProject('Annexe')">
-        Lakowe Annexe
-        <small id="landing-annex-sub">78 units · ₦6.27B inflow</small>
+        Lakowe Annex
+        <small>78 units · ₦6.27B inflow</small>
       </button>
     </div>
   </div>
@@ -605,75 +614,78 @@ nav { padding: 0 14px; gap: 12px; }
     <div class="project-heading">
       <span class="nav-badge badge-cx">Lakowe Crossings</span>
       <h2>Performance Overview</h2>
-      <span class="ph-date" id="cx-sheet-date">Jan 5 – Apr 20, 2026</span>
+      <span class="ph-date">Jan 5 – Apr 20, 2026</span>
     </div>
 
-```
-<div class="metrics-grid">
-  <div class="metric-card">
-    <div class="metric-label">Total Inflow</div>
-    <div class="metric-value" id="val-cx-inflow">₦1.72B</div>
-    <div class="metric-delta">↑ +₦670M since Jan</div>
-  </div>
-  <div class="metric-card">
-    <div class="metric-label">Units Sold</div>
-    <div class="metric-value" id="val-cx-units">6</div>
-    <div class="metric-delta">+2 in Jan; stagnant since</div>
-  </div>
-  <div class="metric-card">
-    <div class="metric-label">Value of Sales</div>
-    <div class="metric-value" id="val-cx-sales">₦2.07B</div>
-    <div class="metric-delta">Adjusted after product switch</div>
-  </div>
-  <div class="metric-card">
-    <div class="metric-label">Budget Spent</div>
-    <div class="metric-value" id="val-cx-budget">₦488M</div>
-    <div class="metric-delta">of ₦527M monthly budget</div>
-  </div>
-  <div class="metric-card priority-card" id="card-cx-offers">
-    <div class="priority-tag">★ Priority</div>
-    <div class="metric-label">Active Offer Letters</div>
-    <div class="metric-value" id="val-cx-offers">0</div>
-    <div class="metric-delta" id="delta-cx-offers">No active offer letters</div>
-  </div>
-  <div class="metric-card priority-card" id="card-cx-balance">
-    <div class="priority-tag">★ Priority</div>
-    <div class="metric-label">Account Balance</div>
-    <div class="metric-value" id="val-cx-balance">₦40M</div>
-    <div class="metric-delta" id="delta-cx-balance">Civil mobilisation tied to ₦800M raise</div>
-  </div>
-</div>
-
-<div id="overdue-cx"></div>
-
-<div class="charts-row">
-  <div class="chart-card">
-    <div class="chart-card-header">
-      <h3>Cumulative Sales Inflow</h3>
-    </div>
-    <div class="chart-wrap"><canvas id="c3"></canvas></div>
-  </div>
-  <div class="chart-card">
-    <div class="chart-card-header">
-      <h3>Monthly Targets</h3>
-      <div class="target-legend">
-        <span class="legend-red">● Carried</span>
-        <span class="legend-green">● New</span>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Total Inflow</div>
+        <div class="metric-value" id="val-cx-inflow">₦1.72B</div>
+        <div class="metric-delta">↑ +₦670M since Jan</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Units Sold</div>
+        <div class="metric-value" id="val-cx-units">6</div>
+        <div class="metric-delta">+2 in Jan; stagnant since</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Value of Sales</div>
+        <div class="metric-value" id="val-cx-sales">₦2.07B</div>
+        <div class="metric-delta">Adjusted after product switch</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Budget Spent</div>
+        <div class="metric-value" id="val-cx-budget">₦488M</div>
+        <div class="metric-delta">of ₦527M monthly budget</div>
+      </div>
+      <div class="metric-card priority-card" id="card-cx-offers">
+        <div class="priority-tag">★ Priority</div>
+        <div class="metric-label">Active Offer Letters</div>
+        <div class="metric-value" id="val-cx-offers">0</div>
+        <div class="metric-delta" id="delta-cx-offers">No active offer letters</div>
+      </div>
+      <div class="metric-card priority-card" id="card-cx-balance">
+        <div class="priority-tag">★ Priority</div>
+        <div class="metric-label">Account Balance</div>
+        <div class="metric-value" id="val-cx-balance">₦40M</div>
+        <div class="metric-delta" id="delta-cx-balance">Civil mobilisation tied to ₦800M raise</div>
       </div>
     </div>
-    <div class="target-list" id="targets-crossings">
-      <div class="target-item new-target"><span class="t-name">Park Completion</span><span class="t-note">Full park end-April; fountain Apr 30. Mosaic tiles + marble underway.</span></div>
-      <div class="target-item carryover"><span class="t-name">BOLAD Lights</span><span class="t-note">Contractor elusive; vendor decision pending design sign-off.</span></div>
-      <div class="target-item new-target"><span class="t-name">Sandfilling</span><span class="t-note">8,130 cbm delivered; +8,000 cbm funded. CX9+CX10 tranche ₦137M.</span></div>
-      <div class="target-item carryover"><span class="t-name">MEP Sign-off</span><span class="t-note">Civil closed by ARUP ✓; MEP electrical pending schedule-of-manuals update.</span></div>
-    </div>
-  </div>
-</div>
 
-<div class="alert-strip alert-red">
-  ⚠ <span><strong>Major redesign:</strong> Hospitality site moved CX9 → CX10. New: 6 commercial + 68 residential units. Render + "coming soon" billboard pending design freeze. Civil mobilisation gated on ₦800M sales milestone.</span>
-</div>
-```
+    <div id="overdue-cx"></div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <h3>Cumulative Sales Inflow</h3>
+        </div>
+        <div class="chart-wrap"><canvas id="c3"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <h3>Monthly Targets</h3>
+          <div class="target-legend">
+            <span class="legend-red">● Carried</span>
+            <span class="legend-green">● New</span>
+          </div>
+        </div>
+        <div class="target-list" id="targets-crossings">
+          <div class="target-item new-target"><span class="t-name">Park Completion</span><span class="t-note">Full park end-April; fountain Apr 30. Mosaic tiles + marble underway.</span></div>
+          <div class="target-item carryover"><span class="t-name">BOLAD Lights</span><span class="t-note">Contractor elusive; vendor decision pending design sign-off.</span></div>
+          <div class="target-item new-target"><span class="t-name">Sandfilling</span><span class="t-note">8,130 cbm delivered; +8,000 cbm funded. CX9+CX10 tranche ₦137M.</span></div>
+          <div class="target-item carryover"><span class="t-name">MEP Sign-off</span><span class="t-note">Civil closed by ARUP ✓; MEP electrical pending schedule-of-manuals update.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-strip alert-red">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px;">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+      <span><strong>Major redesign:</strong> Hospitality site moved CX9 → CX10. New: 6 commercial + 68 residential units. Render + "coming soon" billboard pending design freeze. Civil mobilisation gated on ₦800M sales milestone.</span>
+    </div>
 
   </div>
 
@@ -681,68 +693,71 @@ nav { padding: 0 14px; gap: 12px; }
     <div class="project-heading">
       <span class="nav-badge badge-annex">Lakowe Annexe</span>
       <h2>Performance Overview</h2>
-      <span class="ph-date" id="annex-sheet-date">Jan 5 – Apr 23, 2026</span>
+      <span class="ph-date">Jan 5 – Apr 20, 2026</span>
     </div>
 
-```
-<div class="metrics-grid">
-  <div class="metric-card">
-    <div class="metric-label">Total Inflow</div>
-    <div class="metric-value" id="val-annex-inflow">₦6.27B</div>
-    <div class="metric-delta">↑ +₦300M since Jan</div>
-  </div>
-  <div class="metric-card">
-    <div class="metric-label">Units Sold</div>
-    <div class="metric-value" id="val-annex-units">78</div>
-    <div class="metric-delta">↓ 2 revocations from 80</div>
-  </div>
-  <div class="metric-card">
-    <div class="metric-label">Value of Sales</div>
-    <div class="metric-value" id="val-annex-sales">₦6.89B</div>
-    <div class="metric-delta">Flat since mid-January</div>
-  </div>
-  <div class="metric-card priority-card" id="card-annex-offers">
-    <div class="priority-tag">★ Priority</div>
-    <div class="metric-label">Active Offer Letters</div>
-    <div class="metric-value" id="val-annex-offers">0</div>
-    <div class="metric-delta" id="delta-annex-offers">No active offer letters</div>
-  </div>
-  <div class="metric-card priority-card" id="card-annex-balance">
-    <div class="priority-tag">★ Priority</div>
-    <div class="metric-label">Account Balance</div>
-    <div class="metric-value" id="val-annex-balance">₦61.9M</div>
-    <div class="metric-delta" id="delta-annex-balance">After ₦32M BAFF + ₦50M Elms repayment</div>
-  </div>
-</div>
-
-<div id="overdue-annex"></div>
-
-<div class="charts-row">
-  <div class="chart-card">
-    <div class="chart-card-header"><h3>Inflow &amp; Balance Trend</h3></div>
-    <div class="chart-wrap"><canvas id="c1"></canvas></div>
-  </div>
-  <div class="chart-card">
-    <div class="chart-card-header">
-      <h3>Monthly Targets</h3>
-      <div class="target-legend">
-        <span class="legend-red">● Carried</span>
-        <span class="legend-green">● New</span>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Total Inflow</div>
+        <div class="metric-value" id="val-annex-inflow">₦6.27B</div>
+        <div class="metric-delta">↑ +₦300M since Jan</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Units Sold</div>
+        <div class="metric-value" id="val-annex-units">78</div>
+        <div class="metric-delta">↓ 2 revocations from 80</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Value of Sales</div>
+        <div class="metric-value" id="val-annex-sales">₦6.89B</div>
+        <div class="metric-delta">Flat since mid-January</div>
+      </div>
+      <div class="metric-card priority-card" id="card-annex-offers">
+        <div class="priority-tag">★ Priority</div>
+        <div class="metric-label">Active Offer Letters</div>
+        <div class="metric-value" id="val-annex-offers">0</div>
+        <div class="metric-delta" id="delta-annex-offers">No active offer letters</div>
+      </div>
+      <div class="metric-card priority-card" id="card-annex-balance">
+        <div class="priority-tag">★ Priority</div>
+        <div class="metric-label">Account Balance</div>
+        <div class="metric-value" id="val-annex-balance">₦61.9M</div>
+        <div class="metric-delta" id="delta-annex-balance">After ₦32M BAFF + ₦50M Elms repayment</div>
       </div>
     </div>
-    <div class="target-list" id="targets-annexe">
-      <div class="target-item new-target"><span class="t-name">Manholes</span><span class="t-note">96/140 done. 44 remaining. Base+wall+cover standard confirmed.</span></div>
-      <div class="target-item new-target"><span class="t-name">Internal Roads</span><span class="t-note">Finidi George ✓ done. Peter Rufai S2 ✓ bends cast. Sunday Oliseh pending BAFF remob.</span></div>
-      <div class="target-item carryover"><span class="t-name">Layout Approval</span><span class="t-note">2-week window expires Apr 22. Direct to Commissioner if no response from Uncle P.</span></div>
-      <div class="target-item new-target"><span class="t-name">Drainage 400m+</span><span class="t-note">ARUP sign-off on new section due Apr 24. 60-day target 90% viable.</span></div>
-    </div>
-  </div>
-</div>
 
-<div class="alert-strip alert-grey">
-  ℹ <span><strong>Cash-construction risk:</strong> Balance ₦61.9M after two large disbursements. No active ad campaign or offer letters. Target ₦1B+ to sustain BAFF momentum. QS onboarding must close by Apr 23.</span>
-</div>
-```
+    <div id="overdue-annex"></div>
+
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-header"><h3>Inflow &amp; Balance Trend</h3></div>
+        <div class="chart-wrap"><canvas id="c1"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <h3>Monthly Targets</h3>
+          <div class="target-legend">
+            <span class="legend-red">● Carried</span>
+            <span class="legend-green">● New</span>
+          </div>
+        </div>
+        <div class="target-list" id="targets-annexe">
+          <div class="target-item new-target"><span class="t-name">Manholes</span><span class="t-note">96/140 done. 44 remaining. Base+wall+cover standard confirmed.</span></div>
+          <div class="target-item new-target"><span class="t-name">Internal Roads</span><span class="t-note">Finidi George ✓ done. Peter Rufai S2 ✓ bends cast. Sunday Oliseh pending BAFF remob.</span></div>
+          <div class="target-item carryover"><span class="t-name">Layout Approval</span><span class="t-note">2-week window expires Apr 22. Direct to Commissioner if no response from Uncle P.</span></div>
+          <div class="target-item new-target"><span class="t-name">Drainage 400m+</span><span class="t-note">ARUP sign-off on new section due Apr 24. 60-day target 90% viable.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-strip alert-grey">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px;">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <span><strong>Cash-construction risk:</strong> Balance ₦61.9M after two large disbursements. No active ad campaign or offer letters. Target ₦1B+ to sustain BAFF momentum. QS onboarding must close by Apr 23.</span>
+    </div>
 
   </div>
 
@@ -763,7 +778,7 @@ nav { padding: 0 14px; gap: 12px; }
         <button class="sidebar-item" onclick="showDept(this,'Crossings','IPD')">IPD <span class="dept-count">0</span></button>
         <button class="sidebar-item" onclick="showDept(this,'Crossings','Landscape')">Landscape <span class="dept-count">0</span></button>
         <button class="sidebar-item" onclick="showDept(this,'Crossings','Operations')">Operations <span class="dept-count">0</span></button>
-        <button class="sidebar-item" onclick="showDept(this,'Crossings','FINCON')">Fincon <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Fincon')">Fincon <span class="dept-count">0</span></button>
         <button class="sidebar-item" onclick="showDept(this,'Crossings','Sales')">Sales <span class="dept-count">0</span></button>
         <button class="sidebar-item" onclick="showDept(this,'Crossings','MCC')">MCC <span class="dept-count">0</span></button>
         <button class="sidebar-item" onclick="showDept(this,'Crossings','General')">General <span class="dept-count">0</span></button>
@@ -772,7 +787,7 @@ nav { padding: 0 14px; gap: 12px; }
         <div class="sidebar-section-label annexe">Lakowe Annexe</div>
         <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Design')">Design <span class="dept-count">0</span></button>
         <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Costing')">Costing <span class="dept-count">0</span></button>
-        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','IPD/PMO')">IPD <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','IPD')">IPD <span class="dept-count">0</span></button>
         <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Operations')">Operations <span class="dept-count">0</span></button>
         <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Fincon')">Fincon <span class="dept-count">0</span></button>
         <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Telemarketing')">Telemarketing <span class="dept-count">0</span></button>
@@ -782,43 +797,41 @@ nav { padding: 0 14px; gap: 12px; }
       </div>
     </div>
 
-```
-<div class="dept-main">
-  <div id="panel-placeholder" class="dept-panel active">
-    <div class="empty-state">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin-bottom:12px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      <h3>Select a Department</h3>
-      <p>Use the sidebar or pills above to view department tasks</p>
-    </div>
-  </div>
+    <div class="dept-main">
+      <div id="panel-placeholder" class="dept-panel active">
+        <div class="empty-state">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin-bottom:12px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <h3>Select a Department</h3>
+          <p>Use the sidebar or pills above to view department tasks</p>
+        </div>
+      </div>
 
-  <div id="dynamic-dept-container" style="display:none;">
-    <div class="dept-history-bar" id="history-bar">
-      <span class="history-label">History:</span>
-    </div>
-    <div class="dept-header">
-      <div class="dept-header-text">
-        <h2 id="dynamic-dept-title">Department</h2>
-        <p>Active tasks and deliverables · <span id="viewing-date-label">Current</span></p>
-        <span id="dynamic-dept-badge" class="nav-badge" style="margin-top:6px;display:inline-block;">Project</span>
+      <div id="dynamic-dept-container" style="display:none;">
+        <div class="dept-history-bar" id="history-bar">
+          <span class="history-label">History:</span>
+        </div>
+        <div class="dept-header">
+          <div class="dept-header-text">
+            <h2 id="dynamic-dept-title">Department</h2>
+            <p>Active tasks and deliverables · <span id="viewing-date-label">Current</span></p>
+            <span id="dynamic-dept-badge" class="nav-badge" style="margin-top:6px;display:inline-block;">Project</span>
+          </div>
+          <div class="dept-controls">
+            <label class="show-done-toggle">
+              <input type="checkbox" id="show-done-toggle" onchange="renderCurrentDept()"> Show completed
+            </label>
+          </div>
+        </div>
+        <div class="filter-tabs" id="filter-tabs">
+          <button class="filter-tab active" data-filter="all" onclick="setFilter('all',this)">All</button>
+          <button class="filter-tab" data-filter="ontrack" onclick="setFilter('ontrack',this)">● On Track</button>
+          <button class="filter-tab" data-filter="delayed" onclick="setFilter('delayed',this)">● Delayed</button>
+          <button class="filter-tab" data-filter="update" onclick="setFilter('update',this)">▶ Update</button>
+          <button class="filter-tab" data-filter="achieved" onclick="setFilter('achieved',this)">✓ Achieved</button>
+        </div>
+        <div class="next-steps-list" id="dynamic-tasks-list"></div>
       </div>
-      <div class="dept-controls">
-        <label class="show-done-toggle">
-          <input type="checkbox" id="show-done-toggle" onchange="renderCurrentDept()"> Show completed
-        </label>
-      </div>
     </div>
-    <div class="filter-tabs" id="filter-tabs">
-      <button class="filter-tab active" data-filter="all" onclick="setFilter('all',this)">All</button>
-      <button class="filter-tab" data-filter="ontrack" onclick="setFilter('ontrack',this)">● On Track</button>
-      <button class="filter-tab" data-filter="delayed" onclick="setFilter('delayed',this)">● Delayed</button>
-      <button class="filter-tab" data-filter="update" onclick="setFilter('update',this)">▶ Update</button>
-      <button class="filter-tab" data-filter="achieved" onclick="setFilter('achieved',this)">✓ Achieved</button>
-    </div>
-    <div class="next-steps-list" id="dynamic-tasks-list"></div>
-  </div>
-</div>
-```
 
   </div>
 </div>
@@ -827,50 +840,24 @@ nav { padding: 0 14px; gap: 12px; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 
 <script>
-// ═══════════════════════════════════════════════════════════════════
-//  GOOGLE SHEETS CONFIG
-//  ─────────────────────────────────────────────────────────────────
-//  SETUP REQUIRED (one-time):
-//  1. Open each Google Sheet
-//  2. Click File → Share → Publish to web → choose "Entire Document"
-//     and format "Comma-separated values (.csv)" → Publish
-//  3. Alternatively: Share → Anyone with the link → Viewer
-//
-//  HOW TO UPDATE AFTER EACH MEETING:
-//  Change the "sheet" value below to match the new date tab name
-//  e.g. change 'Apr 20' → 'May 4' after the May 4 session
-// ═══════════════════════════════════════════════════════════════════
-const SHEET_CONFIG = {
-  Crossings: {
-    id: '1UPEpb7IDrayYhBxqJRJIm-Dl7tV2jHP1DVsRjGp06Mc',
-    sheet: 'Apr 20'   // ← Update to latest meeting date tab name
-  },
-  Annexe: {
-    id: '1wcoefW36HH-veJ9idVMw5lxEiYZOqB76JPldivW4e6o',
-    sheet: 'Apr 23'   // ← Update to latest meeting date tab name
-  }
-};
-const AUTO_SYNC_MINUTES = 10; // Auto-refresh interval (0 = disable)
-
-function getSheetCSVUrl(proj) {
-  const cfg = SHEET_CONFIG[proj];
-  // Uses Google's visualization query endpoint — works with "Anyone with link" sharing
-  return `https://docs.google.com/spreadsheets/d/${cfg.id}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(cfg.sheet)}`;
-}
-
 // ═══════════════════════════════════════════════
-// STATE
+// STATE & GOOGLE SHEETS SETUP
 // ═══════════════════════════════════════════════
 let currentProject = null;
 let currentDept = null;
 let currentFilter = 'all';
-let viewingSessionDate = 'current';
+let viewingSessionDate = 'current'; 
+let chartsInitialized = false;
+
+const SHEET_CROSSINGS = 'https://docs.google.com/spreadsheets/d/1UPEpb7IDrayYhBxqJRJIm-Dl7tV2jHP1DVsRjGp06Mc/export?format=csv'; 
+const SHEET_ANNEXE = 'https://docs.google.com/spreadsheets/d/1wcoefW36HH-veJ9idVMw5lxEiYZOqB76JPldivW4e6o/export?format=csv'; 
+const AUTO_SYNC_MINUTES = 5;
 
 // ═══════════════════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════════════════
 const SESSION_KEY = 'lakowe_sessions_v3';
-const STATUS_KEY  = 'lakowe_status_v3';
+const STATUS_KEY = 'lakowe_status_v3';
 
 function getSessions() {
   try { return JSON.parse(localStorage.getItem(SESSION_KEY)) || []; } catch { return []; }
@@ -894,20 +881,21 @@ function archiveSession(label) {
   const sessions = getSessions();
   const today = label || new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'});
   const snap = {
-    date: today, ts: Date.now(),
+    date: today,
+    ts: Date.now(),
     tasks: JSON.parse(JSON.stringify(taskDatabase)),
     metrics: {
-      'val-cx-inflow':    document.getElementById('val-cx-inflow').textContent,
-      'val-cx-units':     document.getElementById('val-cx-units').textContent,
-      'val-cx-offers':    document.getElementById('val-cx-offers').textContent,
-      'val-cx-sales':     document.getElementById('val-cx-sales').textContent,
-      'val-cx-budget':    document.getElementById('val-cx-budget').textContent,
-      'val-cx-balance':   document.getElementById('val-cx-balance').textContent,
+      'val-cx-inflow': document.getElementById('val-cx-inflow').textContent,
+      'val-cx-units': document.getElementById('val-cx-units').textContent,
+      'val-cx-offers': document.getElementById('val-cx-offers').textContent,
+      'val-cx-sales': document.getElementById('val-cx-sales').textContent,
+      'val-cx-budget': document.getElementById('val-cx-budget').textContent,
+      'val-cx-balance': document.getElementById('val-cx-balance').textContent,
       'val-annex-inflow': document.getElementById('val-annex-inflow').textContent,
-      'val-annex-units':  document.getElementById('val-annex-units').textContent,
+      'val-annex-units': document.getElementById('val-annex-units').textContent,
       'val-annex-offers': document.getElementById('val-annex-offers').textContent,
-      'val-annex-sales':  document.getElementById('val-annex-sales').textContent,
-      'val-annex-balance':document.getElementById('val-annex-balance').textContent,
+      'val-annex-sales': document.getElementById('val-annex-sales').textContent,
+      'val-annex-balance': document.getElementById('val-annex-balance').textContent,
     }
   };
   const idx = sessions.findIndex(s => s.date === today);
@@ -916,276 +904,47 @@ function archiveSession(label) {
 }
 
 // ═══════════════════════════════════════════════
-// GOOGLE SHEETS SYNC
+// GOOGLE SHEETS DYNAMIC FETCH
 // ═══════════════════════════════════════════════
-function setSyncState(state, msg) {
-  const btn  = document.getElementById('sync-btn');
-  const dot  = document.getElementById('sync-dot');
-  const lbl  = document.getElementById('sync-label');
-  btn.className  = 'sync-indicator ' + state;
-  dot.className  = 'sync-dot' + (state === 'syncing' ? ' pulse' : '');
-  lbl.textContent = msg;
-}
-
-async function syncProjectFromSheet(proj) {
-  const url = getSheetCSVUrl(proj);
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const csvText = await response.text();
-  // gviz wraps values in quotes and uses standard CSV encoding
-  const rows = parseCSV(csvText);
-  processProjectSheetData(rows, proj);
-  return true;
-}
-
-async function syncAllSheets() {
-  setSyncState('syncing', 'Syncing…');
-  archiveSession();
-
-  let cxOk = false, annexOk = false, errMsg = '';
-
-  try { cxOk    = await syncProjectFromSheet('Crossings'); } catch(e) { errMsg += `Crossings: ${e.message}. `; }
-  try { annexOk = await syncProjectFromSheet('Annexe');    } catch(e) { errMsg += `Annexe: ${e.message}.`;    }
-
-  if (cxOk || annexOk) {
-    const now = new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short'})
-              + ' ' + new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('last-updated-text').textContent = 'Live: ' + now;
-    setSyncState('success', '✓ Live');
-    setTimeout(() => setSyncState('', 'Sync Sheets'), 4000);
-  } else {
-    setSyncState('error', '✗ Failed');
-    setTimeout(() => setSyncState('', 'Sync Sheets'), 5000);
-    console.warn('Sheet sync failed:', errMsg,
-      '\n→ Make sure both sheets are shared as "Anyone with the link can view" or published to web.');
-  }
-
-  updateSidebarCounts();
-  applyPriorityColors();
-  renderOverduePanels();
-  rebuildMobilePills();
-  if (currentDept) renderCurrentDept();
-}
-
-// ═══════════════════════════════════════════════
-// SHEET DATA PARSING HELPERS
-// ═══════════════════════════════════════════════
-
-/**
- * Normalise raw status string from the sheet to one of:
- * 'ontrack' | 'delayed' | 'achieved' | 'update'
- *
- * Sheet values seen: "On -Track", "On - Track", "Delayed",
- * "Completed", "Update Expected", "On Hold", "Ongoing", "Targets"
- */
-function normalizeStatus(raw) {
-  if (!raw) return 'ontrack';
-  const s = String(raw).toLowerCase().replace(/[\s\-]+/g, '');
-  if (s.includes('ontrack'))                          return 'ontrack';
-  if (s.includes('delayed'))                          return 'delayed';
-  if (s.includes('completed'))                        return 'achieved';
-  if (s.includes('update') || s.includes('expected')) return 'update';
-  if (s.includes('onhold') || s.includes('hold'))     return 'update';
-  if (s.includes('ongoing') || s.includes('target'))  return 'ontrack';
-  return 'ontrack';
-}
-
-/** Format a due-date cell value for display. */
-function fmtDue(val) {
-  if (!val || /^(N\/A|TBD|TBA|N\/A|null|undefined)$/i.test(String(val).trim())) return 'TBD';
-  const s = String(val).trim();
-  if (/bi.?monthly/i.test(s)) return 'Bi-Monthly';
-  // Already a readable string like "Apr 27"
-  if (/^[A-Za-z]{3}\s+\d{1,2}$/.test(s)) return s;
-  // Try parsing as date
-  const d = new Date(s);
-  if (!isNaN(d.getTime())) {
-    return d.toLocaleDateString('en-NG', { month: 'short', day: 'numeric' });
-  }
-  return s.substring(0, 20);
-}
-
-/**
- * Scan an explanation/notes cell for key financial metrics and
- * update the relevant dashboard cards for the given project.
- *
- * Column layout in CSV (sheet starts at col B, so index 0 = col B):
- *   [0] S/N  [1] Dept  [2] Action  [3] Due  [4] Result  [5] Explanation  [6] Category  [7] Status
- */
-function tryExtractMetrics(cells, proj) {
-  // Metrics appear in col G (Explanation, index 5) and sometimes col F (Result, index 4)
-  const note = String(cells[5] || cells[4] || '').trim();
-  if (!note) return;
-
-  const isCx     = proj === 'Crossings';
-  const pfxInflow  = isCx ? 'val-cx-inflow'   : 'val-annex-inflow';
-  const pfxUnits   = isCx ? 'val-cx-units'     : 'val-annex-units';
-  const pfxSales   = isCx ? 'val-cx-sales'     : 'val-annex-sales';
-  const pfxBal     = isCx ? 'val-cx-balance'   : 'val-annex-balance';
-  const pfxOffers  = isCx ? 'val-cx-offers'    : 'val-annex-offers';
-
-  // Helper: "N6.27Bn" | "₦1.72B" → "₦6.27B" | "₦40M"
-  const fmt = (num, unit) => {
-    if (!unit) return '₦' + num;
-    const u = unit.toLowerCase();
-    if (u.startsWith('b')) return '₦' + num + 'B';
-    if (u.startsWith('m')) return '₦' + num + 'M';
-    return '₦' + num;
-  };
-
-  let m;
-  // Total Inflow   e.g. "Total Inflow - N6.27Bn" or "Sales Inflow - 1.72B"
-  m = note.match(/(?:total\s+)?inflow\s*[-:–]\s*[₦N]?\s*([\d.]+)\s*(B|Bn|M|Mn|b|m)?/i);
-  if (m) setMetric(pfxInflow, fmt(m[1], m[2]));
-
-  // Units sold     e.g. "Sales- 78" or "Sales - 6"
-  m = note.match(/^sales\s*[-:–]\s*(\d+)$/im);
-  if (m) setMetric(pfxUnits, m[1]);
-
-  // Value of Sales e.g. "Value of Sales - N2.07B"
-  m = note.match(/value\s+of\s+sales\s*[-:–]\s*[₦N]?\s*([\d.]+)\s*(B|Bn|M|Mn|b|m)?/i);
-  if (m) setMetric(pfxSales, fmt(m[1], m[2]));
-
-  // Account Balance  e.g. "Balance - N61.9Mn" or "Account balance - N40Mn"
-  m = note.match(/(?:account\s+)?balance\s*[-:–]\s*[₦N]?\s*([\d.]+)\s*(B|Bn|M|Mn|b|m)?/i);
-  if (m) setMetric(pfxBal, fmt(m[1], m[2]));
-
-  // Offer letters  e.g. "1 ACTIVE OFFER LETTER" or "No active offer letter"
-  m = note.match(/(\d+)\s*active\s+offer/i);
-  if (m) { setMetric(pfxOffers, m[1]); }
-  else if (/no\s+active\s+offer/i.test(note)) { setMetric(pfxOffers, '0'); }
-}
-
-// Rows to skip entirely — they are section separators, not tasks
-const SKIP_ROW_RE = /^(completed tasks|tasks on hold|end of [a-z]+ targets?|tasks completed|completed$)/i;
-
-/**
- * Parse one project's sheet CSV rows and update taskDatabase.
- *
- * CSV column mapping (sheet data starts at col B so gviz omits col A):
- *   [0] = S/N       (col B)
- *   [1] = Dept      (col C) — merged across multiple rows
- *   [2] = Action    (col D)
- *   [3] = Due Date  (col E)
- *   [4] = Result    (col F)
- *   [5] = Expl.     (col G)
- *   [6] = Category  (col H)
- *   [7] = Status    (col I)
- */
-function processProjectSheetData(rows, proj) {
-  // Remove stale tasks for this project; keep other project intact
-  taskDatabase = taskDatabase.filter(t => t.project !== proj);
-
-  let currentDeptName = 'General';
-  let dataStartIdx    = 3; // default: rows 0=empty,1=title,2=headers,3+=data
-
-  // Robustly find the header row (contains "Department" or "Next Steps")
-  for (let i = 0; i < Math.min(rows.length, 8); i++) {
-    const r = rows[i];
-    if (r && r.some(c => /department/i.test(String(c || '')))) {
-      dataStartIdx = i + 1;
-      break;
-    }
-  }
-
-  // Update the "sheet date" label in dashboard heading
-  const sheetLabel = SHEET_CONFIG[proj].sheet;
-  const dateEl = document.getElementById(proj === 'Crossings' ? 'cx-sheet-date' : 'annex-sheet-date');
-  if (dateEl) dateEl.textContent = `Jan 5 – ${sheetLabel}, 2026`;
-
-  for (let i = dataStartIdx; i < rows.length; i++) {
-    const c = rows[i];
-    if (!c || c.length < 3) continue;
-
-    // Track current department (handle merged cells → empty in CSV)
-    const deptVal = String(c[1] || '').trim();
-    if (deptVal && !/^\d+$/.test(deptVal)) {
-      currentDeptName = deptVal;
-    }
-
-    // Always scan for metrics regardless of action content
-    tryExtractMetrics(c, proj);
-
-    // Clean up the action text
-    const rawAction = String(c[2] || '').trim();
-    const action    = rawAction.replace(/^\*+\s*/, '').trim();
-
-    // Skip non-task rows
-    if (!action || SKIP_ROW_RE.test(action)) continue;
-
-    const rawStatus = String(c[7] || '').trim();
-    // Skip rows with no meaningful status or that are completed/section markers
-    if (/^(completed|targets|n\/a)$/i.test(rawStatus) && rawStatus) continue;
-
-    const status      = normalizeStatus(rawStatus);
-    const due         = fmtDue(c[3]);
-    const result      = String(c[4] || '').trim();
-    const explanation = String(c[5] || '').trim();
-
-    taskDatabase.push({
-      project: proj,
-      dept:    currentDeptName,
-      result,
-      action,
-      explanation,
-      due,
-      status
+async function syncWithGoogleSheet() {
+  try {
+    const fetches = [];
+    if (SHEET_CROSSINGS) fetches.push(fetch(SHEET_CROSSINGS + '&t=' + Date.now()).then(r => r.text()).then(t => ({text: t, proj: 'Crossings'})));
+    if (SHEET_ANNEXE) fetches.push(fetch(SHEET_ANNEXE + '&t=' + Date.now()).then(r => r.text()).then(t => ({text: t, proj: 'Annexe'})));
+    
+    if (fetches.length === 0) return;
+    
+    const results = await Promise.all(fetches);
+    taskDatabase = []; 
+    document.getElementById('targets-crossings').innerHTML = '';
+    document.getElementById('targets-annexe').innerHTML = '';
+    
+    results.forEach(res => {
+      const rows = parseCSV(res.text);
+      processData(rows, res.proj);
     });
-  }
-
-  // Apply any locally-stored status overrides on top of fresh sheet data
-  applyStoredStatuses();
-
-  // Update landing page subtitle dynamically
-  updateLandingSubtitle(proj);
-}
-
-function updateLandingSubtitle(proj) {
-  if (proj === 'Crossings') {
-    const units = document.getElementById('val-cx-units').textContent;
-    const inflow = document.getElementById('val-cx-inflow').textContent;
-    const el = document.getElementById('landing-cx-sub');
-    if (el) el.textContent = `${units} units · ${inflow} inflow`;
-  } else {
-    const units = document.getElementById('val-annex-units').textContent;
-    const inflow = document.getElementById('val-annex-inflow').textContent;
-    const el = document.getElementById('landing-annex-sub');
-    if (el) el.textContent = `${units} units · ${inflow} inflow`;
+    
+    archiveSession('Auto-Sync');
+    
+    const now = new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('last-updated-text').textContent = 'Live Synced: ' + now;
+    
+    updateSidebarCounts();
+    applyPriorityColors();
+    renderOverduePanels();
+    rebuildMobilePills();
+    if (currentDept) renderCurrentDept();
+    
+    console.log('Successfully synced with Google Sheets.');
+  } catch (error) {
+    console.error('Error syncing with Google Sheets:', error);
   }
 }
 
 // ═══════════════════════════════════════════════
-// TASK DATABASE (seed data — replaced on sync)
+// TASK DATABASE
 // ═══════════════════════════════════════════════
-let taskDatabase = [
-  // ── CROSSINGS ──
-  {project:'Crossings',dept:'Design',result:'Hospitality Block Redesign',action:'Send CX10 redesign proposal to Olamide (Costing) for cost estimate',explanation:'MAJOR REDESIGN: site moved from CX9→CX10. New inventory: 6 commercial + 68 residential units (Floors 1–2: 32×1-bed; Floors 3–4: 36 units). Terraces face park; roof garden deferred. Previous deadline Apr 7 — now Apr 23.',due:'Apr 23',status:'delayed'},
-  {project:'Crossings',dept:'Design',result:'Coming Soon Billboard',action:'Prepare render/elevation images and share with MCC for "coming soon" graphic',explanation:'Render output is a blocker for the MCC campaign. Design freeze required before billboard can go to print.',due:'Apr 27',status:'delayed'},
-  {project:'Crossings',dept:'Design',result:'Roundabout Alignment Decision',action:'Share final decision on roundabout (most economic option) by Apr 23',explanation:'Team to refine and share update independently.',due:'Apr 27',status:'ontrack'},
-  {project:'Crossings',dept:'Costing',result:'Sandfilling Progress',action:'Update on sandfilling progress vs. budget actuals',explanation:'8,130 cbm delivered to date; additional 8,000 cbm funded. CX9+CX10: 7,733 cbm / ₦137M separate tranche.',due:'Apr 27',status:'ontrack'},
-  {project:'Crossings',dept:'Costing',result:'BOLAD Lights Vendor',action:'Finalize vendor selection for bollad lights — final design sign-off on samples',explanation:'Hazel: terminated. Wemsel: sample on-site. Mr. Obidong: samples arriving. Final vendor decision on hold.',due:'Apr 27',status:'ontrack'},
-  {project:'Crossings',dept:'AMC',result:'Contractor Selection',action:'Decide between BAFF or FUNKUS for General Infrastructure Works',explanation:'Management decision pending. AMC waiting on direction before issuing instruction.',due:'Apr 27',status:'ontrack'},
-  {project:'Crossings',dept:'IPD',result:'Phase 1 Completion Target',action:'Sandfilling progress update — target Phase 1 (clearing & filling) complete by May 18',explanation:'8,130 cbm delivered as of Apr 19. Additional 8,000 cbm issued to contractor.',due:'Apr 27',status:'delayed'},
-  {project:'Crossings',dept:'IPD',result:'MEP Sign-off',action:'Secure full ARUP multi-discipline MEP/electrical sign-off',explanation:'Civil designs: SIGNED OFF ✓. MEP/Electrical: ARUP requested schedule-of-manuals updates.',due:'Apr 27',status:'delayed'},
-  {project:'Crossings',dept:'Landscape',result:'Park Completion',action:'Provide park progress update — full park completion target end of April',explanation:'Mosaic tiles commenced. Marble top concluding. Fountain commissioning target: Apr 30.',due:'Apr 27',status:'delayed'},
-  {project:'Crossings',dept:'Landscape',result:'BOLAD Lights',action:'Follow up closely on BOLAD lights contractor — 2-week delay confirmed',explanation:'No further updates. Contractor remains elusive.',due:'Apr 27',status:'delayed'},
-  {project:'Crossings',dept:'Operations',result:'Sales & Finance Update',action:'Provide weekly updates on all sales metrics',explanation:'Sales: 6. Value of Sales: ₦2.07B. Inflow: ₦1.72B. Account Balance: ₦40M. No active offer letters.',due:'Apr 27',status:'ontrack'},
-  {project:'Crossings',dept:'Sales',result:'₦1B Inflow Target',action:'Present clear pathway to ₦1B cumulative inflow target',explanation:'No new inflow figures at Apr 20 meeting. Pipeline challenge and pricing objections continue.',due:'Apr 27',status:'delayed'},
-  {project:'Crossings',dept:'MCC',result:'Billboard Rollout',action:'3-board rollout: Board 1 by May 4, Boards 2&3 by May 18 — move park board to golf estate',explanation:'Placement: gold road roundabout. Board goes up immediately after BOLAD lights are done.',due:'May 4',status:'ontrack'},
-  {project:'Crossings',dept:'General',result:'Competitive Intelligence',action:'Every department: present competitive intelligence ideas at next session (bi-monthly)',explanation:'DA raised: need for visually striking impression of project scale (₦50B context).',due:'Bi-Monthly',status:'ontrack'},
-
-  // ── ANNEXE ──
-  {project:'Annexe',dept:'Design',result:'Layout Progress Overlay',action:'Provide layout progress overlay report — current work vs. main layout (every 3 weeks)',explanation:'Progress overlay showing current construction status against approved layout.',due:'Apr 23',status:'ontrack'},
-  {project:'Annexe',dept:'Design',result:'Provisional Layout Approval',action:'Contact Uncle P — if no provisional layout, go directly to Commissioner',explanation:'2-WEEK WINDOW EXPIRES APR 22. Provisional layout for 19 hectares (Dondemmy) blocked since Oct 2025.',due:'Apr 22',status:'delayed'},
-  {project:'Annexe',dept:'Costing',result:'QS Onboarding',action:'Complete QS onboarding; first BAFF valuation by Apr 25–30',explanation:'Legal to clear engagement letter. QS virtual briefing before Thursday. BAFF ₦32M paid ✓.',due:'Apr 23',status:'ontrack'},
-  {project:'Annexe',dept:'IPD/PMO',result:'BAFF Remobilisation',action:'Confirm BAFF remobilised after ₦32M payment — Segun Odegbami clearing to commence immediately',explanation:'STILL NOT STARTED as of Apr 20. ₦32M payment confirmed sent ✓.',due:'Apr 23',status:'delayed'},
-  {project:'Annexe',dept:'IPD/PMO',result:'60-Day Drainage Target',action:'Monitor drainage target — ARUP sign-off due Apr 24',explanation:'Still ~90% viable if BAFF fully mobilised. New section: 400m + 120m culvert.',due:'Apr 23',status:'ontrack'},
-  {project:'Annexe',dept:'IPD/PMO',result:'Internal Roads',action:'Confirm BAFF remob and execute road targets: Sunday Oliseh, Peter Rufai 2, Tunde-5 sandfilling',explanation:'MANHOLES: 96 completed. Target: 140. INTERNAL ROADS: NO PROGRESS confirmed.',due:'Apr 23',status:'delayed'},
-  {project:'Annexe',dept:'Operations',result:'Sales & Finance Update',action:'Provide update on sales metrics, offer letters, inflow and account balance',explanation:'Total Inflow ₦6.27Bn | Units: 78 | Sales: ₦6.89Bn | Balance: ₦61.9M | No active offer letters.',due:'Apr 23',status:'ontrack'},
-  {project:'Annexe',dept:'MCC',result:'Billboard Locations',action:'Present formal billboard designs + Lekki-Epe location options at next meeting',explanation:'Gate billboard sunk. June 12 Road board: move to right. New locations: Lekki-Epe / near gate.',due:'Apr 23',status:'ontrack'},
-  {project:'Annexe',dept:'Sales',result:'₦1B Account Target',action:'Share Sales + MCC joint strategy report — present strategy to push account to ₦1B+',explanation:'No active offer letters. 6-plot group buy still in discussion. No active ad campaign.',due:'Apr 23',status:'delayed'},
-  {project:'Annexe',dept:'Legal',result:'LNT Trademark',action:'Monitor LNT Trademark publication — waiting on Aug 21 publication date',explanation:'Acceptance letter received. New publication date: Aug 21. Certificate expected Oct 21.',due:'Aug 21',status:'ontrack'},
-];
+let taskDatabase = [];
 
 // ═══════════════════════════════════════════════
 // APPLY STORED STATUS OVERRIDES
@@ -1249,19 +1008,19 @@ function offersColorClass(valStr) {
 function applyPriorityColors() {
   const cxBal = document.getElementById('val-cx-balance').textContent;
   document.getElementById('card-cx-balance').className = 'metric-card priority-card ' + balanceColorClass(cxBal);
-  document.getElementById('val-cx-balance').className  = 'metric-value ' + balanceColorClass(cxBal);
+  document.getElementById('val-cx-balance').className = 'metric-value ' + balanceColorClass(cxBal);
 
   const cxOff = document.getElementById('val-cx-offers').textContent;
-  document.getElementById('card-cx-offers').className  = 'metric-card priority-card ' + offersColorClass(cxOff);
-  document.getElementById('val-cx-offers').className   = 'metric-value ' + offersColorClass(cxOff);
+  document.getElementById('card-cx-offers').className = 'metric-card priority-card ' + offersColorClass(cxOff);
+  document.getElementById('val-cx-offers').className = 'metric-value ' + offersColorClass(cxOff);
 
   const aBal = document.getElementById('val-annex-balance').textContent;
   document.getElementById('card-annex-balance').className = 'metric-card priority-card ' + balanceColorClass(aBal);
-  document.getElementById('val-annex-balance').className  = 'metric-value ' + balanceColorClass(aBal);
+  document.getElementById('val-annex-balance').className = 'metric-value ' + balanceColorClass(aBal);
 
   const aOff = document.getElementById('val-annex-offers').textContent;
-  document.getElementById('card-annex-offers').className  = 'metric-card priority-card ' + offersColorClass(aOff);
-  document.getElementById('val-annex-offers').className   = 'metric-value ' + offersColorClass(aOff);
+  document.getElementById('card-annex-offers').className = 'metric-card priority-card ' + offersColorClass(aOff);
+  document.getElementById('val-annex-offers').className = 'metric-value ' + offersColorClass(aOff);
 }
 
 // ═══════════════════════════════════════════════
@@ -1275,14 +1034,20 @@ function renderOverduePanels() {
     if (overdue.length === 0) { el.innerHTML = ''; return; }
     let html = `<div class="overdue-panel" onclick="this.classList.toggle('expanded')">
       <div class="overdue-header">
-        <span>⚠ ${overdue.length} Overdue Task${overdue.length > 1?'s':''} — Click to review</span>
+        <span style="display:flex; align-items:center; gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          ${overdue.length} Overdue Task${overdue.length > 1?'s':''} — Click to review
+        </span>
         <span class="overdue-toggle-icon">▼</span>
       </div>
       <div class="overdue-list">`;
     overdue.forEach(t => {
       html += `<div class="overdue-item">
         <span class="overdue-dept">${t.dept}</span>
-        <span class="overdue-action">${t.action.length > 85 ? t.action.substring(0,82)+'…' : t.action}</span>
+        <span class="overdue-action">${t.action.length > 85 ? t.action.substring(0,82)+'...' : t.action}</span>
         <span class="overdue-due">Due: ${t.due}</span>
       </div>`;
     });
@@ -1297,37 +1062,27 @@ function renderOverduePanels() {
 function updateSidebarCounts() {
   document.querySelectorAll('.sidebar-item').forEach(btn => {
     const oc = btn.getAttribute('onclick') || '';
-    const m  = oc.match(/showDept\(this,'([^']+)','([^']+)'\)/);
+    const m = oc.match(/showDept\(this,'([^']+)','([^']+)'\)/);
     if (!m) return;
-    // Match department name flexibly (e.g. "IPD/PMO" maps to sidebar label "IPD")
-    const count = taskDatabase.filter(t => t.project === m[1] && deptMatches(t.dept, m[2])).length;
-    const span  = btn.querySelector('.dept-count');
+    const count = taskDatabase.filter(t => t.project === m[1] && t.dept === m[2]).length;
+    const span = btn.querySelector('.dept-count');
     if (span) span.textContent = count;
   });
   rebuildMobilePills();
 }
 
-// Flexible dept matching: sidebar key "IPD" matches "IPD/PMO" in DB, etc.
-function deptMatches(taskDept, sidebarDept) {
-  if (taskDept === sidebarDept) return true;
-  const td = taskDept.toLowerCase().replace(/[^a-z]/g,'');
-  const sd = sidebarDept.toLowerCase().replace(/[^a-z]/g,'');
-  return td.startsWith(sd) || sd.startsWith(td);
-}
-
-// Dept lists for sidebar generation
-const CX_DEPTS    = ['Design','Costing','AMC','IPD','Landscape','Operations','FINCON','Sales','MCC','General'];
-const ANNEX_DEPTS = ['Design','Costing','IPD/PMO','Operations','Fincon','Telemarketing','MCC','Sales','Legal'];
+const CX_DEPTS = ['Design','Costing','AMC','IPD','Landscape','Operations','Fincon','Sales','MCC','General'];
+const ANNEX_DEPTS = ['Design','Costing','IPD','Operations','Fincon','Telemarketing','MCC','Sales','Legal'];
 
 function rebuildMobilePills() {
   const container = document.getElementById('mobile-dept-pills');
   if (!container || !currentProject) { if(container) container.innerHTML=''; return; }
-  const depts      = currentProject === 'Crossings' ? CX_DEPTS : ANNEX_DEPTS;
+  const depts = currentProject === 'Crossings' ? CX_DEPTS : ANNEX_DEPTS;
   const activeClass = currentProject === 'Crossings' ? 'active-cx' : 'active-annex';
   container.innerHTML = depts.map(d => {
-    const count    = taskDatabase.filter(t => t.project === currentProject && deptMatches(t.dept, d)).length;
-    const isActive = (currentDept && deptMatches(currentDept, d)) ? activeClass : '';
-    return `<button class="mobile-dept-pill ${isActive}" onclick="showDeptMobile('${d}')">${d.replace('/PMO','')} <span class="pill-count">${count}</span></button>`;
+    const count = taskDatabase.filter(t => t.project === currentProject && t.dept === d).length;
+    const isActive = currentDept === d ? activeClass : '';
+    return `<button class="mobile-dept-pill ${isActive}" onclick="showDeptMobile('${d}')">${d} <span class="pill-count">${count}</span></button>`;
   }).join('');
 }
 
@@ -1342,7 +1097,7 @@ function showDeptMobile(dept) {
 // HISTORY BAR
 // ═══════════════════════════════════════════════
 function buildHistoryBar() {
-  const bar      = document.getElementById('history-bar');
+  const bar = document.getElementById('history-bar');
   const sessions = getSessions();
   let html = '<span class="history-label">History:</span>';
   html += `<button class="history-pill ${viewingSessionDate==='current'?'active':''}" onclick="switchSession('current')">Current</button>`;
@@ -1356,7 +1111,8 @@ function buildHistoryBar() {
 function switchSession(dateStr) {
   viewingSessionDate = dateStr;
   buildHistoryBar();
-  document.getElementById('viewing-date-label').textContent = dateStr === 'current' ? 'Current' : dateStr;
+  const dateLabel = document.getElementById('viewing-date-label');
+  dateLabel.textContent = dateStr === 'current' ? 'Current' : dateStr;
   renderCurrentDept();
 }
 
@@ -1376,10 +1132,10 @@ function renderDeptContent(proj, dept) {
   const container = document.getElementById('dynamic-dept-container');
   container.style.display = 'block';
 
-  document.getElementById('dynamic-dept-title').textContent = dept.replace('/PMO','');
+  document.getElementById('dynamic-dept-title').textContent = dept;
   const badge = document.getElementById('dynamic-dept-badge');
-  badge.textContent  = proj;
-  badge.className    = 'nav-badge ' + (proj === 'Crossings' ? 'badge-cx' : 'badge-annex');
+  badge.textContent = proj;
+  badge.className = 'nav-badge ' + (proj==='Crossings' ? 'badge-cx' : 'badge-annex');
 
   buildHistoryBar();
   document.getElementById('viewing-date-label').textContent = viewingSessionDate === 'current' ? 'Current' : viewingSessionDate;
@@ -1392,21 +1148,27 @@ function renderCurrentDept() {
 
   let tasks;
   if (viewingSessionDate === 'current') {
-    tasks = taskDatabase.filter(t => t.project === currentProject && deptMatches(t.dept, currentDept));
+    tasks = taskDatabase.filter(t => t.project === currentProject && t.dept === currentDept);
   } else {
     const sessions = getSessions();
-    const session  = sessions.find(s => s.date === viewingSessionDate);
-    tasks = session ? session.tasks.filter(t => t.project === currentProject && deptMatches(t.dept, currentDept)) : [];
+    const session = sessions.find(s => s.date === viewingSessionDate);
+    tasks = session ? session.tasks.filter(t => t.project === currentProject && t.dept === currentDept) : [];
   }
 
   if (viewingSessionDate === 'current') {
     const overrides = getStatusOverrides();
     tasks = tasks.map(t => ({ ...t, status: overrides[taskId(t)] || t.status }));
-    tasks = tasks.map(t => (isOverdue(t) && t.status === 'ontrack') ? { ...t, status: 'delayed' } : t);
+  }
+
+  if (viewingSessionDate === 'current') {
+    tasks = tasks.map(t => {
+      if (isOverdue(t) && t.status === 'ontrack') return { ...t, status: 'delayed' };
+      return t;
+    });
   }
 
   let filtered = tasks;
-  if (!showDone)            filtered = filtered.filter(t => t.status !== 'achieved');
+  if (!showDone) filtered = filtered.filter(t => t.status !== 'achieved');
   if (currentFilter !== 'all') filtered = filtered.filter(t => t.status === currentFilter);
 
   const list = document.getElementById('dynamic-tasks-list');
@@ -1416,21 +1178,21 @@ function renderCurrentDept() {
   }
 
   const isHistory = viewingSessionDate !== 'current';
-  const overrides  = getStatusOverrides();
+  const overrides = getStatusOverrides();
 
   list.innerHTML = filtered.map(t => {
-    const id          = taskId(t);
-    const status      = (viewingSessionDate === 'current' ? (overrides[id] || t.status) : t.status) || 'ontrack';
+    const id = taskId(t);
+    const status = (viewingSessionDate === 'current' ? (overrides[id] || t.status) : t.status) || 'ontrack';
     const statusLabel = {ontrack:'On Track',delayed:'Delayed',update:'Update',achieved:'Achieved'}[status] || 'On Track';
-    const dueCls      = isOverdue(t) ? 'overdue' : '';
-    const ctxText     = t.result || '';
+    const dueCls = isOverdue(t) ? 'overdue' : '';
+    const ctxText = t.result || '';
 
     const actionButtons = !isHistory ? `
       <div class="status-actions" onclick="event.stopPropagation()">
         <button class="status-btn btn-achieved" onclick="setTaskStatus('${id}','achieved')">✓ Achieved</button>
-        <button class="status-btn btn-delayed"  onclick="setTaskStatus('${id}','delayed')">⚠ Delayed</button>
-        <button class="status-btn btn-update"   onclick="setTaskStatus('${id}','update')">▶ Update</button>
-        <button class="status-btn btn-ontrack"  onclick="setTaskStatus('${id}','ontrack')">▲ On Track</button>
+        <button class="status-btn btn-delayed" onclick="setTaskStatus('${id}','delayed')">⚠ Delayed</button>
+        <button class="status-btn btn-update" onclick="setTaskStatus('${id}','update')">▶ Update</button>
+        <button class="status-btn btn-ontrack" onclick="setTaskStatus('${id}','ontrack')">▲ On Track</button>
       </div>` : '';
 
     return `<div class="step-card s-${status}" onclick="this.classList.toggle('expanded')" id="card-${id}">
@@ -1444,7 +1206,7 @@ function renderCurrentDept() {
       </div>
       <div class="step-details-pane" onclick="event.stopPropagation()">
         <div class="pane-title">Details</div>
-        <div style="margin-bottom:8px;white-space:pre-wrap">${t.explanation}</div>
+        <div style="margin-bottom:8px">${t.explanation}</div>
         ${actionButtons}
       </div>
     </div>`;
@@ -1497,20 +1259,20 @@ function showLanding() {
 
 function selectProject(proj) {
   currentProject = proj;
-  currentDept    = null;
+  currentDept = null;
   viewingSessionDate = 'current';
-  currentFilter  = 'all';
+  currentFilter = 'all';
 
   document.querySelectorAll('.nav-project-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(proj === 'Crossings' ? 'btn-nav-cx' : 'btn-nav-annex').classList.add('active');
 
-  document.getElementById('block-crossings').style.display  = proj === 'Crossings' ? 'block' : 'none';
-  document.getElementById('block-annexe').style.display     = proj === 'Annexe'    ? 'block' : 'none';
+  document.getElementById('block-crossings').style.display = proj === 'Crossings' ? 'block' : 'none';
+  document.getElementById('block-annexe').style.display = proj === 'Annexe' ? 'block' : 'none';
   document.getElementById('sidebar-crossings').style.display = proj === 'Crossings' ? 'block' : 'none';
-  document.getElementById('sidebar-annexe').style.display   = proj === 'Annexe'    ? 'block' : 'none';
+  document.getElementById('sidebar-annexe').style.display = proj === 'Annexe' ? 'block' : 'none';
 
   document.getElementById('nav-tabs-group').style.display = 'flex';
-  document.getElementById('bottom-nav').style.display     = 'block';
+  document.getElementById('bottom-nav').style.display = 'block';
 
   const dashTab = document.querySelector('.nav-tab');
   showPage('dashboard', dashTab);
@@ -1531,106 +1293,31 @@ function selectProject(proj) {
 function handleFileUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-  const ext  = file.name.split('.').pop().toLowerCase();
-  archiveSession(document.getElementById('last-updated-text').textContent.replace(/Last updated:|Live:/g,'').trim());
+  const ext = file.name.split('.').pop().toLowerCase();
+  archiveSession(document.getElementById('last-updated-text').textContent.replace('Last updated: ','').replace('Live Synced: ',''));
 
   if (ext === 'csv') {
     const reader = new FileReader();
-    reader.onload = e => {
-      const rows = parseCSV(e.target.result);
-      // Detect which project from title row
-      const title = (rows[1] || []).join(' ').toUpperCase();
-      const proj  = title.includes('CROSSING') ? 'Crossings' : 'Annexe';
-      processProjectSheetData(rows, proj);
-      finalizeUpload(file.name);
-    };
+    reader.onload = e => { taskDatabase = []; processData(parseCSV(e.target.result)); finalizeUpload(file.name); };
     reader.readAsText(file);
-
   } else if (ext === 'xlsx' || ext === 'xls') {
     const reader = new FileReader();
     reader.onload = e => {
+      taskDatabase = [];
       const wb = XLSX.read(e.target.result, {type:'binary'});
-      // Try the last date-named sheet (before 'Targets'/'KD'/'Dashboard')
-      const SPECIAL = /^(targets|kd|dashboard|calendar|milestones)$/i;
-      let sheetName = wb.SheetNames[0];
-      for (let i = wb.SheetNames.length - 1; i >= 0; i--) {
-        if (!SPECIAL.test(wb.SheetNames[i])) { sheetName = wb.SheetNames[i]; break; }
-      }
-      const ws   = wb.Sheets[sheetName];
-      const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
-      // Detect project from title row
-      const flatTitle = rows.slice(0,3).flat().join(' ').toUpperCase();
-      const proj = flatTitle.includes('CROSSING') ? 'Crossings' : 'Annexe';
-      // For xlsx, the sheet may have an empty col A; detect offset
-      processProjectSheetDataFromXlsx(rows, proj);
-      finalizeUpload(file.name + ' [' + sheetName + ']');
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      processData(XLSX.utils.sheet_to_json(ws, {header:1}));
+      finalizeUpload(file.name);
     };
     reader.readAsBinaryString(file);
-
   } else if (ext === 'txt') {
     const reader = new FileReader();
     reader.onload = e => { parseTranscript(e.target.result); finalizeUpload(file.name); };
     reader.readAsText(file);
-
   } else {
     alert('Unsupported format. Please upload .xlsx, .csv, or .txt');
   }
   event.target.value = '';
-}
-
-/**
- * For XLSX uploads, openpyxl-style: col A is index 0 (empty), col B = index 1, etc.
- * Adjust indices by +1 compared to the CSV (gviz) mapping.
- */
-function processProjectSheetDataFromXlsx(rows, proj) {
-  taskDatabase = taskDatabase.filter(t => t.project !== proj);
-  let currentDeptName = 'General';
-  let dataStartIdx    = 3;
-
-  for (let i = 0; i < Math.min(rows.length, 8); i++) {
-    const r = rows[i];
-    if (r && r.some(c => /department/i.test(String(c || '')))) {
-      dataStartIdx = i + 1; break;
-    }
-  }
-
-  for (let i = dataStartIdx; i < rows.length; i++) {
-    const raw = rows[i];
-    if (!raw || raw.length < 4) continue;
-    // Detect col offset: if raw[0] is empty (col A), shift by 1
-    const offset = (raw[0] === '' || raw[0] === null || raw[0] === undefined) ? 1 : 0;
-    const c = {
-      0: raw[offset],      // S/N
-      1: raw[offset + 1],  // Dept
-      2: raw[offset + 2],  // Action
-      3: raw[offset + 3],  // Due
-      4: raw[offset + 4],  // Result
-      5: raw[offset + 5],  // Explanation
-      6: raw[offset + 6],  // Category
-      7: raw[offset + 7],  // Status
-    };
-
-    const deptVal = String(c[1] || '').trim();
-    if (deptVal && !/^\d+$/.test(deptVal)) currentDeptName = deptVal;
-
-    tryExtractMetrics(c, proj);
-
-    const action = String(c[2] || '').trim().replace(/^\*+\s*/, '').trim();
-    if (!action || SKIP_ROW_RE.test(action)) continue;
-
-    const rawStatus = String(c[7] || '').trim();
-    if (/^(completed|targets|n\/a)$/i.test(rawStatus) && rawStatus) continue;
-
-    const status      = normalizeStatus(rawStatus);
-    const due         = fmtDue(c[3]);
-    const result      = String(c[4] || '').trim();
-    const explanation = String(c[5] || '').trim();
-
-    taskDatabase.push({ project: proj, dept: currentDeptName, result, action, explanation, due, status });
-  }
-
-  applyStoredStatuses();
-  updateLandingSubtitle(proj);
 }
 
 function finalizeUpload(fname) {
@@ -1644,9 +1331,6 @@ function finalizeUpload(fname) {
   alert(`✓ "${fname}" loaded successfully. Previous data archived.`);
 }
 
-// ═══════════════════════════════════════════════
-// CSV PARSER
-// ═══════════════════════════════════════════════
 function parseCSV(text) {
   const rows = []; let row = [], cur = '', inQ = false;
   for (let i = 0; i < text.length; i++) {
@@ -1662,15 +1346,59 @@ function parseCSV(text) {
   return rows;
 }
 
-// ═══════════════════════════════════════════════
-// TRANSCRIPT IMPORT
-// ═══════════════════════════════════════════════
+function processData(rows, defaultProj = null) {
+  const cxTargets = [], aTargets = [];
+  for (let i = 1; i < rows.length; i++) {
+    const c = rows[i]; if (!c || c.length < 3) continue;
+    const s = c.join(' ').toLowerCase();
+    const proj = defaultProj || (s.includes('crossings') ? 'Crossings' : 'Annexe');
+    const k = String(c[0]).toLowerCase();
+    
+    if (k.includes('inflow')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', c[1]||c[2]||c[3]); continue; }
+    if (k.includes('units')||k.includes('sold')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', c[1]||c[2]||c[3]); continue; }
+    if (k.includes('sales')) { setMetric(proj==='Crossings'?'val-cx-sales':'val-annex-sales', c[1]||c[2]||c[3]); continue; }
+    if (k.includes('budget')) { setMetric('val-cx-budget', c[1]||c[2]||c[3]); continue; }
+    if (k.includes('offer')) { setMetric(proj==='Crossings'?'val-cx-offers':'val-annex-offers', c[1]||c[2]||c[3]); continue; }
+    if (k.includes('balance')) { setMetric(proj==='Crossings'?'val-cx-balance':'val-annex-balance', c[1]||c[2]||c[3]); continue; }
+    
+    if (k === 'target' || s.includes('monthly target')) {
+      const cls = (String(c[4])||'').toLowerCase().includes('carry') ? 'carryover' : 'new-target';
+      const html = `<div class="target-item ${cls}"><span class="t-name">${c[2]}</span><span class="t-note">${c[3]}</span></div>`;
+      (proj === 'Crossings' ? cxTargets : aTargets).push(html); continue;
+    }
+    
+    taskDatabase.push({
+      project: proj,
+      dept: c[1] || 'General',
+      action: c[2] || 'No action',
+      due: c[3] || 'TBD',
+      result: c[4] || c[6] || '',
+      explanation: c[5] || '',
+      status: (c[7] || 'ontrack').toLowerCase().replace(/[^a-z]/g, '')
+    });
+  }
+  
+  if (cxTargets.length) {
+    const el = document.getElementById('targets-crossings');
+    if(el) el.innerHTML += cxTargets.join('');
+  }
+  if (aTargets.length) {
+    const el = document.getElementById('targets-annexe');
+    if(el) el.innerHTML += aTargets.join('');
+  }
+  applyStoredStatuses();
+}
+
+function setMetric(id, val) {
+  const el = document.getElementById(id);
+  if (el && val) el.textContent = val;
+}
+
 function parseTranscript(text) {
-  const lines      = text.split('\n').map(l => l.trim()).filter(Boolean);
-  const deptNames  = ['Design','Costing','IPD','IPD/PMO','AMC','Operations','Fincon','Sales','MCC','Legal','Telemarketing','Landscape','General'];
-  const newTasks   = [];
-  let currentDeptName = 'General';
-  let currentProj  = currentProject || 'Crossings';
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const deptNames = ['Design','Costing','IPD','IPD/PMO','AMC','Operations','Fincon','Sales','MCC','Legal','Telemarketing','Landscape','General'];
+  const newTasks = [];
+  let currentDeptName = 'General', currentProj = currentProject || 'Crossings';
 
   lines.forEach(line => {
     if (/crossings/i.test(line)) currentProj = 'Crossings';
@@ -1679,24 +1407,22 @@ function parseTranscript(text) {
     if (deptMatch) { currentDeptName = deptMatch; return; }
     const isAction = /^[\*\-\•]|\d+[\.\)]/.test(line);
     if (isAction && line.length > 10) {
-      const action    = line.replace(/^[\*\-\•\d\.\)]+\s*/, '').trim();
+      const action = line.replace(/^[\*\-\•\d\.\)]+\s*/, '').trim();
       const dateMatch = action.match(/by\s+([A-Za-z]+\s+\d+)|(\d+\s+[A-Za-z]+)/i);
-      const due       = dateMatch ? dateMatch[0].replace(/by\s+/i,'') : 'TBD';
+      const due = dateMatch ? dateMatch[0].replace(/by\s+/i,'') : 'TBD';
       newTasks.push({ project: currentProj, dept: currentDeptName, result: 'Transcript Import', action, explanation: 'Imported from meeting transcript.', due, status: 'ontrack' });
     }
   });
 
-  if (newTasks.length === 0) { alert('No structured tasks found in transcript.'); return; }
+  if (newTasks.length === 0) {
+    alert('No structured tasks found in transcript.');
+    return;
+  }
   const affectedDepts = [...new Set(newTasks.map(t => t.project + '_' + t.dept))];
   taskDatabase = taskDatabase.filter(t => !affectedDepts.includes(t.project + '_' + t.dept));
   taskDatabase = taskDatabase.concat(newTasks);
   applyStoredStatuses();
   alert(`✓ ${newTasks.length} tasks imported from transcript across ${affectedDepts.length} department(s).`);
-}
-
-function setMetric(id, val) {
-  const el = document.getElementById(id);
-  if (el && val) el.textContent = val;
 }
 
 // ═══════════════════════════════════════════════
@@ -1707,11 +1433,11 @@ const lastPointPlugin = {
   afterDatasetsDraw(chart) {
     const { ctx, data } = chart;
     data.datasets.forEach((ds, i) => {
-      const meta   = chart.getDatasetMeta(i);
+      const meta = chart.getDatasetMeta(i);
       if (meta.hidden) return;
       const lastIdx = ds.data.length - 1;
       if (lastIdx < 0) return;
-      const pt  = meta.data[lastIdx];
+      const pt = meta.data[lastIdx];
       const val = ds.data[lastIdx];
       if (val == null) return;
       let label;
@@ -1721,7 +1447,7 @@ const lastPointPlugin = {
         label = '₦' + (val * 100).toFixed(0) + 'M';
       }
       ctx.save();
-      ctx.font      = 'bold 10px DM Mono, monospace';
+      ctx.font = 'bold 10px DM Mono, monospace';
       ctx.fillStyle = ds.borderColor;
       ctx.textAlign = 'right';
       ctx.fillText(label, pt.x - 4, pt.y - 10);
@@ -1731,18 +1457,19 @@ const lastPointPlugin = {
 };
 Chart.register(lastPointPlugin);
 
-const labels      = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7','Apr 13','Apr 16','Apr 20'];
+const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7','Apr 13','Apr 16','Apr 20'];
 const annexInflow = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27,6.27,6.27,6.27];
-const annexBalance= [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,82.78,150,149.1,61.9];
-const cxInflow    = [1.05,1.179,1.3,1.3,1.3,1.415,1.415,1.415,1.415,1.415,2.07,1.68,1.72,1.72,1.72,1.72,1.72,1.72];
+const annexBalance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,82.78,150,149.1,61.9];
+const cxInflow = [1.05,1.179,1.3,1.3,1.3,1.415,1.415,1.415,1.415,1.415,2.07,1.68,1.72,1.72,1.72,1.72,1.72,1.72];
 
-const gridC  = 'rgba(0,0,0,0.06)';
-const textC  = '#999';
+const gridC = 'rgba(0,0,0,0.06)', textC = '#999';
 const baseOpts = {
   responsive: true, maintainAspectRatio: false,
   plugins: {
-    legend: { display: true, position: 'bottom',
-      labels: { font: { size: 11, weight: '700', family: 'DM Sans' }, color: textC, boxWidth: 14, padding: 12 } }
+    legend: {
+      display: true, position: 'bottom',
+      labels: { font: { size: 11, weight: '700', family: 'DM Sans' }, color: textC, boxWidth: 14, padding: 12 }
+    }
   },
   scales: {
     x: { ticks: { color: textC, font: { size: 10, weight: '600' }, maxRotation: 45, autoSkip: true, maxTicksLimit: 6 }, grid: { display: false } },
@@ -1756,7 +1483,7 @@ new Chart(document.getElementById('c1'), {
     labels,
     datasets: [
       { label: 'Inflow (₦B)', data: annexInflow, borderColor: '#616161', backgroundColor: 'rgba(97,97,97,0.08)', borderWidth: 2.5, pointRadius: 2.5, pointBackgroundColor: '#616161', fill: true, tension: 0.4, yAxisID: 'y' },
-      { label: 'Balance (₦100M)', data: annexBalance.map(v => +(v/100).toFixed(2)), borderColor: '#1565c0', backgroundColor: 'rgba(21,101,192,0.05)', borderWidth: 2, pointRadius: 2.5, pointBackgroundColor: '#1565c0', fill: false, tension: 0.4, borderDash: [4,3], yAxisID: 'y1' }
+      { label: 'Balance (₦100M)', data: annexBalance.map(v => +(v/100).toFixed(2)), borderColor: '#1565c0', backgroundColor: 'rgba(21,101,192,0.05)', borderWidth: 2, pointRadius: 2.5, pointBackgroundColor: '#1565c0', fill: false, tension: 0.4, borderDash: [4, 3], yAxisID: 'y1' }
     ]
   },
   options: { ...baseOpts, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, position: 'left' }, y1: { ...baseOpts.scales.y, position: 'right', grid: { display: false } } } }
@@ -1780,13 +1507,13 @@ window.onload = function () {
   applyStoredStatuses();
   updateSidebarCounts();
   applyPriorityColors();
-
-  // Attempt live sync — gracefully falls back to seed data if sheets aren't public yet
-  syncAllSheets();
-
-  // Auto-refresh
-  if (AUTO_SYNC_MINUTES > 0) {
-    setInterval(syncAllSheets, AUTO_SYNC_MINUTES * 60 * 1000);
+  
+  // Trigger initial Google Sheet fetch on load
+  syncWithGoogleSheet();
+  
+  // Auto refresh
+  if ((SHEET_CROSSINGS && SHEET_CROSSINGS !== '') || (SHEET_ANNEXE && SHEET_ANNEXE !== '')) {
+    setInterval(syncWithGoogleSheet, AUTO_SYNC_MINUTES * 60 * 1000);
   }
 };
 </script>
