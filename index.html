@@ -63,13 +63,6 @@
   --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
 }
 
-/* ── CRITICAL MOBILE VIEWPORT FIX ── */
-html, body {
-  overflow-x: hidden;
-  width: 100%;
-  max-width: 100vw;
-}
-
 body {
   font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
@@ -77,7 +70,7 @@ body {
   font-size: 14px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  /* Removed overscroll-behavior: none; to restore trackpad scrolling */
+  overflow-x: hidden; /* Replaced aggressive html/body combo to fix trackpad scrolling */
 }
 
 /* ── NAV ── */
@@ -294,8 +287,8 @@ nav {
 .target-item.new-target .t-name { color: #2e7d32; }
 .target-item.carryover { border-left-color: #f44336; }
 .target-item.carryover .t-name { color: #c62828; }
-.t-name { font-weight: 800; min-width: 0; flex-basis: 35%; flex-shrink: 0; font-size: 11px; word-wrap: break-word;}
-.t-note { color: var(--text-secondary); line-height: 1.5; min-width: 0; word-wrap: break-word;}
+.t-name { font-weight: 800; min-width: 0; flex-basis: 35%; flex-shrink: 0; font-size: 11px; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; }
+.t-note { color: var(--text-secondary); line-height: 1.5; min-width: 0; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; }
 
 /* Alert Strip */
 .alert-strip {
@@ -342,6 +335,8 @@ nav {
   min-height: 500px; 
   min-width: 0;
   width: 100%;
+  overflow-y: auto; /* CRITICAL FIX: Trackpad Scroll Lock resolved natively */
+  overflow-x: hidden;
 }
 .dept-panel { display: none; animation: fadeIn 0.25s ease; }
 .dept-panel.active { display: block; }
@@ -394,6 +389,47 @@ nav {
 .filter-tab[data-filter="achieved"].active { background: var(--status-blue); border-color: var(--status-blue); }
 
 .next-steps-list { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+
+/* ── UI REFACTOR: MONTHLY GROUPING ACCORDIONS ── */
+.month-accordion {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  margin-bottom: 6px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.month-header {
+  padding: 14px 16px;
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 800;
+  font-size: 13px;
+  user-select: none;
+  transition: background 0.2s;
+  color: var(--text-primary);
+}
+.month-header:hover { background: #ebebeb; }
+.month-toggle-icon { font-size: 10px; transition: transform 0.2s; }
+.month-accordion.expanded .month-toggle-icon { transform: rotate(180deg); }
+.month-tasks-wrapper {
+  display: none;
+  padding: 16px;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+}
+.month-accordion.expanded .month-tasks-wrapper { display: flex; }
+
+.month-tasks-wrapper .step-card {
+  box-shadow: none;
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+}
+
 .step-card {
   background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 16px; box-shadow: var(--shadow); cursor: pointer;
@@ -413,7 +449,7 @@ nav {
 .step-context {
   font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
   color: var(--text-muted); margin-bottom: 5px;
-  word-wrap: break-word; overflow-wrap: break-word;
+  word-break: break-word; word-wrap: break-word; overflow-wrap: break-word;
 }
 .s-ontrack .step-context { color: var(--status-green); }
 .s-delayed .step-context { color: var(--status-red); }
@@ -421,8 +457,11 @@ nav {
 .s-achieved .step-context { color: var(--status-blue); }
 
 .step-card-top { 
-  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; 
+  display: flex; 
+  flex-direction: row; /* CRITICAL FIX: explicitly declare row to stop squishing */
+  align-items: flex-start; justify-content: space-between; gap: 12px; 
   min-width: 0; 
+  width: 100%;
 }
 
 .step-text { 
@@ -433,6 +472,7 @@ nav {
   flex: 1; 
   min-width: 0; 
   white-space: pre-wrap; 
+  word-break: break-word; /* CRITICAL FIX: Stops text running vertically */
   word-wrap: break-word; 
   overflow-wrap: break-word; 
 }
@@ -460,6 +500,7 @@ nav {
   border-top: 1px dashed var(--border-md); font-size: 13px;
   color: var(--text-secondary); line-height: 1.65;
   white-space: pre-wrap; 
+  word-break: break-word;
   word-wrap: break-word;
 }
 .step-card.expanded .step-details-pane { display: block; animation: fadeIn 0.2s ease; }
@@ -534,48 +575,29 @@ nav {
 /* ── RESPONSIVE / MOBILE ── */
 @media (max-width: 768px) {
   :root { --nav-h: 56px; }
-
-  /* Show bottom nav */
   .bottom-nav { display: block; }
   .page.active { padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 8px)); }
-
-  /* Hide desktop tabs */
   #nav-tabs-group { display: none !important; }
   .nav-date { display: none; }
   .sync-btn-text { display: none; }
-
-  /* Nav compact */
   nav { padding: 0 14px; gap: 12px; }
   .nav-brand { font-size: 14px; }
-
-  /* Landing */
   .landing-buttons { flex-direction: column; width: 100%; max-width: 320px; }
   .landing-btn { width: 100%; justify-content: center; }
-
-  /* Dashboard */
   .dash-container { padding: 0 12px 24px; }
   .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .metric-card { padding: 14px; }
   .metric-value { font-size: 18px; }
   .charts-row { grid-template-columns: 1fr; gap: 10px; }
   .chart-wrap { height: 170px; }
-
-  /* Departments */
   .dept-container { padding: 0 12px 24px; }
   .dept-layout { grid-template-columns: 1fr !important; gap: 12px; }
   .dept-sidebar { display: none; }
   .mobile-dept-scroller { display: flex; }
-
-  /* Task cards */
   .step-card { padding: 14px; }
   .step-text { font-size: 13px; }
-
-  /* Alert strip */
   .alert-strip { font-size: 12px; padding: 10px 12px; }
-
-  /* Overdue items */
   .overdue-action { font-size: 11px; }
-  
   .t-name { min-width: 80px; }
 }
 
@@ -928,13 +950,20 @@ function taskId(t) {
   return (t.project + '_' + t.dept + '_' + t.session + '_' + t.action).replace(/\W+/g,'_').substring(0, 60);
 }
 
-// ── NEW: Excel Serial Date Formatter (fixes 42638 bleeding out) ──
+// ── FIX 1: Excel Serial Date Formatter (fixes 42638 bleeding out) ──
 function formatExcelDate(val) {
   if (!val) return 'TBD';
-  if (typeof val === 'number' && val > 20000) {
-    const d = new Date((val - 25569) * 86400 * 1000);
+  
+  if (val instanceof Date) {
+    return val.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+  }
+  
+  const num = Number(val);
+  if (!isNaN(num) && num > 20000 && num < 60000) {
+    const d = new Date((num - 25569) * 86400 * 1000);
     return d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
   }
+  
   return String(val).trim();
 }
 
@@ -984,8 +1013,8 @@ async function syncWithGoogleSheet() {
       
       let allSheets = wb.SheetNames;
       
-      // ── STRICT 2026>>> OR Calendar>> DIVIDER ──
-      let markerIndex = allSheets.findIndex(name => name.includes('2026') && name.includes('>') || name.includes('Calendar>>') || name.includes('>>'));
+      // ── FIX 2: STRICT 2026>> DIVIDER BOUNDARY ──
+      let markerIndex = allSheets.findIndex(name => name.includes('2026>>'));
       let resultSheets = [];
       
       if (markerIndex !== -1) {
@@ -1052,14 +1081,22 @@ async function syncWithGoogleSheet() {
   }
 }
 
-// ── NEW: Robust metric extraction ──
-function extractMetricValue(rowStr, isCurrency) {
-    const match = rowStr.match(/(?:₦|N|n)?\s*([\d.,]+\s*[bmkBMK]?)/i);
-    if (match) {
-        let val = match[0].toUpperCase().replace(/\s+/g, '');
-        if (isCurrency && !val.startsWith('N') && !val.startsWith('₦')) val = '₦' + val;
-        if (!isCurrency) val = val.replace(/[₦N]/g, '');
-        return val;
+// ── FIX 6: Robust dashboard card data mapping ──
+function extractMetricValue(rowArray, isCurrency) {
+    let combined = rowArray.join(' ').toLowerCase();
+    
+    if (isCurrency) {
+        let currencyMatch = combined.match(/(?:₦|n)\s*([\d.,]+\s*[bmk]?)/i);
+        if (currencyMatch) return '₦' + currencyMatch[1].toUpperCase();
+        
+        let fallback = combined.match(/([\d.,]+\s*[bmk])/i);
+        if (fallback) return '₦' + fallback[1].toUpperCase();
+    } else {
+        let numMatch = combined.match(/-\s*(\d+)|:\s*(\d+)|\s+(\d+)\s/);
+        if (numMatch) return numMatch[1] || numMatch[2] || numMatch[3];
+        
+        let simpleNum = combined.match(/(\d+)/);
+        if (simpleNum) return simpleNum[1];
     }
     return '';
 }
@@ -1068,7 +1105,7 @@ function processSheet(rows, proj, sheetName, isLatest) {
   const targets = [];
   let lastDept = 'General';
   
-  // ── NEW: Dynamic Column Mapper (Fixes Crossings mismatch and vertical text blowouts) ──
+  // ── Dynamic Column Mapper (Fixes Crossings mismatch and vertical text blowouts) ──
   let colMap = { dept: 1, action: 2, due: 3, result: 4, explanation: 5, status: 7 };
   
   for(let r=0; r<Math.min(10, rows.length); r++) {
@@ -1092,20 +1129,20 @@ function processSheet(rows, proj, sheetName, isLatest) {
     const c = rows[i]; 
     if (!c || c.length < 3) continue;
     
-    const sStr = String(c.join(' ')).toLowerCase();
-    
     if (isLatest) {
-        if (sStr.includes('inflow') && !sStr.includes('target')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', extractMetricValue(sStr, true)); continue; }
-        if ((sStr.includes('sales-') || sStr.includes('sale:') || sStr.includes('sales:')) && !sStr.includes('value')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', extractMetricValue(sStr, false)); continue; }
-        if (sStr.includes('value of sales') || sStr.includes('tvs')) { setMetric(proj==='Crossings'?'val-cx-sales':'val-annex-sales', extractMetricValue(sStr, true)); continue; }
-        if (sStr.includes('budget')) { setMetric(proj==='Crossings'?'val-cx-budget':'val-annex-budget', extractMetricValue(sStr, true)); continue; }
-        if (sStr.includes('offer letter')) { setMetric(proj==='Crossings'?'val-cx-offers':'val-annex-offers', extractMetricValue(sStr, false)); continue; }
-        if (sStr.includes('balance') || sStr.includes('bal:')) { setMetric(proj==='Crossings'?'val-cx-balance':'val-annex-balance', extractMetricValue(sStr, true)); continue; }
+        let rowStr = c.join(' ').toLowerCase();
         
-        if (String(c[0]).toLowerCase() === 'target' || sStr.includes('monthly target') || (sStr.includes('end of') && sStr.includes('target'))) {
+        if (rowStr.includes('inflow') && !rowStr.includes('target')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', extractMetricValue(c, true)); continue; }
+        if ((rowStr.includes('sales-') || rowStr.includes('sale:') || rowStr.includes('sales:')) && !rowStr.includes('value')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', extractMetricValue(c, false)); continue; }
+        if (rowStr.includes('value of sales') || rowStr.includes('tvs')) { setMetric(proj==='Crossings'?'val-cx-sales':'val-annex-sales', extractMetricValue(c, true)); continue; }
+        if (rowStr.includes('budget spent')) { setMetric(proj==='Crossings'?'val-cx-budget':'val-annex-budget', extractMetricValue(c, true)); continue; }
+        if (rowStr.includes('offer letter')) { setMetric(proj==='Crossings'?'val-cx-offers':'val-annex-offers', extractMetricValue(c, false)); continue; }
+        if (rowStr.includes('balance') || rowStr.includes('bal:')) { setMetric(proj==='Crossings'?'val-cx-balance':'val-annex-balance', extractMetricValue(c, true)); continue; }
+        
+        if (String(c[0]).toLowerCase() === 'target' || rowStr.includes('monthly target') || (rowStr.includes('end of') && rowStr.includes('target'))) {
             const tName = c[2] || c[4] || c[1];
             const tNote = c[3] || c[5] || '';
-            const cls = sStr.includes('carry') ? 'carryover' : 'new-target';
+            const cls = rowStr.includes('carry') ? 'carryover' : 'new-target';
             if (tName && tName.length > 3) {
                 targets.push(`<div class="target-item ${cls}"><span class="t-name">${tName}</span><span class="t-note">${tNote}</span></div>`);
             }
@@ -1268,7 +1305,6 @@ function showDeptMobile(dept) {
   renderDeptContent(currentProject, dept);
 }
 
-// ── NEW: Month Based History Collapsing ──
 function buildHistoryBar() {
   const bar = document.getElementById('history-bar');
   if (!currentProject) return;
@@ -1327,7 +1363,6 @@ function renderCurrentDept() {
     const latest = availableSessions[currentProject] && availableSessions[currentProject][0];
     tasks = taskDatabase.filter(t => t.project === currentProject && t.dept.toLowerCase().includes(currentDept.toLowerCase()) && t.session === latest);
   } else {
-    // ── NEW: Grab the LATEST sheet in the selected month ──
     const latestInMonth = availableSessions[currentProject].find(s => s.toLowerCase().startsWith(viewingSessionDate));
     tasks = taskDatabase.filter(t => t.project === currentProject && t.dept.toLowerCase().includes(currentDept.toLowerCase()) && t.session === latestInMonth);
   }
@@ -1353,37 +1388,65 @@ function renderCurrentDept() {
   }
 
   const isHistory = viewingSessionDate !== 'current';
+  
+  // ── FIX 3: GROUP BY MONTH LOGIC FOR ACCORDION UI ──
+  const groupedTasks = {};
+  filtered.forEach(t => {
+      const mMatch = t.session.match(/^[a-z]{3}/i);
+      const monthName = mMatch ? mMatch[0].charAt(0).toUpperCase() + mMatch[0].slice(1).toLowerCase() : 'Other';
+      if(!groupedTasks[monthName]) groupedTasks[monthName] = [];
+      groupedTasks[monthName].push(t);
+  });
 
-  list.innerHTML = filtered.map(t => {
-    const id = taskId(t);
-    const status = t.status || 'ontrack';
-    const statusLabel = {ontrack:'On Track',delayed:'Delayed',update:'Update',achieved:'Achieved'}[status] || 'On Track';
-    const dueCls = isOverdue(t) ? 'overdue' : '';
+  let finalHTML = '';
+  for(const month in groupedTasks) {
+      let tasksHTML = groupedTasks[month].map(t => {
+          const id = taskId(t);
+          const status = t.status || 'ontrack';
+          const statusLabel = {ontrack:'On Track',delayed:'Delayed',update:'Update',achieved:'Achieved'}[status] || 'On Track';
+          const dueCls = isOverdue(t) ? 'overdue' : '';
+          
+          const actionButtons = !isHistory ? `
+            <div class="status-actions" onclick="event.stopPropagation()">
+              <button class="status-btn btn-achieved" onclick="setTaskStatus('${id}','achieved')">✓ Achieved</button>
+              <button class="status-btn btn-delayed" onclick="setTaskStatus('${id}','delayed')">⚠ Delayed</button>
+              <button class="status-btn btn-update" onclick="setTaskStatus('${id}','update')">▶ Update</button>
+              <button class="status-btn btn-ontrack" onclick="setTaskStatus('${id}','ontrack')">▲ On Track</button>
+            </div>` : '';
 
-    const actionButtons = !isHistory ? `
-      <div class="status-actions" onclick="event.stopPropagation()">
-        <button class="status-btn btn-achieved" onclick="setTaskStatus('${id}','achieved')">✓ Achieved</button>
-        <button class="status-btn btn-delayed" onclick="setTaskStatus('${id}','delayed')">⚠ Delayed</button>
-        <button class="status-btn btn-update" onclick="setTaskStatus('${id}','update')">▶ Update</button>
-        <button class="status-btn btn-ontrack" onclick="setTaskStatus('${id}','ontrack')">▲ On Track</button>
-      </div>` : '';
+          return `<div class="step-card s-${status}" onclick="this.classList.toggle('expanded')" id="card-${id}">
+            ${t.resultToAchieve ? `<div class="step-context">${t.resultToAchieve}</div>` : ''}
+            <div class="step-card-top">
+              <div class="step-text">${t.action}</div>
+              <div class="step-meta">
+                <span class="step-date ${dueCls}">Due: ${t.due}</span>
+                <span class="status-badge sb-${status}">${statusLabel}</span>
+              </div>
+            </div>
+            <div class="step-details-pane" onclick="event.stopPropagation()">
+              <div class="pane-title">Details</div>
+              <div style="margin-bottom:8px"><strong>Explanation:</strong> ${t.explanation || 'No further explanation provided in sheet.'}</div>
+              ${actionButtons}
+            </div>
+          </div>`;
+      }).join('');
 
-    return `<div class="step-card s-${status}" onclick="this.classList.toggle('expanded')" id="card-${id}">
-      ${t.resultToAchieve ? `<div class="step-context">${t.resultToAchieve}</div>` : ''}
-      <div class="step-card-top">
-        <div class="step-text">${t.action}</div>
-        <div class="step-meta">
-          <span class="step-date ${dueCls}">Due: ${t.due}</span>
-          <span class="status-badge sb-${status}">${statusLabel}</span>
-        </div>
-      </div>
-      <div class="step-details-pane" onclick="event.stopPropagation()">
-        <div class="pane-title">Details</div>
-        <div style="margin-bottom:8px"><strong>Explanation:</strong> ${t.explanation || 'No further explanation provided in sheet.'}</div>
-        ${actionButtons}
-      </div>
-    </div>`;
-  }).join('');
+      finalHTML += `
+      <div class="month-accordion">
+          <div class="month-header" onclick="this.parentElement.classList.toggle('expanded')">
+              <div style="display:flex; align-items:center; gap:8px;">
+                  <span>${month} Tasks</span>
+                  <span class="nav-badge" style="background:var(--border-md); color:var(--text-primary);">${groupedTasks[month].length}</span>
+              </div>
+              <span class="month-toggle-icon">▼</span>
+          </div>
+          <div class="month-tasks-wrapper">
+              ${tasksHTML}
+          </div>
+      </div>`;
+  }
+
+  list.innerHTML = finalHTML;
 }
 
 function setTaskStatus(id, status) {
