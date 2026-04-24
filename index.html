@@ -546,7 +546,15 @@ nav {
 <body>
 
 <nav>
-  <div class="nav-brand" onclick="showLanding()" title="Return to selection">Projects <span>Tracker</span></div>
+  <div class="nav-brand" onclick="showLanding()" title="Return to selection">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7"></rect>
+      <rect x="14" y="3" width="7" height="7"></rect>
+      <rect x="14" y="14" width="7" height="7"></rect>
+      <rect x="3" y="14" width="7" height="7"></rect>
+    </svg>
+    Projects <span>Tracker</span>
+  </div>
   <div class="nav-tabs" id="nav-tabs-group" style="display:none;">
     <button class="nav-tab active" onclick="showPage('dashboard',this)">Dashboard</button>
     <button class="nav-tab" onclick="showPage('departments',this)">Departments</button>
@@ -1348,12 +1356,19 @@ function parseCSV(text) {
 
 function processData(rows, defaultProj = null) {
   const cxTargets = [], aTargets = [];
+  
+  // Sheet logic maps columns correctly 
+  // 0: Number, 1: Department, 2: Next steps/Action, 3: Due dates, 
+  // 4: Results to achieve, 5: Explanations, 6: Result, 7: Status
   for (let i = 1; i < rows.length; i++) {
-    const c = rows[i]; if (!c || c.length < 3) continue;
+    const c = rows[i]; 
+    if (!c || c.length < 3) continue;
+    
     const s = c.join(' ').toLowerCase();
     const proj = defaultProj || (s.includes('crossings') ? 'Crossings' : 'Annexe');
     const k = String(c[0]).toLowerCase();
     
+    // Parse Dashboard Metrics 
     if (k.includes('inflow')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', c[1]||c[2]||c[3]); continue; }
     if (k.includes('units')||k.includes('sold')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', c[1]||c[2]||c[3]); continue; }
     if (k.includes('sales')) { setMetric(proj==='Crossings'?'val-cx-sales':'val-annex-sales', c[1]||c[2]||c[3]); continue; }
@@ -1367,14 +1382,21 @@ function processData(rows, defaultProj = null) {
       (proj === 'Crossings' ? cxTargets : aTargets).push(html); continue;
     }
     
+    // Determine standardized status from column 7
+    let statusRaw = (c[7] || 'ontrack').toLowerCase().replace(/[^a-z]/g, '');
+    if(statusRaw.includes('delay') || statusRaw.includes('offtrack')) statusRaw = 'delayed';
+    else if(statusRaw.includes('achieve') || statusRaw.includes('done') || statusRaw.includes('completed')) statusRaw = 'achieved';
+    else if(statusRaw.includes('update')) statusRaw = 'update';
+    else statusRaw = 'ontrack';
+
     taskDatabase.push({
       project: proj,
       dept: c[1] || 'General',
       action: c[2] || 'No action',
       due: c[3] || 'TBD',
-      result: c[4] || c[6] || '',
+      result: c[6] || c[4] || '', // Using column 7 (index 6) for Result, fallback to column 5 (index 4)
       explanation: c[5] || '',
-      status: (c[7] || 'ontrack').toLowerCase().replace(/[^a-z]/g, '')
+      status: statusRaw
     });
   }
   
