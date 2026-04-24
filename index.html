@@ -65,7 +65,7 @@
 
 /* ── CRITICAL MOBILE VIEWPORT FIX ── */
 html, body {
-  overflow-x: hidden; /* Prevents the entire page from sliding horizontally */
+  overflow-x: hidden;
   width: 100%;
   max-width: 100vw;
 }
@@ -77,7 +77,7 @@ body {
   font-size: 14px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior: none;
+  /* Removed overscroll-behavior: none; to restore trackpad scrolling */
 }
 
 /* ── NAV ── */
@@ -271,7 +271,7 @@ nav {
 }
 .overdue-action { 
   color: var(--text-primary); font-weight: 600; flex: 1; 
-  min-width: 0; /* Changed from fixed px to allow wrapping */
+  min-width: 0;
   word-wrap: break-word;
 }
 .overdue-due { color: var(--status-red); font-size: 10px; font-weight: 700; white-space: nowrap; }
@@ -340,7 +340,7 @@ nav {
 /* Dept Main */
 .dept-main { 
   min-height: 500px; 
-  min-width: 0; /* CRITICAL FIX: Stops nested scrollbars from breaking the grid layout */
+  min-width: 0;
   width: 100%;
 }
 .dept-panel { display: none; animation: fadeIn 0.25s ease; }
@@ -431,8 +431,6 @@ nav {
   line-height: 1.55; 
   font-weight: 700; 
   flex: 1; 
-  
-  /* CRITICAL FIX: Ensures text wraps, bullet points are respected, and container isn't pushed wide */
   min-width: 0; 
   white-space: pre-wrap; 
   word-wrap: break-word; 
@@ -461,7 +459,7 @@ nav {
   display: none; margin-top: 14px; padding-top: 12px;
   border-top: 1px dashed var(--border-md); font-size: 13px;
   color: var(--text-secondary); line-height: 1.65;
-  white-space: pre-wrap; /* Keeps formatting from sheet */
+  white-space: pre-wrap; 
   word-wrap: break-word;
 }
 .step-card.expanded .step-details-pane { display: block; animation: fadeIn 0.2s ease; }
@@ -914,7 +912,7 @@ let taskDatabase = [];
 let availableSessions = { Crossings: [], Annexe: [] };
 
 // ═══════════════════════════════════════════════
-// STORAGE
+// STORAGE & UTILS
 // ═══════════════════════════════════════════════
 const STATUS_KEY = 'lakowe_status_v5';
 
@@ -930,9 +928,16 @@ function taskId(t) {
   return (t.project + '_' + t.dept + '_' + t.session + '_' + t.action).replace(/\W+/g,'_').substring(0, 60);
 }
 
-// ═══════════════════════════════════════════════
-// DATE PARSING & ROUTING 
-// ═══════════════════════════════════════════════
+// ── NEW: Excel Serial Date Formatter (fixes 42638 bleeding out) ──
+function formatExcelDate(val) {
+  if (!val) return 'TBD';
+  if (typeof val === 'number' && val > 20000) {
+    const d = new Date((val - 25569) * 86400 * 1000);
+    return d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+  }
+  return String(val).trim();
+}
+
 const monthMap = {jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12};
 
 function parseDueDate(due) {
@@ -969,19 +974,18 @@ async function syncWithGoogleSheet() {
     
     const results = await Promise.all(fetches);
     
-    // Reset Data completely
     taskDatabase = []; 
     availableSessions = { Crossings: [], Annexe: [] };
     document.getElementById('targets-crossings').innerHTML = '';
     document.getElementById('targets-annexe').innerHTML = '';
     
     results.forEach(res => {
-      const wb = XLSX.read(res.data, {type: 'array'});
+      const wb = XLSX.read(res.data, {type: 'array', cellDates: true});
       
-      // Step 1 & 2: Strict "2026>>>" boundary detection
       let allSheets = wb.SheetNames;
-      let markerIndex = allSheets.findIndex(name => name.includes('2026>>>'));
       
+      // ── STRICT 2026>>> OR Calendar>> DIVIDER ──
+      let markerIndex = allSheets.findIndex(name => name.includes('2026') && name.includes('>') || name.includes('Calendar>>') || name.includes('>>'));
       let resultSheets = [];
       
       if (markerIndex !== -1) {
@@ -991,11 +995,13 @@ async function syncWithGoogleSheet() {
           if (resultSheets.length > 1) {
               let firstMonth = monthMap[resultSheets[0].substring(0,3).toLowerCase()];
               let lastMonth = monthMap[resultSheets[resultSheets.length-1].substring(0,3).toLowerCase()];
+              // Auto-reverse if ordered oldest-to-newest
               if (firstMonth <= lastMonth) {
                   resultSheets.reverse();
               }
           }
       } else {
+          // Absolute fallback if the marker was completely deleted: ensure no 2025 sheets bypass.
           let dateSheets = allSheets.filter(name => /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*\d+/i.test(name.trim()));
           if (dateSheets.length === 0) return;
           
@@ -1022,10 +1028,9 @@ async function syncWithGoogleSheet() {
       
       availableSessions[res.proj] = resultSheets;
       
-      // Step 3: Extract data from every valid 2026 sheet
       resultSheets.forEach((sheetName, index) => {
          const ws = wb.Sheets[sheetName];
-         const rows = XLSX.utils.sheet_to_json(ws, {header: 1});
+         const rows = XLSX.utils.sheet_to_json(ws, {header: 1, raw: true, defval: ''});
          const isLatest = index === 0; 
          processSheet(rows, res.proj, sheetName, isLatest);
       });
@@ -1047,14 +1052,14 @@ async function syncWithGoogleSheet() {
   }
 }
 
-function extractMetricValue(row) {
-    for (let i = 1; i <= 7; i++) {
-        const str = String(row[i] || '').trim();
-        if (/\d/.test(str) && !/target|inflow/i.test(str)) {
-            const match = str.match(/(?:-|:)?\s*(N?[\d.,]+[bmk]?)/i);
-            if (match) return match[1].toUpperCase();
-            return str;
-        }
+// ── NEW: Robust metric extraction ──
+function extractMetricValue(rowStr, isCurrency) {
+    const match = rowStr.match(/(?:₦|N|n)?\s*([\d.,]+\s*[bmkBMK]?)/i);
+    if (match) {
+        let val = match[0].toUpperCase().replace(/\s+/g, '');
+        if (isCurrency && !val.startsWith('N') && !val.startsWith('₦')) val = '₦' + val;
+        if (!isCurrency) val = val.replace(/[₦N]/g, '');
+        return val;
     }
     return '';
 }
@@ -1063,24 +1068,44 @@ function processSheet(rows, proj, sheetName, isLatest) {
   const targets = [];
   let lastDept = 'General';
   
+  // ── NEW: Dynamic Column Mapper (Fixes Crossings mismatch and vertical text blowouts) ──
+  let colMap = { dept: 1, action: 2, due: 3, result: 4, explanation: 5, status: 7 };
+  
+  for(let r=0; r<Math.min(10, rows.length); r++) {
+      if(!rows[r]) continue;
+      let rowStr = rows[r].join(' ').toLowerCase();
+      if ((rowStr.includes('department') || rowStr.includes('dept')) && (rowStr.includes('step') || rowStr.includes('action') || rowStr.includes('task'))) {
+          for(let c=0; c<rows[r].length; c++) {
+              let h = String(rows[r][c]).toLowerCase();
+              if(h.includes('department') || h.includes('dept')) colMap.dept = c;
+              if(h.includes('step') || h.includes('action') || h.includes('task')) colMap.action = c;
+              if(h.includes('timeline') || h.includes('due') || h.includes('target')) colMap.due = c;
+              if(h.includes('result')) colMap.result = c;
+              if(h.includes('explanation') || h.includes('note')) colMap.explanation = c;
+              if(h.includes('status')) colMap.status = c;
+          }
+          break;
+      }
+  }
+
   for (let i = 0; i < rows.length; i++) {
     const c = rows[i]; 
     if (!c || c.length < 3) continue;
     
-    const s = String(c.join(' ')).toLowerCase();
+    const sStr = String(c.join(' ')).toLowerCase();
     
     if (isLatest) {
-        if (s.includes('inflow') && !s.includes('target')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', extractMetricValue(c)); continue; }
-        if ((s.includes('sales-') || s.includes('sale:') || s.includes('sales:')) && !s.includes('value')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', extractMetricValue(c)); continue; }
-        if (s.includes('value of sales') || s.includes('tvs')) { setMetric(proj==='Crossings'?'val-cx-sales':'val-annex-sales', extractMetricValue(c)); continue; }
-        if (s.includes('budget')) { setMetric(proj==='Crossings'?'val-cx-budget':'val-annex-budget', extractMetricValue(c)); continue; }
-        if (s.includes('offer letter')) { setMetric(proj==='Crossings'?'val-cx-offers':'val-annex-offers', extractMetricValue(c)); continue; }
-        if (s.includes('balance') || s.includes('bal:')) { setMetric(proj==='Crossings'?'val-cx-balance':'val-annex-balance', extractMetricValue(c)); continue; }
+        if (sStr.includes('inflow') && !sStr.includes('target')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', extractMetricValue(sStr, true)); continue; }
+        if ((sStr.includes('sales-') || sStr.includes('sale:') || sStr.includes('sales:')) && !sStr.includes('value')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', extractMetricValue(sStr, false)); continue; }
+        if (sStr.includes('value of sales') || sStr.includes('tvs')) { setMetric(proj==='Crossings'?'val-cx-sales':'val-annex-sales', extractMetricValue(sStr, true)); continue; }
+        if (sStr.includes('budget')) { setMetric(proj==='Crossings'?'val-cx-budget':'val-annex-budget', extractMetricValue(sStr, true)); continue; }
+        if (sStr.includes('offer letter')) { setMetric(proj==='Crossings'?'val-cx-offers':'val-annex-offers', extractMetricValue(sStr, false)); continue; }
+        if (sStr.includes('balance') || sStr.includes('bal:')) { setMetric(proj==='Crossings'?'val-cx-balance':'val-annex-balance', extractMetricValue(sStr, true)); continue; }
         
-        if (String(c[0]).toLowerCase() === 'target' || s.includes('monthly target') || (s.includes('end of') && s.includes('target'))) {
+        if (String(c[0]).toLowerCase() === 'target' || sStr.includes('monthly target') || (sStr.includes('end of') && sStr.includes('target'))) {
             const tName = c[2] || c[4] || c[1];
             const tNote = c[3] || c[5] || '';
-            const cls = s.includes('carry') ? 'carryover' : 'new-target';
+            const cls = sStr.includes('carry') ? 'carryover' : 'new-target';
             if (tName && tName.length > 3) {
                 targets.push(`<div class="target-item ${cls}"><span class="t-name">${tName}</span><span class="t-note">${tNote}</span></div>`);
             }
@@ -1088,16 +1113,15 @@ function processSheet(rows, proj, sheetName, isLatest) {
         }
     }
     
-    let rawDept = String(c[1] || '').trim();
+    let rawDept = String(c[colMap.dept] || '').trim();
     if (rawDept && !/department|s\/n|next step/i.test(rawDept)) {
         lastDept = rawDept; 
     }
     
-    let action = String(c[2] || '').trim();
-    
+    let action = String(c[colMap.action] || '').trim();
     if (!action || action.length < 4 || /department|next step|action point|sn|s\/n/i.test(action)) continue;
     
-    let rawStat = String(c[7] || 'ontrack').toLowerCase();
+    let rawStat = String(c[colMap.status] || 'ontrack').toLowerCase();
     let statusRaw = rawStat.replace(/[^a-z]/g, '');
     if(statusRaw.includes('delay') || statusRaw.includes('offtrack')) statusRaw = 'delayed';
     else if(statusRaw.includes('achieve') || statusRaw.includes('done') || statusRaw.includes('complete')) statusRaw = 'achieved';
@@ -1109,10 +1133,9 @@ function processSheet(rows, proj, sheetName, isLatest) {
       session: sheetName,
       dept: lastDept,
       action: action, 
-      due: String(c[3] || 'TBD').trim(),
-      resultToAchieve: String(c[4] || '').trim(),
-      explanation: String(c[5] || '').trim(),
-      result: String(c[6] || '').trim(),
+      due: formatExcelDate(c[colMap.due]), 
+      resultToAchieve: String(c[colMap.result] || '').trim(),
+      explanation: String(c[colMap.explanation] || '').trim(),
       status: statusRaw
     });
   }
@@ -1245,27 +1268,30 @@ function showDeptMobile(dept) {
   renderDeptContent(currentProject, dept);
 }
 
+// ── NEW: Month Based History Collapsing ──
 function buildHistoryBar() {
   const bar = document.getElementById('history-bar');
   if (!currentProject) return;
   
   const sessions = availableSessions[currentProject] || [];
+  const uniqueMonths = [...new Set(sessions.map(s => s.substring(0,3).toLowerCase()))];
   
   let html = '<span class="history-label">History:</span>';
   html += `<button class="history-pill ${viewingSessionDate==='current'?'active':''}" onclick="switchSession('current')">Current</button>`;
   
-  sessions.forEach(s => {
-    const isActive = viewingSessionDate === s ? 'active' : '';
-    html += `<button class="history-pill ${isActive}" onclick="switchSession('${s}')">${s}</button>`;
+  uniqueMonths.forEach(m => {
+    const displayMonth = m.charAt(0).toUpperCase() + m.slice(1);
+    const isActive = viewingSessionDate === m ? 'active' : '';
+    html += `<button class="history-pill ${isActive}" onclick="switchSession('${m}')">${displayMonth}</button>`;
   });
   bar.innerHTML = html;
 }
 
-function switchSession(dateStr) {
-  viewingSessionDate = dateStr;
+function switchSession(val) {
+  viewingSessionDate = val;
   buildHistoryBar();
   const dateLabel = document.getElementById('viewing-date-label');
-  dateLabel.textContent = dateStr === 'current' ? 'Current' : dateStr;
+  dateLabel.textContent = val === 'current' ? 'Current' : (val.charAt(0).toUpperCase() + val.slice(1) + ' Rollup');
   renderCurrentDept();
 }
 
@@ -1288,7 +1314,7 @@ function renderDeptContent(proj, dept) {
   badge.className = 'nav-badge ' + (proj==='Crossings' ? 'badge-cx' : 'badge-annex');
 
   buildHistoryBar();
-  document.getElementById('viewing-date-label').textContent = viewingSessionDate === 'current' ? 'Current' : viewingSessionDate;
+  document.getElementById('viewing-date-label').textContent = viewingSessionDate === 'current' ? 'Current' : (viewingSessionDate.charAt(0).toUpperCase() + viewingSessionDate.slice(1) + ' Rollup');
   renderCurrentDept();
 }
 
@@ -1301,7 +1327,9 @@ function renderCurrentDept() {
     const latest = availableSessions[currentProject] && availableSessions[currentProject][0];
     tasks = taskDatabase.filter(t => t.project === currentProject && t.dept.toLowerCase().includes(currentDept.toLowerCase()) && t.session === latest);
   } else {
-    tasks = taskDatabase.filter(t => t.project === currentProject && t.dept.toLowerCase().includes(currentDept.toLowerCase()) && t.session === viewingSessionDate);
+    // ── NEW: Grab the LATEST sheet in the selected month ──
+    const latestInMonth = availableSessions[currentProject].find(s => s.toLowerCase().startsWith(viewingSessionDate));
+    tasks = taskDatabase.filter(t => t.project === currentProject && t.dept.toLowerCase().includes(currentDept.toLowerCase()) && t.session === latestInMonth);
   }
 
   const overrides = getStatusOverrides();
@@ -1352,7 +1380,6 @@ function renderCurrentDept() {
       <div class="step-details-pane" onclick="event.stopPropagation()">
         <div class="pane-title">Details</div>
         <div style="margin-bottom:8px"><strong>Explanation:</strong> ${t.explanation || 'No further explanation provided in sheet.'}</div>
-        ${t.result ? `<div style="margin-bottom:8px"><strong>Result:</strong> ${t.result}</div>` : ''}
         ${actionButtons}
       </div>
     </div>`;
