@@ -277,7 +277,7 @@ nav {
 .target-legend { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: flex; gap: 8px; }
 .legend-red { color: #d32f2f; }
 .legend-green { color: #2e7d32; }
-.target-list { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+.target-list { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; max-height: 190px; overflow-y: auto; padding-right: 5px; }
 .target-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; border-left: 3px solid transparent; padding-left: 10px; }
 .target-item.new-target { border-left-color: #4caf50; }
 .target-item.new-target .t-name { color: #2e7d32; }
@@ -562,7 +562,7 @@ nav {
     <button class="nav-tab" onclick="showPage('departments',this)">Departments</button>
   </div>
   <div class="nav-right">
-    <span class="nav-date" id="last-updated-text">Last updated: Apr 20, 2026</span>
+    <span class="nav-date" id="last-updated-text">Last updated: Waiting for Sync</span>
     <span class="nav-badge badge-cx nav-project-btn" id="btn-nav-cx" onclick="selectProject('Crossings')">Crossings</span>
     <span class="nav-badge badge-annex nav-project-btn" id="btn-nav-annex" onclick="selectProject('Annexe')">Annexe</span>
     
@@ -858,26 +858,21 @@ let currentDept = null;
 let currentFilter = 'all';
 let viewingSessionDate = 'current'; 
 
-// CRITICAL: You must use the "Publish to Web" CSV links here. Standard /edit links will be blocked by CORS.
-// 1. In Google Sheets, go to File > Share > Publish to web.
-// 2. Select the correct Sheet tab and choose "Comma-separated values (.csv)".
-// 3. Paste those links below.
-const SHEET_CROSSINGS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTEgKzQ6k4R4b9aD_NlP5YVzE4h9fJ5zK-b8M-fW8m_Q9z-P7L5-V9f_J5zK-b8M-fW8m_Q9z-P7L5/pub?gid=0&single=true&output=csv'; // PLACEHOLDER: Update with your Published CSV link for Crossings
-const SHEET_ANNEXE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTz_m_Q9z-P7L5-V9f_J5zK-b8M-fW8m_Q9z-P7L5-V9f_J5zK-b8M-fW8m_Q9z-P7L5-V9f_J5/pub?gid=0&single=true&output=csv'; // PLACEHOLDER: Update with your Published CSV link for Annexe
+// CRITICAL FIX: To extract all sheets seamlessly without manual exporting, we download the entire published workbook as an Excel binary (.xlsx)
+// The parsing logic will then dynamically open every sheet within the file.
+const SHEET_CROSSINGS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_BotFNOFLBaUKX-lzjWZkfe2DhCWL28EmOGGBkVBnkcKxoM2l02lBjsqdhnnweUKngc1DWpO82OPL/pub?output=xlsx'; 
+const SHEET_ANNEXE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCwJvm2NJYEAAcGRCvIEz_OnT4IqrIC8MtxXnbOAwaPuOie0nJMnPts7NQ7B4_gMzkp0cAeg8BO7Jk/pub?output=xlsx'; 
+
 const AUTO_SYNC_MINUTES = 5;
+
+let taskDatabase = [];
+let availableSessions = { Crossings: [], Annexe: [] };
 
 // ═══════════════════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════════════════
-const SESSION_KEY = 'lakowe_sessions_v3';
-const STATUS_KEY = 'lakowe_status_v3';
+const STATUS_KEY = 'lakowe_status_v4';
 
-function getSessions() {
-  try { return JSON.parse(localStorage.getItem(SESSION_KEY)) || []; } catch { return []; }
-}
-function saveSessions(s) {
-  try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch(e) { console.warn('Storage full'); }
-}
 function getStatusOverrides() {
   try { return JSON.parse(localStorage.getItem(STATUS_KEY)) || {}; } catch { return {}; }
 }
@@ -887,144 +882,183 @@ function saveStatus(taskId, status) {
   localStorage.setItem(STATUS_KEY, JSON.stringify(o));
 }
 function taskId(t) {
-  return (t.project + '_' + t.dept + '_' + t.action).replace(/\W+/g,'_').substring(0, 60);
-}
-
-function archiveSession(label) {
-  const sessions = getSessions();
-  const today = label || new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'});
-  const snap = {
-    date: today,
-    ts: Date.now(),
-    tasks: JSON.parse(JSON.stringify(taskDatabase)),
-    metrics: {
-      'val-cx-inflow': document.getElementById('val-cx-inflow').textContent,
-      'val-cx-units': document.getElementById('val-cx-units').textContent,
-      'val-cx-offers': document.getElementById('val-cx-offers').textContent,
-      'val-cx-sales': document.getElementById('val-cx-sales').textContent,
-      'val-cx-budget': document.getElementById('val-cx-budget').textContent,
-      'val-cx-balance': document.getElementById('val-cx-balance').textContent,
-      'val-annex-inflow': document.getElementById('val-annex-inflow').textContent,
-      'val-annex-units': document.getElementById('val-annex-units').textContent,
-      'val-annex-offers': document.getElementById('val-annex-offers').textContent,
-      'val-annex-sales': document.getElementById('val-annex-sales').textContent,
-      'val-annex-balance': document.getElementById('val-annex-balance').textContent,
-    }
-  };
-  const idx = sessions.findIndex(s => s.date === today);
-  if (idx >= 0) sessions[idx] = snap; else sessions.unshift(snap);
-  saveSessions(sessions.slice(0, 30));
+  return (t.project + '_' + t.dept + '_' + t.session + '_' + t.action).replace(/\W+/g,'_').substring(0, 60);
 }
 
 // ═══════════════════════════════════════════════
-// GOOGLE SHEETS DYNAMIC FETCH
+// DATE PARSING & ROUTING 
 // ═══════════════════════════════════════════════
-async function syncWithGoogleSheet() {
-  try {
-    // UI Indicator
-    document.querySelectorAll('.sync-btn').forEach(btn => btn.classList.add('syncing'));
+const monthMap = {jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12};
 
-    const fetches = [];
-    if (SHEET_CROSSINGS && SHEET_CROSSINGS.includes('pub?')) {
-        fetches.push(fetch(SHEET_CROSSINGS + '&t=' + Date.now()).then(r => r.text()).then(t => ({text: t, proj: 'Crossings'})));
-    }
-    if (SHEET_ANNEXE && SHEET_ANNEXE.includes('pub?')) {
-        fetches.push(fetch(SHEET_ANNEXE + '&t=' + Date.now()).then(r => r.text()).then(t => ({text: t, proj: 'Annexe'})));
-    }
-    
-    if (fetches.length === 0) {
-        alert("Action Required: Please update the SHEET_CROSSINGS and SHEET_ANNEXE links in the code to your 'Published to the Web' CSV links.");
-        return;
-    }
-    
-    const results = await Promise.all(fetches);
-    let newTasks = []; 
-    let htmlBlocked = false;
-
-    // Reset Dashboard Targets for fresh population
-    document.getElementById('targets-crossings').innerHTML = '';
-    document.getElementById('targets-annexe').innerHTML = '';
-    
-    results.forEach(res => {
-      // PRE-FLIGHT CHECK: Did Google return an HTML login page instead of a CSV?
-      if (res.text.trim().toLowerCase().startsWith('<!doctype html>') || res.text.trim().toLowerCase().startsWith('<html')) {
-        htmlBlocked = true;
-        console.error(`Fetch blocked for ${res.proj}. Google returned HTML. The sheet must be Published to the web.`);
-        return;
-      }
-      
-      const rows = parseCSV(res.text);
-      const parsedTasks = processData(rows, res.proj);
-      newTasks = newTasks.concat(parsedTasks);
-    });
-
-    if (htmlBlocked) {
-        alert("Sync Blocked: Google Sheets returned an HTML login page. \n\nFix: Go to File > Share > Publish to web. Choose 'Comma-separated values (.csv)' and update the links in the code. Standard sharing links will not work.");
-        return; // Halt so we don't wipe out the dashboard with an empty array
-    }
-    
-    if (newTasks.length > 0) {
-        taskDatabase = newTasks; // Safely overwrite old tasks
-        archiveSession('Auto-Sync');
-        
-        const now = new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'});
-        document.getElementById('last-updated-text').textContent = 'Live Synced: ' + now;
-        
-        updateSidebarCounts();
-        applyPriorityColors();
-        renderOverduePanels();
-        rebuildMobilePills();
-        if (currentDept) renderCurrentDept();
-        
-        console.log(`Successfully synced ${newTasks.length} tasks from Google Sheets.`);
-    } else {
-        alert("Sync completed, but no valid task data was found matching the 8-column layout in the sheets.");
-    }
-
-  } catch (error) {
-    console.error('Error syncing with Google Sheets:', error);
-    alert('Failed to sync. Check your internet connection or ensure the Google Sheets are Published to the Web as CSVs.');
-  } finally {
-    document.querySelectorAll('.sync-btn').forEach(btn => btn.classList.remove('syncing'));
-  }
+// Maps a sheet name like "Apr 20" or "Jan 5" to an actual Javascript Date.
+function parseSheetDate(sheetName) {
+    const m = sheetName.toLowerCase().match(/([a-z]{3})\s*(\d+)/);
+    if (!m) return null;
+    const month = monthMap[m[1]];
+    if (!month) return null;
+    const day = parseInt(m[2], 10);
+    // Based on the data, Oct-Dec were 2025, and January onwards is 2026.
+    const year = month >= 10 ? 2025 : 2026;
+    return new Date(year, month - 1, day);
 }
 
-// ═══════════════════════════════════════════════
-// TASK DATABASE
-// ═══════════════════════════════════════════════
-let taskDatabase = [];
-
-// ═══════════════════════════════════════════════
-// APPLY STORED STATUS OVERRIDES
-// ═══════════════════════════════════════════════
-function applyStoredStatuses() {
-  const overrides = getStatusOverrides();
-  taskDatabase.forEach(t => {
-    const id = taskId(t);
-    if (overrides[id]) t.status = overrides[id];
-  });
-}
-
-// ═══════════════════════════════════════════════
-// DATE PARSING & OVERDUE DETECTION
-// ═══════════════════════════════════════════════
-const MONTHS = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
 function parseDueDate(due) {
   if (!due) return null;
   const s = due.toLowerCase();
   if (/overdue|past due|past|delayed/.test(s)) return new Date(2000, 0, 1);
   const m = s.match(/([a-z]+)\s+(\d+)/);
-  if (m && MONTHS[m[1].substring(0,3)] !== undefined) {
-    return new Date(2026, MONTHS[m[1].substring(0,3)], parseInt(m[2]));
+  if (m && monthMap[m[1].substring(0,3)] !== undefined) {
+    return new Date(2026, monthMap[m[1].substring(0,3)] - 1, parseInt(m[2]));
   }
   return null;
 }
+
 function isOverdue(task) {
   if (task.status === 'achieved') return false;
   const due = parseDueDate(task.due);
   if (!due) return false;
   const today = new Date(); today.setHours(0,0,0,0);
   return due < today;
+}
+
+// ═══════════════════════════════════════════════
+// GOOGLE SHEETS DYNAMIC EXCEL FETCH
+// ═══════════════════════════════════════════════
+async function syncWithGoogleSheet() {
+  try {
+    document.querySelectorAll('.sync-btn').forEach(btn => btn.classList.add('syncing'));
+
+    const fetches = [];
+    if (SHEET_CROSSINGS) fetches.push(fetch(SHEET_CROSSINGS).then(r => r.arrayBuffer()).then(b => ({data: b, proj: 'Crossings'})));
+    if (SHEET_ANNEXE) fetches.push(fetch(SHEET_ANNEXE).then(r => r.arrayBuffer()).then(b => ({data: b, proj: 'Annexe'})));
+    
+    if (fetches.length === 0) return;
+    
+    const results = await Promise.all(fetches);
+    
+    // Reset Data
+    taskDatabase = []; 
+    availableSessions = { Crossings: [], Annexe: [] };
+    document.getElementById('targets-crossings').innerHTML = '';
+    document.getElementById('targets-annexe').innerHTML = '';
+    
+    results.forEach(res => {
+      // Decode entire excel workbook
+      const wb = XLSX.read(res.data, {type: 'array'});
+      
+      // Filter out only sheets that are dates, and ensure they are ON OR AFTER January 1st, 2026
+      let validSheets = wb.SheetNames.filter(name => {
+          const d = parseSheetDate(name);
+          return d && d >= new Date(2026, 0, 1);
+      });
+      
+      // Sort the sheets chronologically descending (latest date first)
+      validSheets.sort((a,b) => parseSheetDate(b) - parseSheetDate(a));
+      availableSessions[res.proj] = validSheets;
+      
+      // Extract data from every valid sheet
+      validSheets.forEach((sheetName, index) => {
+         const ws = wb.Sheets[sheetName];
+         const rows = XLSX.utils.sheet_to_json(ws, {header: 1});
+         const isLatest = index === 0; // True only for the most recent date
+         processSheet(rows, res.proj, sheetName, isLatest);
+      });
+    });
+    
+    // Display updates
+    const now = new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('last-updated-text').textContent = 'Live Synced: ' + now;
+    
+    viewingSessionDate = 'current'; 
+    updateSidebarCounts();
+    applyPriorityColors();
+    renderOverduePanels();
+    rebuildMobilePills();
+    if (currentDept) renderCurrentDept();
+    
+    console.log(`Successfully synced ${taskDatabase.length} tasks from Google Sheets.`);
+  } catch (error) {
+    console.error('Error syncing with Google Sheets:', error);
+    alert('Failed to sync. Please check your internet connection.');
+  } finally {
+    document.querySelectorAll('.sync-btn').forEach(btn => btn.classList.remove('syncing'));
+  }
+}
+
+// Extract metric values across any of the adjacent cells
+function extractMetricValue(row) {
+    for (let i = 1; i < row.length; i++) {
+        if (row[i] && String(row[i]).trim() !== '') return String(row[i]).trim();
+    }
+    return '';
+}
+
+function processSheet(rows, proj, sheetName, isLatest) {
+  const targets = [];
+  
+  for (let i = 1; i < rows.length; i++) {
+    const c = rows[i]; 
+    if (!c || c.length < 3) continue;
+    
+    const s = String(c.join(' ')).toLowerCase();
+    const k = String(c[0]).toLowerCase();
+    
+    // METRICS: Update Dashboard only if this is the newest sheet
+    if (isLatest) {
+        if (k.includes('inflow')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', extractMetricValue(c)); continue; }
+        if (k.includes('units')||k.includes('sold')||k.includes('sale:')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', extractMetricValue(c)); continue; }
+        if (k.includes('sales')||k.includes('tvs')) { setMetric(proj==='Crossings'?'val-cx-sales':'val-annex-sales', extractMetricValue(c)); continue; }
+        if (k.includes('budget')) { setMetric(proj==='Crossings'?'val-cx-budget':'val-annex-budget', extractMetricValue(c)); continue; }
+        if (k.includes('offer')) { setMetric(proj==='Crossings'?'val-cx-offers':'val-annex-offers', extractMetricValue(c)); continue; }
+        if (k.includes('balance')||k.includes('bal:')) { setMetric(proj==='Crossings'?'val-cx-balance':'val-annex-balance', extractMetricValue(c)); continue; }
+        
+        if (k === 'target' || s.includes('target')) {
+            if (c[2] || c[4]) {
+                const tName = c[2] || c[4] || c[1];
+                const tNote = c[3] || c[5] || '';
+                const cls = s.includes('carry') ? 'carryover' : 'new-target';
+                targets.push(`<div class="target-item ${cls}"><span class="t-name">${tName}</span><span class="t-note">${tNote}</span></div>`);
+            }
+            continue;
+        }
+    }
+    
+    // TASKS: Standard 8-column layout logic applied across all filtered sheets
+    let dept = String(c[1] || '').trim();
+    let action = String(c[2] || '').trim();
+    
+    // Avoid parsing table headers
+    if (!action || action.length < 4 || ['department','next steps','action point'].includes(action.toLowerCase())) continue;
+    
+    // Evaluate Status from Column 8
+    let statusRaw = (c[7] || 'ontrack').toString().toLowerCase().replace(/[^a-z]/g, '');
+    if(statusRaw.includes('delay') || statusRaw.includes('offtrack')) statusRaw = 'delayed';
+    else if(statusRaw.includes('achieve') || statusRaw.includes('done') || statusRaw.includes('completed')) statusRaw = 'achieved';
+    else if(statusRaw.includes('update')) statusRaw = 'update';
+    else statusRaw = 'ontrack';
+
+    taskDatabase.push({
+      project: proj,
+      session: sheetName,
+      dept: dept || 'General',
+      action: action, // Column 3
+      due: c[3] || 'TBD', // Column 4
+      resultToAchieve: c[4] || '', // Column 5
+      explanation: c[5] || '', // Column 6
+      result: c[6] || '', // Column 7
+      status: statusRaw // Column 8
+    });
+  }
+  
+  if (isLatest && targets.length > 0) {
+    const el = document.getElementById(proj === 'Crossings' ? 'targets-crossings' : 'targets-annexe');
+    if(el) el.innerHTML += targets.join('');
+  }
+}
+
+function setMetric(id, val) {
+  const el = document.getElementById(id);
+  if (el && val) el.textContent = val;
 }
 
 // ═══════════════════════════════════════════════
@@ -1078,8 +1112,13 @@ function renderOverduePanels() {
   ['Crossings','Annexe'].forEach(proj => {
     const el = document.getElementById('overdue-' + proj.toLowerCase());
     if (!el) return;
-    const overdue = taskDatabase.filter(t => t.project === proj && isOverdue(t));
+    
+    // Target the latest session
+    const latest = availableSessions[proj] && availableSessions[proj][0];
+    const overdue = taskDatabase.filter(t => t.project === proj && t.session === latest && isOverdue(t));
+    
     if (overdue.length === 0) { el.innerHTML = ''; return; }
+    
     let html = `<div class="overdue-panel" onclick="this.classList.toggle('expanded')">
       <div class="overdue-header">
         <span style="display:flex; align-items:center; gap:6px;">
@@ -1112,7 +1151,12 @@ function updateSidebarCounts() {
     const oc = btn.getAttribute('onclick') || '';
     const m = oc.match(/showDept\(this,'([^']+)','([^']+)'\)/);
     if (!m) return;
-    const count = taskDatabase.filter(t => t.project === m[1] && t.dept === m[2]).length;
+    
+    const proj = m[1];
+    const dept = m[2];
+    const latest = availableSessions[proj] && availableSessions[proj][0];
+    
+    const count = taskDatabase.filter(t => t.project === proj && t.dept === dept && t.session === latest).length;
     const span = btn.querySelector('.dept-count');
     if (span) span.textContent = count;
   });
@@ -1125,10 +1169,13 @@ const ANNEX_DEPTS = ['Design','Costing','IPD','Operations','Fincon','Telemarketi
 function rebuildMobilePills() {
   const container = document.getElementById('mobile-dept-pills');
   if (!container || !currentProject) { if(container) container.innerHTML=''; return; }
+  
   const depts = currentProject === 'Crossings' ? CX_DEPTS : ANNEX_DEPTS;
   const activeClass = currentProject === 'Crossings' ? 'active-cx' : 'active-annex';
+  const latest = availableSessions[currentProject] && availableSessions[currentProject][0];
+  
   container.innerHTML = depts.map(d => {
-    const count = taskDatabase.filter(t => t.project === currentProject && t.dept === d).length;
+    const count = taskDatabase.filter(t => t.project === currentProject && t.dept === d && t.session === latest).length;
     const isActive = currentDept === d ? activeClass : '';
     return `<button class="mobile-dept-pill ${isActive}" onclick="showDeptMobile('${d}')">${d} <span class="pill-count">${count}</span></button>`;
   }).join('');
@@ -1142,16 +1189,20 @@ function showDeptMobile(dept) {
 }
 
 // ═══════════════════════════════════════════════
-// HISTORY BAR
+// HISTORY BAR DYNAMIC GENERATION
 // ═══════════════════════════════════════════════
 function buildHistoryBar() {
   const bar = document.getElementById('history-bar');
-  const sessions = getSessions();
+  if (!currentProject) return;
+  
+  const sessions = availableSessions[currentProject] || [];
+  
   let html = '<span class="history-label">History:</span>';
   html += `<button class="history-pill ${viewingSessionDate==='current'?'active':''}" onclick="switchSession('current')">Current</button>`;
+  
   sessions.forEach(s => {
-    const isActive = viewingSessionDate === s.date ? 'active' : '';
-    html += `<button class="history-pill ${isActive}" onclick="switchSession('${s.date}')">${s.date}</button>`;
+    const isActive = viewingSessionDate === s ? 'active' : '';
+    html += `<button class="history-pill ${isActive}" onclick="switchSession('${s}')">${s}</button>`;
   });
   bar.innerHTML = html;
 }
@@ -1196,17 +1247,16 @@ function renderCurrentDept() {
 
   let tasks;
   if (viewingSessionDate === 'current') {
-    tasks = taskDatabase.filter(t => t.project === currentProject && t.dept === currentDept);
+    // Current means the absolute latest session available for the project
+    const latest = availableSessions[currentProject] && availableSessions[currentProject][0];
+    tasks = taskDatabase.filter(t => t.project === currentProject && t.dept === currentDept && t.session === latest);
   } else {
-    const sessions = getSessions();
-    const session = sessions.find(s => s.date === viewingSessionDate);
-    tasks = session ? session.tasks.filter(t => t.project === currentProject && t.dept === currentDept) : [];
+    // User requested an older history sheet
+    tasks = taskDatabase.filter(t => t.project === currentProject && t.dept === currentDept && t.session === viewingSessionDate);
   }
 
-  if (viewingSessionDate === 'current') {
-    const overrides = getStatusOverrides();
-    tasks = tasks.map(t => ({ ...t, status: overrides[taskId(t)] || t.status }));
-  }
+  const overrides = getStatusOverrides();
+  tasks = tasks.map(t => ({ ...t, status: overrides[taskId(t)] || t.status }));
 
   if (viewingSessionDate === 'current') {
     tasks = tasks.map(t => {
@@ -1226,14 +1276,12 @@ function renderCurrentDept() {
   }
 
   const isHistory = viewingSessionDate !== 'current';
-  const overrides = getStatusOverrides();
 
   list.innerHTML = filtered.map(t => {
     const id = taskId(t);
-    const status = (viewingSessionDate === 'current' ? (overrides[id] || t.status) : t.status) || 'ontrack';
+    const status = t.status || 'ontrack';
     const statusLabel = {ontrack:'On Track',delayed:'Delayed',update:'Update',achieved:'Achieved'}[status] || 'On Track';
     const dueCls = isOverdue(t) ? 'overdue' : '';
-    const ctxText = t.result || '';
 
     const actionButtons = !isHistory ? `
       <div class="status-actions" onclick="event.stopPropagation()">
@@ -1244,7 +1292,7 @@ function renderCurrentDept() {
       </div>` : '';
 
     return `<div class="step-card s-${status}" onclick="this.classList.toggle('expanded')" id="card-${id}">
-      ${ctxText ? `<div class="step-context">${ctxText}</div>` : ''}
+      ${t.resultToAchieve ? `<div class="step-context">${t.resultToAchieve}</div>` : ''}
       <div class="step-card-top">
         <div class="step-text">${t.action}</div>
         <div class="step-meta">
@@ -1254,7 +1302,8 @@ function renderCurrentDept() {
       </div>
       <div class="step-details-pane" onclick="event.stopPropagation()">
         <div class="pane-title">Details</div>
-        <div style="margin-bottom:8px">${t.explanation}</div>
+        <div style="margin-bottom:8px"><strong>Explanation:</strong> ${t.explanation || 'No further explanation provided in sheet.'}</div>
+        ${t.result ? `<div style="margin-bottom:8px"><strong>Result:</strong> ${t.result}</div>` : ''}
         ${actionButtons}
       </div>
     </div>`;
@@ -1335,88 +1384,6 @@ function selectProject(proj) {
   rebuildMobilePills();
 }
 
-function parseCSV(text) {
-  const rows = []; let row = [], cur = '', inQ = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (c === '"' && text[i+1] === '"') { cur += '"'; i++; }
-    else if (c === '"') inQ = !inQ;
-    else if (c === ',' && !inQ) { row.push(cur.trim()); cur = ''; }
-    else if (c === '\n' && !inQ) { row.push(cur.trim()); rows.push(row); row = []; cur = ''; }
-    else cur += c;
-  }
-  if (cur) row.push(cur.trim());
-  if (row.length) rows.push(row);
-  return rows;
-}
-
-function processData(rows, defaultProj) {
-  const parsedTasks = [];
-  const cxTargets = []; 
-  const aTargets = [];
-  
-  // Custom parsing based on the 8 column standard:
-  // 0: Number, 1: Department, 2: Action, 3: Due dates, 
-  // 4: Results, 5: Explanations, 6: Result (alt), 7: Status
-  
-  for (let i = 1; i < rows.length; i++) {
-    const c = rows[i]; 
-    if (!c || c.length < 3) continue;
-    
-    const s = c.join(' ').toLowerCase();
-    const proj = defaultProj || (s.includes('crossings') ? 'Crossings' : 'Annexe');
-    const k = String(c[0]).toLowerCase();
-    
-    // Parse Dashboard Metrics 
-    if (k.includes('inflow')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', c[1]||c[2]||c[3]); continue; }
-    if (k.includes('units')||k.includes('sold')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', c[1]||c[2]||c[3]); continue; }
-    if (k.includes('sales')) { setMetric(proj==='Crossings'?'val-cx-sales':'val-annex-sales', c[1]||c[2]||c[3]); continue; }
-    if (k.includes('budget')) { setMetric('val-cx-budget', c[1]||c[2]||c[3]); continue; }
-    if (k.includes('offer')) { setMetric(proj==='Crossings'?'val-cx-offers':'val-annex-offers', c[1]||c[2]||c[3]); continue; }
-    if (k.includes('balance')) { setMetric(proj==='Crossings'?'val-cx-balance':'val-annex-balance', c[1]||c[2]||c[3]); continue; }
-    
-    if (k === 'target' || s.includes('monthly target')) {
-      const cls = (String(c[4])||'').toLowerCase().includes('carry') ? 'carryover' : 'new-target';
-      const html = `<div class="target-item ${cls}"><span class="t-name">${c[2]}</span><span class="t-note">${c[3]}</span></div>`;
-      (proj === 'Crossings' ? cxTargets : aTargets).push(html); continue;
-    }
-    
-    // Standardized status from column 8 (Index 7)
-    let statusRaw = (c[7] || 'ontrack').toLowerCase().replace(/[^a-z]/g, '');
-    if(statusRaw.includes('delay') || statusRaw.includes('offtrack')) statusRaw = 'delayed';
-    else if(statusRaw.includes('achieve') || statusRaw.includes('done') || statusRaw.includes('completed')) statusRaw = 'achieved';
-    else if(statusRaw.includes('update')) statusRaw = 'update';
-    else statusRaw = 'ontrack';
-
-    parsedTasks.push({
-      project: proj,
-      dept: c[1] || 'General',
-      action: c[2] || 'No action defined',
-      due: c[3] || 'TBD',
-      result: c[4] || c[6] || '',
-      explanation: c[5] || '',
-      status: statusRaw
-    });
-  }
-  
-  if (cxTargets.length > 0 && defaultProj === 'Crossings') {
-    const el = document.getElementById('targets-crossings');
-    if(el) el.innerHTML += cxTargets.join('');
-  }
-  if (aTargets.length > 0 && defaultProj === 'Annexe') {
-    const el = document.getElementById('targets-annexe');
-    if(el) el.innerHTML += aTargets.join('');
-  }
-  
-  applyStoredStatuses();
-  return parsedTasks;
-}
-
-function setMetric(id, val) {
-  const el = document.getElementById(id);
-  if (el && val) el.textContent = val;
-}
-
 // ═══════════════════════════════════════════════
 // CHARTS
 // ═══════════════════════════════════════════════
@@ -1449,7 +1416,7 @@ const lastPointPlugin = {
 };
 Chart.register(lastPointPlugin);
 
-// Static Chart Data Placeholder - You can make this dynamic via CSV parsing later too
+// Static Chart Data Placeholder - Updates with live data dynamically soon.
 const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7','Apr 13','Apr 16','Apr 20'];
 const annexInflow = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27,6.27,6.27,6.27];
 const annexBalance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,82.78,150,149.1,61.9];
