@@ -912,41 +912,42 @@ async function syncWithGoogleSheet() {
       // Step 1: Find all sheets that have a Date title (e.g. "Apr 20")
       let dateSheets = wb.SheetNames.filter(name => /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*\d+/i.test(name.trim()));
       
-      // Step 2: Extract month numbers to figure out if the spreadsheet is ordered newest-first or oldest-first
-      let monthNumbers = dateSheets.map(s => {
-          const m = s.trim().toLowerCase().match(/^([a-z]{3})/)[1];
-          return monthMap[m];
+      // Step 2: DYNAMIC YEAR CALCULATION
+      // We read tabs strictly from left-to-right (the way they are placed in Excel). 
+      // We start at 2025. Every time we encounter a "Jan" tab following a later month, we bump the year up.
+      let currentYear = 2025;
+      let lastMonth = 6; // Assume starting around June based on the data
+      let validSheets = [];
+
+      dateSheets.forEach(name => {
+          const m = name.toLowerCase().match(/^([a-z]{3})\s*(\d+)/);
+          if (!m) return;
+          const monthIndex = monthMap[m[1]];
+          const day = parseInt(m[2], 10);
+
+          // If the month jumps backward significantly (e.g., Dec -> Jan), it means we crossed into a new year
+          if (monthIndex < lastMonth && (lastMonth - monthIndex) > 5) {
+              currentYear++;
+          }
+          lastMonth = monthIndex;
+
+          // Push strictly ONLY 2026 dates to the dashboard (Removes Aug 2025 completely)
+          if (currentYear >= 2026) {
+              validSheets.push({
+                  name: name.trim(),
+                  date: new Date(currentYear, monthIndex - 1, day)
+              });
+          }
       });
       
-      let descCount = 0, ascCount = 0;
-      for(let i=0; i<monthNumbers.length-1; i++) {
-          if(monthNumbers[i] === monthNumbers[i+1]) continue;
-          if(monthNumbers[i] === 1 && monthNumbers[i+1] === 12) descCount++; // Jan -> Dec is descending year
-          else if(monthNumbers[i] === 12 && monthNumbers[i+1] === 1) ascCount++;
-          else if(monthNumbers[i] > monthNumbers[i+1]) descCount++;
-          else ascCount++;
-      }
+      // Sort strictly by the calculated Date object, descending (Newest first)
+      validSheets.sort((a, b) => b.date - a.date);
       
-      let isNewestFirst = descCount >= ascCount;
+      // Save just the names to our session list
+      availableSessions[res.proj] = validSheets.map(s => s.name);
       
-      // If the spreadsheet is ordered oldest first, reverse it. This ensures index 0 is ALWAYS the newest sheet!
-      if (!isNewestFirst) {
-          dateSheets.reverse();
-      }
-      
-      // Step 3: Find the boundary of 2026. The user requested to ONLY track from the first "Jan" sheet.
-      // Since it's now sorted newest-first (e.g. Apr -> Mar -> Feb -> Jan -> Dec -> Oct)
-      // We want to slice from index 0 down to the LAST "Jan" sheet.
-      let lastJanIdx = -1;
-      for(let i=0; i<dateSheets.length; i++) {
-          if(/^jan/i.test(dateSheets[i].trim())) lastJanIdx = i;
-      }
-      
-      let validSheets = lastJanIdx !== -1 ? dateSheets.slice(0, lastJanIdx + 1) : dateSheets;
-      availableSessions[res.proj] = validSheets;
-      
-      // Step 4: Extract data from every valid 2026 sheet
-      validSheets.forEach((sheetName, index) => {
+      // Step 3: Extract data from every valid 2026 sheet
+      availableSessions[res.proj].forEach((sheetName, index) => {
          const ws = wb.Sheets[sheetName];
          const rows = XLSX.utils.sheet_to_json(ws, {header: 1});
          const isLatest = index === 0; // True only for the most recent 2026 date
@@ -973,13 +974,11 @@ async function syncWithGoogleSheet() {
   }
 }
 
-// Extract metric values across any of the adjacent cells
+// Extract metric values robustly
 function extractMetricValue(row) {
     for (let i = 0; i < row.length; i++) {
         const str = String(row[i] || '').trim();
-        // Look for cells with numbers, but ignore the Target headers
         if (/\d/.test(str) && !/target/i.test(str)) {
-            // Extracts numbers naturally e.g., "N75m (from payment plan)" -> "N75M"
             const match = str.match(/(?:-|:)?\s*(N?[\d.,]+[bmk]?)/i);
             if (match) return match[1].toUpperCase();
             return str;
@@ -991,13 +990,44 @@ function extractMetricValue(row) {
 function processSheet(rows, proj, sheetName, isLatest) {
   const targets = [];
   
-  for (let i = 1; i < rows.length; i++) {
+  // DYNAMIC HEADER MAPPING
+  // This completely eliminates the "shifted columns" bug regardless of invisible margins
+  let idxDept = -1, idxAction = -1, idxDue = -1, idxExp = -1, idxResult = -1, idxStatus = -1;
+  let dataStartIndex = 1;
+
+  for (let i = 0; i < Math.min(rows.length, 15); i++) {
+      if (!rows[i]) continue;
+      const rStr = rows[i].map(x => String(x).toLowerCase().trim());
+      
+      // If we find the row with the actual headers
+      if (rStr.includes('department') || rStr.includes('next steps') || rStr.some(x => x.includes('action'))) {
+          idxDept = rStr.indexOf('department');
+          idxAction = rStr.findIndex(x => x.includes('next step') || x.includes('action'));
+          idxDue = rStr.findIndex(x => x.includes('timeline') || x.includes('due'));
+          idxResult = rStr.findIndex(x => x === 'result');
+          idxExp = rStr.findIndex(x => x.includes('explanation') || x.includes('note'));
+          idxStatus = rStr.indexOf('status');
+
+          // Bulletproof fallbacks assuming 8-column layout relative to "S/N" or "Department"
+          if(idxDept === -1) idxDept = rStr.includes('s/n') ? rStr.indexOf('s/n') + 1 : 2;
+          if(idxAction === -1) idxAction = idxDept + 1;
+          if(idxDue === -1) idxDue = idxDept + 2;
+          if(idxResult === -1) idxResult = idxDept + 4;
+          if(idxExp === -1) idxExp = idxDept + 5;
+          if(idxStatus === -1) idxStatus = rStr.includes('status') ? rStr.indexOf('status') : idxDept + 6;
+
+          dataStartIndex = i + 1;
+          break;
+      }
+  }
+  
+  for (let i = dataStartIndex; i < rows.length; i++) {
     const c = rows[i]; 
     if (!c || c.length < 3) continue;
     
     const s = String(c.join(' ')).toLowerCase();
     
-    // METRICS: Update Dashboard only if this is the newest sheet
+    // METRICS
     if (isLatest) {
         if (s.includes('inflow') && !s.includes('target')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', extractMetricValue(c)); continue; }
         if ((s.includes('sales-') || s.includes('sale:') || s.includes('sales:')) && !s.includes('value')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', extractMetricValue(c)); continue; }
@@ -1007,8 +1037,8 @@ function processSheet(rows, proj, sheetName, isLatest) {
         if (s.includes('balance') || s.includes('bal:')) { setMetric(proj==='Crossings'?'val-cx-balance':'val-annex-balance', extractMetricValue(c)); continue; }
         
         if (String(c[0]).toLowerCase() === 'target' || s.includes('monthly target') || (s.includes('end of') && s.includes('target'))) {
-            const tName = c[2] || c[4] || c[1];
-            const tNote = c[3] || c[5] || '';
+            const tName = c[idxAction] || c[idxDept] || c[2] || c[1];
+            const tNote = c[idxAction + 1] || c[3] || '';
             const cls = s.includes('carry') ? 'carryover' : 'new-target';
             if (tName && tName.length > 3) {
                 targets.push(`<div class="target-item ${cls}"><span class="t-name">${tName}</span><span class="t-note">${tNote}</span></div>`);
@@ -1017,16 +1047,15 @@ function processSheet(rows, proj, sheetName, isLatest) {
         }
     }
     
-    // TASKS: Standard 8-column layout logic applied across all filtered sheets
-    let dept = String(c[1] || '').trim();
-    let action = String(c[2] || '').trim();
+    // Use dynamically found indices, or fall back safely
+    let dept = String(c[idxDept !== -1 ? idxDept : 1] || '').trim();
+    let action = String(c[idxAction !== -1 ? idxAction : 2] || '').trim();
     
-    // Avoid parsing table headers
     if (!action || action.length < 4 || /department|next steps|action point|sn|s\/n/i.test(action)) continue;
     if (!dept || /department|s\/n/i.test(dept)) continue;
     
-    // Evaluate Status from Column 8
-    let statusRaw = String(c[7] || 'ontrack').toLowerCase().replace(/[^a-z]/g, '');
+    let rawStat = String(c[idxStatus !== -1 ? idxStatus : 7] || 'ontrack').toLowerCase();
+    let statusRaw = rawStat.replace(/[^a-z]/g, '');
     if(statusRaw.includes('delay') || statusRaw.includes('offtrack')) statusRaw = 'delayed';
     else if(statusRaw.includes('achieve') || statusRaw.includes('done') || statusRaw.includes('complete')) statusRaw = 'achieved';
     else if(statusRaw.includes('update')) statusRaw = 'update';
@@ -1036,12 +1065,12 @@ function processSheet(rows, proj, sheetName, isLatest) {
       project: proj,
       session: sheetName,
       dept: dept || 'General',
-      action: action, // Column 3
-      due: String(c[3] || 'TBD').trim(), // Column 4
-      resultToAchieve: String(c[4] || '').trim(), // Column 5
-      explanation: String(c[5] || '').trim(), // Column 6
-      result: String(c[6] || '').trim(), // Column 7
-      status: statusRaw // Column 8
+      action: action, 
+      due: String(c[idxDue !== -1 ? idxDue : 3] || 'TBD').trim(),
+      resultToAchieve: String(c[idxResult !== -1 ? idxResult : 4] || '').trim(),
+      explanation: String(c[idxExp !== -1 ? idxExp : 5] || '').trim(),
+      result: String(c[idxResult !== -1 ? idxResult + 1 : 6] || '').trim(),
+      status: statusRaw
     });
   }
   
@@ -1108,7 +1137,6 @@ function renderOverduePanels() {
     const el = document.getElementById('overdue-' + proj.toLowerCase());
     if (!el) return;
     
-    // Target the latest session
     const latest = availableSessions[proj] && availableSessions[proj][0];
     const overdue = taskDatabase.filter(t => t.project === proj && t.session === latest && isOverdue(t));
     
@@ -1147,7 +1175,6 @@ function rebuildSidebarAndPills() {
   const latest = availableSessions[currentProject] && availableSessions[currentProject][0];
   if (!latest) return;
   
-  // Get EXACT unique departments currently in the database to prevent string mismatches (e.g. IPD vs IPD/PMO)
   let rawDepts = taskDatabase
       .filter(t => t.project === currentProject && t.session === latest)
       .map(t => t.dept.trim());
@@ -1158,7 +1185,6 @@ function rebuildSidebarAndPills() {
       currentDept = depts[0];
   }
 
-  // Inject into Desktop Sidebar
   const sidebarId = currentProject === 'Crossings' ? 'sidebar-crossings' : 'sidebar-annexe';
   const sidebarSection = document.getElementById(sidebarId);
   const btnClass = currentProject === 'Crossings' ? '' : 'annexe-btn';
@@ -1174,7 +1200,6 @@ function rebuildSidebarAndPills() {
       sidebarSection.style.display = 'block';
   }
 
-  // Inject into Mobile Pills
   const pillsContainer = document.getElementById('mobile-dept-pills');
   const activeClass = currentProject === 'Crossings' ? 'active-cx' : 'active-annex';
   
@@ -1254,11 +1279,9 @@ function renderCurrentDept() {
 
   let tasks;
   if (viewingSessionDate === 'current') {
-    // Current means the absolute latest session available for the project
     const latest = availableSessions[currentProject] && availableSessions[currentProject][0];
     tasks = taskDatabase.filter(t => t.project === currentProject && t.dept === currentDept && t.session === latest);
   } else {
-    // User requested an older history sheet
     tasks = taskDatabase.filter(t => t.project === currentProject && t.dept === currentDept && t.session === viewingSessionDate);
   }
 
@@ -1278,7 +1301,7 @@ function renderCurrentDept() {
 
   const list = document.getElementById('dynamic-tasks-list');
   if (filtered.length === 0) {
-    list.innerHTML = `<div style="padding:20px;color:#999;text-align:center;font-size:13px">No tasks matched your criteria. (Try changing your filter or hit "Sync" to fetch latest data)</div>`;
+    list.innerHTML = `<div style="padding:20px;color:#999;text-align:center;font-size:13px">No tasks matched your criteria.</div>`;
     return;
   }
 
@@ -1373,7 +1396,6 @@ function selectProject(proj) {
   document.getElementById('block-crossings').style.display = proj === 'Crossings' ? 'block' : 'none';
   document.getElementById('block-annexe').style.display = proj === 'Annexe' ? 'block' : 'none';
   
-  // Hide sidebars initially until rebuilt dynamically
   document.getElementById('sidebar-crossings').style.display = 'none';
   document.getElementById('sidebar-annexe').style.display = 'none';
 
@@ -1421,7 +1443,6 @@ const lastPointPlugin = {
 };
 Chart.register(lastPointPlugin);
 
-// Static Chart Data Placeholder - Updates with live data dynamically soon.
 const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7','Apr 13','Apr 16','Apr 20'];
 const annexInflow = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27,6.27,6.27,6.27];
 const annexBalance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,82.78,150,149.1,61.9];
@@ -1471,11 +1492,7 @@ new Chart(document.getElementById('c3'), {
 window.onload = function () {
   applyStoredStatuses();
   applyPriorityColors();
-  
-  // Trigger initial Google Sheet fetch on load
   syncWithGoogleSheet();
-  
-  // Auto refresh
   setInterval(syncWithGoogleSheet, AUTO_SYNC_MINUTES * 60 * 1000);
 };
 </script>
