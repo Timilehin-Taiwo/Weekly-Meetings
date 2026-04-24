@@ -682,11 +682,7 @@ nav {
           </div>
         </div>
         <div class="target-list" id="targets-crossings">
-          <div class="target-item new-target"><span class="t-name">Park Completion</span><span class="t-note">Full park end-April; fountain Apr 30. Mosaic tiles + marble underway.</span></div>
-          <div class="target-item carryover"><span class="t-name">BOLAD Lights</span><span class="t-note">Contractor elusive; vendor decision pending design sign-off.</span></div>
-          <div class="target-item new-target"><span class="t-name">Sandfilling</span><span class="t-note">8,130 cbm delivered; +8,000 cbm funded. CX9+CX10 tranche ₦137M.</span></div>
-          <div class="target-item carryover"><span class="t-name">MEP Sign-off</span><span class="t-note">Civil closed by ARUP ✓; MEP electrical pending schedule-of-manuals update.</span></div>
-        </div>
+          </div>
       </div>
     </div>
 
@@ -754,11 +750,7 @@ nav {
           </div>
         </div>
         <div class="target-list" id="targets-annexe">
-          <div class="target-item new-target"><span class="t-name">Manholes</span><span class="t-note">96/140 done. 44 remaining. Base+wall+cover standard confirmed.</span></div>
-          <div class="target-item new-target"><span class="t-name">Internal Roads</span><span class="t-note">Finidi George ✓ done. Peter Rufai S2 ✓ bends cast. Sunday Oliseh pending BAFF remob.</span></div>
-          <div class="target-item carryover"><span class="t-name">Layout Approval</span><span class="t-note">2-week window expires Apr 22. Direct to Commissioner if no response from Uncle P.</span></div>
-          <div class="target-item new-target"><span class="t-name">Drainage 400m+</span><span class="t-note">ARUP sign-off on new section due Apr 24. 60-day target 90% viable.</span></div>
-        </div>
+          </div>
       </div>
     </div>
 
@@ -865,11 +857,13 @@ let currentProject = null;
 let currentDept = null;
 let currentFilter = 'all';
 let viewingSessionDate = 'current'; 
-let chartsInitialized = false;
 
-// Updated Google Sheet Export Links based on the provided IDs
-const SHEET_CROSSINGS = 'https://docs.google.com/spreadsheets/d/1UPEpb7IDrayYhBxqJRJIm-Dl7tV2jHP1DVsRjGp06Mc/export?format=csv'; 
-const SHEET_ANNEXE = 'https://docs.google.com/spreadsheets/d/1wcoefW36HH-veJ9idVMw5lxEiYZOqB76JPldivW4e6o/export?format=csv'; 
+// CRITICAL: You must use the "Publish to Web" CSV links here. Standard /edit links will be blocked by CORS.
+// 1. In Google Sheets, go to File > Share > Publish to web.
+// 2. Select the correct Sheet tab and choose "Comma-separated values (.csv)".
+// 3. Paste those links below.
+const SHEET_CROSSINGS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTEgKzQ6k4R4b9aD_NlP5YVzE4h9fJ5zK-b8M-fW8m_Q9z-P7L5-V9f_J5zK-b8M-fW8m_Q9z-P7L5/pub?gid=0&single=true&output=csv'; // PLACEHOLDER: Update with your Published CSV link for Crossings
+const SHEET_ANNEXE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTz_m_Q9z-P7L5-V9f_J5zK-b8M-fW8m_Q9z-P7L5-V9f_J5zK-b8M-fW8m_Q9z-P7L5-V9f_J5/pub?gid=0&single=true&output=csv'; // PLACEHOLDER: Update with your Published CSV link for Annexe
 const AUTO_SYNC_MINUTES = 5;
 
 // ═══════════════════════════════════════════════
@@ -927,40 +921,69 @@ function archiveSession(label) {
 // ═══════════════════════════════════════════════
 async function syncWithGoogleSheet() {
   try {
-    // Add rotating animation classes to sync buttons
+    // UI Indicator
     document.querySelectorAll('.sync-btn').forEach(btn => btn.classList.add('syncing'));
 
     const fetches = [];
-    if (SHEET_CROSSINGS) fetches.push(fetch(SHEET_CROSSINGS + '&t=' + Date.now()).then(r => r.text()).then(t => ({text: t, proj: 'Crossings'})));
-    if (SHEET_ANNEXE) fetches.push(fetch(SHEET_ANNEXE + '&t=' + Date.now()).then(r => r.text()).then(t => ({text: t, proj: 'Annexe'})));
+    if (SHEET_CROSSINGS && SHEET_CROSSINGS.includes('pub?')) {
+        fetches.push(fetch(SHEET_CROSSINGS + '&t=' + Date.now()).then(r => r.text()).then(t => ({text: t, proj: 'Crossings'})));
+    }
+    if (SHEET_ANNEXE && SHEET_ANNEXE.includes('pub?')) {
+        fetches.push(fetch(SHEET_ANNEXE + '&t=' + Date.now()).then(r => r.text()).then(t => ({text: t, proj: 'Annexe'})));
+    }
     
-    if (fetches.length === 0) return;
+    if (fetches.length === 0) {
+        alert("Action Required: Please update the SHEET_CROSSINGS and SHEET_ANNEXE links in the code to your 'Published to the Web' CSV links.");
+        return;
+    }
     
     const results = await Promise.all(fetches);
-    taskDatabase = []; 
+    let newTasks = []; 
+    let htmlBlocked = false;
+
+    // Reset Dashboard Targets for fresh population
     document.getElementById('targets-crossings').innerHTML = '';
     document.getElementById('targets-annexe').innerHTML = '';
     
     results.forEach(res => {
+      // PRE-FLIGHT CHECK: Did Google return an HTML login page instead of a CSV?
+      if (res.text.trim().toLowerCase().startsWith('<!doctype html>') || res.text.trim().toLowerCase().startsWith('<html')) {
+        htmlBlocked = true;
+        console.error(`Fetch blocked for ${res.proj}. Google returned HTML. The sheet must be Published to the web.`);
+        return;
+      }
+      
       const rows = parseCSV(res.text);
-      processData(rows, res.proj);
+      const parsedTasks = processData(rows, res.proj);
+      newTasks = newTasks.concat(parsedTasks);
     });
+
+    if (htmlBlocked) {
+        alert("Sync Blocked: Google Sheets returned an HTML login page. \n\nFix: Go to File > Share > Publish to web. Choose 'Comma-separated values (.csv)' and update the links in the code. Standard sharing links will not work.");
+        return; // Halt so we don't wipe out the dashboard with an empty array
+    }
     
-    archiveSession('Auto-Sync');
-    
-    const now = new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('last-updated-text').textContent = 'Live Synced: ' + now;
-    
-    updateSidebarCounts();
-    applyPriorityColors();
-    renderOverduePanels();
-    rebuildMobilePills();
-    if (currentDept) renderCurrentDept();
-    
-    console.log('Successfully synced with Google Sheets.');
+    if (newTasks.length > 0) {
+        taskDatabase = newTasks; // Safely overwrite old tasks
+        archiveSession('Auto-Sync');
+        
+        const now = new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'});
+        document.getElementById('last-updated-text').textContent = 'Live Synced: ' + now;
+        
+        updateSidebarCounts();
+        applyPriorityColors();
+        renderOverduePanels();
+        rebuildMobilePills();
+        if (currentDept) renderCurrentDept();
+        
+        console.log(`Successfully synced ${newTasks.length} tasks from Google Sheets.`);
+    } else {
+        alert("Sync completed, but no valid task data was found matching the 8-column layout in the sheets.");
+    }
+
   } catch (error) {
     console.error('Error syncing with Google Sheets:', error);
-    alert('Failed to sync. Check network connection or spreadsheet permissions.');
+    alert('Failed to sync. Check your internet connection or ensure the Google Sheets are Published to the Web as CSVs.');
   } finally {
     document.querySelectorAll('.sync-btn').forEach(btn => btn.classList.remove('syncing'));
   }
@@ -1198,7 +1221,7 @@ function renderCurrentDept() {
 
   const list = document.getElementById('dynamic-tasks-list');
   if (filtered.length === 0) {
-    list.innerHTML = `<div style="padding:20px;color:#999;text-align:center;font-size:13px">No tasks match this filter.</div>`;
+    list.innerHTML = `<div style="padding:20px;color:#999;text-align:center;font-size:13px">No tasks matched your criteria. (Try changing your filter or hit "Sync" to fetch latest data)</div>`;
     return;
   }
 
@@ -1327,18 +1350,14 @@ function parseCSV(text) {
   return rows;
 }
 
-function processData(rows, defaultProj = null) {
-  const cxTargets = [], aTargets = [];
+function processData(rows, defaultProj) {
+  const parsedTasks = [];
+  const cxTargets = []; 
+  const aTargets = [];
   
-  // Custom parsing as defined:
-  // 1: S/N (Numbering) -> index 0
-  // 2: Department -> index 1
-  // 3: Next steps/Action points -> index 2
-  // 4: Due dates -> index 3
-  // 5: Results to achieve -> index 4
-  // 6: Explanations -> index 5
-  // 7: Result -> index 6
-  // 8: Status (On track / Delayed) -> index 7
+  // Custom parsing based on the 8 column standard:
+  // 0: Number, 1: Department, 2: Action, 3: Due dates, 
+  // 4: Results, 5: Explanations, 6: Result (alt), 7: Status
   
   for (let i = 1; i < rows.length; i++) {
     const c = rows[i]; 
@@ -1362,17 +1381,17 @@ function processData(rows, defaultProj = null) {
       (proj === 'Crossings' ? cxTargets : aTargets).push(html); continue;
     }
     
-    // Determine standardized status from column 8 (Index 7)
+    // Standardized status from column 8 (Index 7)
     let statusRaw = (c[7] || 'ontrack').toLowerCase().replace(/[^a-z]/g, '');
     if(statusRaw.includes('delay') || statusRaw.includes('offtrack')) statusRaw = 'delayed';
     else if(statusRaw.includes('achieve') || statusRaw.includes('done') || statusRaw.includes('completed')) statusRaw = 'achieved';
     else if(statusRaw.includes('update')) statusRaw = 'update';
     else statusRaw = 'ontrack';
 
-    taskDatabase.push({
+    parsedTasks.push({
       project: proj,
       dept: c[1] || 'General',
-      action: c[2] || 'No action',
+      action: c[2] || 'No action defined',
       due: c[3] || 'TBD',
       result: c[4] || c[6] || '',
       explanation: c[5] || '',
@@ -1380,15 +1399,17 @@ function processData(rows, defaultProj = null) {
     });
   }
   
-  if (cxTargets.length) {
+  if (cxTargets.length > 0 && defaultProj === 'Crossings') {
     const el = document.getElementById('targets-crossings');
     if(el) el.innerHTML += cxTargets.join('');
   }
-  if (aTargets.length) {
+  if (aTargets.length > 0 && defaultProj === 'Annexe') {
     const el = document.getElementById('targets-annexe');
     if(el) el.innerHTML += aTargets.join('');
   }
+  
   applyStoredStatuses();
+  return parsedTasks;
 }
 
 function setMetric(id, val) {
@@ -1428,7 +1449,7 @@ const lastPointPlugin = {
 };
 Chart.register(lastPointPlugin);
 
-// Date Tracking started from Jan 5 (First Jan sheet)
+// Static Chart Data Placeholder - You can make this dynamic via CSV parsing later too
 const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7','Apr 13','Apr 16','Apr 20'];
 const annexInflow = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27,6.27,6.27,6.27];
 const annexBalance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,82.78,150,149.1,61.9];
@@ -1484,9 +1505,7 @@ window.onload = function () {
   syncWithGoogleSheet();
   
   // Auto refresh
-  if ((SHEET_CROSSINGS && SHEET_CROSSINGS !== '') || (SHEET_ANNEXE && SHEET_ANNEXE !== '')) {
-    setInterval(syncWithGoogleSheet, AUTO_SYNC_MINUTES * 60 * 1000);
-  }
+  setInterval(syncWithGoogleSheet, AUTO_SYNC_MINUTES * 60 * 1000);
 };
 </script>
 
