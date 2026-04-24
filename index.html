@@ -110,7 +110,7 @@ nav {
 .nav-project-btn { cursor: pointer; opacity: 0.35; transition: opacity 0.2s; }
 .nav-project-btn:hover { opacity: 0.7; }
 .nav-project-btn.active { opacity: 1; }
-.upload-btn {
+.sync-btn {
   background: var(--brand-grey-dark); color: white;
   font-size: 11px; font-weight: 700; padding: 7px 12px;
   border-radius: var(--radius-sm); cursor: pointer;
@@ -118,8 +118,10 @@ nav {
   display: inline-flex; align-items: center; gap: 5px;
   font-family: inherit;
 }
-.upload-btn:hover { background: var(--text-primary); }
-.upload-btn-text { display: inline; }
+.sync-btn:hover { background: var(--text-primary); }
+.sync-btn-text { display: inline; }
+.syncing .sync-icon { animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
 /* ── MOBILE BOTTOM NAV ── */
 .bottom-nav {
@@ -502,7 +504,7 @@ nav {
   /* Hide desktop tabs */
   #nav-tabs-group { display: none !important; }
   .nav-date { display: none; }
-  .upload-btn-text { display: none; }
+  .sync-btn-text { display: none; }
 
   /* Nav compact */
   nav { padding: 0 14px; gap: 12px; }
@@ -563,11 +565,13 @@ nav {
     <span class="nav-date" id="last-updated-text">Last updated: Apr 20, 2026</span>
     <span class="nav-badge badge-cx nav-project-btn" id="btn-nav-cx" onclick="selectProject('Crossings')">Crossings</span>
     <span class="nav-badge badge-annex nav-project-btn" id="btn-nav-annex" onclick="selectProject('Annexe')">Annexe</span>
-    <label for="fileUpload" class="upload-btn" title="Upload Excel or Transcript">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      <span class="upload-btn-text">Upload</span>
-    </label>
-    <input type="file" id="fileUpload" accept=".csv,.xlsx,.xls,.txt" style="display:none;" onchange="handleFileUpload(event)">
+    
+    <button class="sync-btn" onclick="syncWithGoogleSheet()" id="sync-btn-nav" title="Sync with Google Sheets">
+      <svg class="sync-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 22v-6h6"/>
+      </svg>
+      <span class="sync-btn-text">Sync</span>
+    </button>
   </div>
 </nav>
 
@@ -583,9 +587,9 @@ nav {
       <span class="bnav-icon"><svg width="1em" height="1em" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'><path d='M4 3h16a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm4 2v2h10V5H8zM4 10h16a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2zm12 2v2h2v-2h-2zM4 17h16a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2zm7 2v2h7v-2h-7z'/></svg></span>
       <span class="bnav-label">Tasks</span>
     </button>
-    <button class="bottom-nav-btn" id="bnav-upload" onclick="document.getElementById('fileUpload').click()">
-      <span class="bnav-icon"><svg width="1em" height="1em" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 10v10h16V10M15 10h5M4 10h5'/><path d='M12 3v12M8 7l4-4 4 4'/></svg></span>
-      <span class="bnav-label">Upload</span>
+    <button class="bottom-nav-btn" id="bnav-sync" onclick="syncWithGoogleSheet()">
+      <span class="bnav-icon"><svg class="sync-icon" width="1em" height="1em" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 22v-6h6"/></svg></span>
+      <span class="bnav-label">Sync</span>
     </button>
   </div>
 </div>
@@ -825,6 +829,12 @@ nav {
             <span id="dynamic-dept-badge" class="nav-badge" style="margin-top:6px;display:inline-block;">Project</span>
           </div>
           <div class="dept-controls">
+            <button class="sync-btn" onclick="syncWithGoogleSheet()" title="Fetch Latest Tasks">
+              <svg class="sync-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 22v-6h6"/>
+              </svg>
+              <span class="sync-btn-text">Sync</span>
+            </button>
             <label class="show-done-toggle">
               <input type="checkbox" id="show-done-toggle" onchange="renderCurrentDept()"> Show completed
             </label>
@@ -857,6 +867,7 @@ let currentFilter = 'all';
 let viewingSessionDate = 'current'; 
 let chartsInitialized = false;
 
+// Updated Google Sheet Export Links based on the provided IDs
 const SHEET_CROSSINGS = 'https://docs.google.com/spreadsheets/d/1UPEpb7IDrayYhBxqJRJIm-Dl7tV2jHP1DVsRjGp06Mc/export?format=csv'; 
 const SHEET_ANNEXE = 'https://docs.google.com/spreadsheets/d/1wcoefW36HH-veJ9idVMw5lxEiYZOqB76JPldivW4e6o/export?format=csv'; 
 const AUTO_SYNC_MINUTES = 5;
@@ -916,6 +927,9 @@ function archiveSession(label) {
 // ═══════════════════════════════════════════════
 async function syncWithGoogleSheet() {
   try {
+    // Add rotating animation classes to sync buttons
+    document.querySelectorAll('.sync-btn').forEach(btn => btn.classList.add('syncing'));
+
     const fetches = [];
     if (SHEET_CROSSINGS) fetches.push(fetch(SHEET_CROSSINGS + '&t=' + Date.now()).then(r => r.text()).then(t => ({text: t, proj: 'Crossings'})));
     if (SHEET_ANNEXE) fetches.push(fetch(SHEET_ANNEXE + '&t=' + Date.now()).then(r => r.text()).then(t => ({text: t, proj: 'Annexe'})));
@@ -946,6 +960,9 @@ async function syncWithGoogleSheet() {
     console.log('Successfully synced with Google Sheets.');
   } catch (error) {
     console.error('Error syncing with Google Sheets:', error);
+    alert('Failed to sync. Check network connection or spreadsheet permissions.');
+  } finally {
+    document.querySelectorAll('.sync-btn').forEach(btn => btn.classList.remove('syncing'));
   }
 }
 
@@ -1295,50 +1312,6 @@ function selectProject(proj) {
   rebuildMobilePills();
 }
 
-// ═══════════════════════════════════════════════
-// FILE UPLOAD — EXCEL & TRANSCRIPT
-// ═══════════════════════════════════════════════
-function handleFileUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const ext = file.name.split('.').pop().toLowerCase();
-  archiveSession(document.getElementById('last-updated-text').textContent.replace('Last updated: ','').replace('Live Synced: ',''));
-
-  if (ext === 'csv') {
-    const reader = new FileReader();
-    reader.onload = e => { taskDatabase = []; processData(parseCSV(e.target.result)); finalizeUpload(file.name); };
-    reader.readAsText(file);
-  } else if (ext === 'xlsx' || ext === 'xls') {
-    const reader = new FileReader();
-    reader.onload = e => {
-      taskDatabase = [];
-      const wb = XLSX.read(e.target.result, {type:'binary'});
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      processData(XLSX.utils.sheet_to_json(ws, {header:1}));
-      finalizeUpload(file.name);
-    };
-    reader.readAsBinaryString(file);
-  } else if (ext === 'txt') {
-    const reader = new FileReader();
-    reader.onload = e => { parseTranscript(e.target.result); finalizeUpload(file.name); };
-    reader.readAsText(file);
-  } else {
-    alert('Unsupported format. Please upload .xlsx, .csv, or .txt');
-  }
-  event.target.value = '';
-}
-
-function finalizeUpload(fname) {
-  const now = new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'});
-  document.getElementById('last-updated-text').textContent = 'Last updated: ' + now;
-  updateSidebarCounts();
-  applyPriorityColors();
-  renderOverduePanels();
-  rebuildMobilePills();
-  if (currentDept) renderCurrentDept();
-  alert(`✓ "${fname}" loaded successfully. Previous data archived.`);
-}
-
 function parseCSV(text) {
   const rows = []; let row = [], cur = '', inQ = false;
   for (let i = 0; i < text.length; i++) {
@@ -1357,9 +1330,16 @@ function parseCSV(text) {
 function processData(rows, defaultProj = null) {
   const cxTargets = [], aTargets = [];
   
-  // Sheet logic maps columns correctly 
-  // 0: Number, 1: Department, 2: Next steps/Action, 3: Due dates, 
-  // 4: Results to achieve, 5: Explanations, 6: Result, 7: Status
+  // Custom parsing as defined:
+  // 1: S/N (Numbering) -> index 0
+  // 2: Department -> index 1
+  // 3: Next steps/Action points -> index 2
+  // 4: Due dates -> index 3
+  // 5: Results to achieve -> index 4
+  // 6: Explanations -> index 5
+  // 7: Result -> index 6
+  // 8: Status (On track / Delayed) -> index 7
+  
   for (let i = 1; i < rows.length; i++) {
     const c = rows[i]; 
     if (!c || c.length < 3) continue;
@@ -1382,7 +1362,7 @@ function processData(rows, defaultProj = null) {
       (proj === 'Crossings' ? cxTargets : aTargets).push(html); continue;
     }
     
-    // Determine standardized status from column 7
+    // Determine standardized status from column 8 (Index 7)
     let statusRaw = (c[7] || 'ontrack').toLowerCase().replace(/[^a-z]/g, '');
     if(statusRaw.includes('delay') || statusRaw.includes('offtrack')) statusRaw = 'delayed';
     else if(statusRaw.includes('achieve') || statusRaw.includes('done') || statusRaw.includes('completed')) statusRaw = 'achieved';
@@ -1394,7 +1374,7 @@ function processData(rows, defaultProj = null) {
       dept: c[1] || 'General',
       action: c[2] || 'No action',
       due: c[3] || 'TBD',
-      result: c[6] || c[4] || '', // Using column 7 (index 6) for Result, fallback to column 5 (index 4)
+      result: c[4] || c[6] || '',
       explanation: c[5] || '',
       status: statusRaw
     });
@@ -1414,37 +1394,6 @@ function processData(rows, defaultProj = null) {
 function setMetric(id, val) {
   const el = document.getElementById(id);
   if (el && val) el.textContent = val;
-}
-
-function parseTranscript(text) {
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-  const deptNames = ['Design','Costing','IPD','IPD/PMO','AMC','Operations','Fincon','Sales','MCC','Legal','Telemarketing','Landscape','General'];
-  const newTasks = [];
-  let currentDeptName = 'General', currentProj = currentProject || 'Crossings';
-
-  lines.forEach(line => {
-    if (/crossings/i.test(line)) currentProj = 'Crossings';
-    else if (/annex/i.test(line)) currentProj = 'Annexe';
-    const deptMatch = deptNames.find(d => new RegExp(`^${d}[:\\s]`, 'i').test(line));
-    if (deptMatch) { currentDeptName = deptMatch; return; }
-    const isAction = /^[\*\-\•]|\d+[\.\)]/.test(line);
-    if (isAction && line.length > 10) {
-      const action = line.replace(/^[\*\-\•\d\.\)]+\s*/, '').trim();
-      const dateMatch = action.match(/by\s+([A-Za-z]+\s+\d+)|(\d+\s+[A-Za-z]+)/i);
-      const due = dateMatch ? dateMatch[0].replace(/by\s+/i,'') : 'TBD';
-      newTasks.push({ project: currentProj, dept: currentDeptName, result: 'Transcript Import', action, explanation: 'Imported from meeting transcript.', due, status: 'ontrack' });
-    }
-  });
-
-  if (newTasks.length === 0) {
-    alert('No structured tasks found in transcript.');
-    return;
-  }
-  const affectedDepts = [...new Set(newTasks.map(t => t.project + '_' + t.dept))];
-  taskDatabase = taskDatabase.filter(t => !affectedDepts.includes(t.project + '_' + t.dept));
-  taskDatabase = taskDatabase.concat(newTasks);
-  applyStoredStatuses();
-  alert(`✓ ${newTasks.length} tasks imported from transcript across ${affectedDepts.length} department(s).`);
 }
 
 // ═══════════════════════════════════════════════
@@ -1479,6 +1428,7 @@ const lastPointPlugin = {
 };
 Chart.register(lastPointPlugin);
 
+// Date Tracking started from Jan 5 (First Jan sheet)
 const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7','Apr 13','Apr 16','Apr 20'];
 const annexInflow = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27,6.27,6.27,6.27];
 const annexBalance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,82.78,150,149.1,61.9];
