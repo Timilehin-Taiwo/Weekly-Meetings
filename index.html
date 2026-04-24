@@ -858,8 +858,7 @@ let currentDept = null;
 let currentFilter = 'all';
 let viewingSessionDate = 'current'; 
 
-// CRITICAL FIX: To extract all sheets seamlessly without manual exporting, we download the entire published workbook as an Excel binary (.xlsx)
-// The parsing logic will then dynamically open every sheet within the file.
+// Fetch the entire Excel binary to dynamically extract all tabs/sheets instead of manually publishing each sheet.
 const SHEET_CROSSINGS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_BotFNOFLBaUKX-lzjWZkfe2DhCWL28EmOGGBkVBnkcKxoM2l02lBjsqdhnnweUKngc1DWpO82OPL/pub?output=xlsx'; 
 const SHEET_ANNEXE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCwJvm2NJYEAAcGRCvIEz_OnT4IqrIC8MtxXnbOAwaPuOie0nJMnPts7NQ7B4_gMzkp0cAeg8BO7Jk/pub?output=xlsx'; 
 
