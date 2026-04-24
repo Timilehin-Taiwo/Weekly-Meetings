@@ -650,14 +650,13 @@ nav {
         <div class="metric-value" id="val-cx-budget">₦488M</div>
         <div class="metric-delta">Live Synced</div>
       </div>
-      <!-- Ensuring priority-card colors default properly -->
-      <div class="metric-card priority-card color-amber" id="card-cx-offers">
+      <div class="metric-card priority-card" id="card-cx-offers">
         <div class="priority-tag">★ Priority</div>
         <div class="metric-label">Active Offer Letters</div>
         <div class="metric-value" id="val-cx-offers">0</div>
         <div class="metric-delta" id="delta-cx-offers">Live Synced</div>
       </div>
-      <div class="metric-card priority-card color-red" id="card-cx-balance">
+      <div class="metric-card priority-card" id="card-cx-balance">
         <div class="priority-tag">★ Priority</div>
         <div class="metric-label">Account Balance</div>
         <div class="metric-value" id="val-cx-balance">₦40M</div>
@@ -722,13 +721,13 @@ nav {
         <div class="metric-value" id="val-annex-sales">₦6.89B</div>
         <div class="metric-delta">Live Synced</div>
       </div>
-      <div class="metric-card priority-card color-amber" id="card-annex-offers">
+      <div class="metric-card priority-card" id="card-annex-offers">
         <div class="priority-tag">★ Priority</div>
         <div class="metric-label">Active Offer Letters</div>
         <div class="metric-value" id="val-annex-offers">0</div>
         <div class="metric-delta" id="delta-annex-offers">Live Synced</div>
       </div>
-      <div class="metric-card priority-card color-green" id="card-annex-balance">
+      <div class="metric-card priority-card" id="card-annex-balance">
         <div class="priority-tag">★ Priority</div>
         <div class="metric-label">Account Balance</div>
         <div class="metric-value" id="val-annex-balance">₦61.9M</div>
@@ -776,7 +775,6 @@ nav {
   <div class="mobile-dept-scroller" id="mobile-dept-pills"></div>
 
   <div class="dept-layout">
-    <!-- Hardcoded Department Sidbars to prevent them from ever "deleting" -->
     <div class="dept-sidebar" id="sidebar-container">
       
       <!-- Lakowe Crossings Sidebar -->
@@ -942,46 +940,36 @@ async function syncWithGoogleSheet() {
     results.forEach(res => {
       const wb = XLSX.read(res.data, {type: 'array'});
       
-      // Step 1: Find all sheets that are Dates (e.g. "Apr 20")
-      let dateSheets = wb.SheetNames.filter(name => /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*\d+/i.test(name.trim()));
-      if (dateSheets.length === 0) return;
-      
-      // Step 2: Strict "January 2026 Onwards" boundary detection
-      // Extract numeric month values (Jan=1, Dec=12)
-      let monthVals = dateSheets.map(n => monthMap[n.substring(0,3).toLowerCase()]);
-      
-      // Determine if array is Newest-first or Oldest-first
-      let isNewestFirst = monthVals[0] > monthVals[monthVals.length - 1] || (monthVals[0] <= 5 && monthVals[monthVals.length - 1] >= 8); 
+      // Step 1: Look explicitly for the "2026>>>" or "2026" time breaker tab
+      const breakerIdx = wb.SheetNames.findIndex(name => name.includes('2026'));
       
       let resultSheets = [];
-      if (isNewestFirst) {
-          // It looks like [Apr, Mar, Feb, Jan, Dec, Nov]
-          // Find the transition point where it drops to Dec (month 12)
-          let cutoff = dateSheets.length;
-          for(let i=0; i<dateSheets.length - 1; i++){
-               // If we step from Jan (1) to Dec (12), we crossed into 2025
-               if(monthVals[i] === 1 && monthVals[i+1] === 12) {
-                   cutoff = i + 1; 
-                   break;
-               }
-          }
-          resultSheets = dateSheets.slice(0, cutoff);
+      
+      if (breakerIdx !== -1) {
+          // Absolute Rule: Anything AFTER the 2026 tab belongs to 2026 (Left-to-Right layout in Excel).
+          const sheetsAfterBreaker = wb.SheetNames.slice(breakerIdx + 1);
+          
+          // Ensure we are only grabbing valid date tabs
+          resultSheets = sheetsAfterBreaker.filter(name => /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*\d+/i.test(name.trim()));
+          
+          // Reversing makes the newest date (far right in Excel) show up first (Index 0) on the dashboard.
+          resultSheets.reverse();
       } else {
-          // It looks like [Nov, Dec, Jan, Feb, Mar, Apr]
+          // Fallback just in case the 2026 tab is removed
+          let dateSheets = wb.SheetNames.filter(name => /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*\d+/i.test(name.trim()));
           let cutoff = 0;
-          for(let i=0; i<dateSheets.length - 1; i++){
-               if(monthVals[i] === 12 && monthVals[i+1] === 1) {
-                   cutoff = i + 1; 
-                   break;
-               }
+          for (let i = 0; i < dateSheets.length - 1; i++) {
+              let m1 = monthMap[dateSheets[i].substring(0,3).toLowerCase()];
+              let m2 = monthMap[dateSheets[i+1].substring(0,3).toLowerCase()];
+              if (m1 === 12 && m2 === 1) { cutoff = i + 1; }
           }
           resultSheets = dateSheets.slice(cutoff);
-          resultSheets.reverse(); // Standardize to newest first for the UI
+          resultSheets.reverse();
       }
-      
+
       availableSessions[res.proj] = resultSheets;
       
-      // Step 3: Extract data from every valid 2026 sheet
+      // Step 2: Extract data from every valid 2026 sheet
       resultSheets.forEach((sheetName, index) => {
          const ws = wb.Sheets[sheetName];
          const rows = XLSX.utils.sheet_to_json(ws, {header: 1});
@@ -1027,7 +1015,37 @@ function processSheet(rows, proj, sheetName, isLatest) {
   const targets = [];
   let lastDept = 'General'; // CRITICAL FIX: Memory cache for merged Excel cells
   
-  for (let i = 0; i < rows.length; i++) {
+  // DYNAMIC HEADER MAPPING
+  // This completely eliminates the "shifted columns" bug regardless of invisible margins
+  let idxDept = -1, idxAction = -1, idxDue = -1, idxExp = -1, idxResult = -1, idxStatus = -1;
+  let dataStartIndex = 1;
+
+  for (let i = 0; i < Math.min(rows.length, 15); i++) {
+      if (!rows[i]) continue;
+      const rStr = rows[i].map(x => String(x).toLowerCase().trim());
+      
+      if (rStr.includes('department') || rStr.includes('next steps') || rStr.some(x => x.includes('action'))) {
+          idxDept = rStr.indexOf('department');
+          idxAction = rStr.findIndex(x => x.includes('next step') || x.includes('action'));
+          idxDue = rStr.findIndex(x => x.includes('timeline') || x.includes('due'));
+          idxResult = rStr.findIndex(x => x === 'result');
+          idxExp = rStr.findIndex(x => x.includes('explanation') || x.includes('note'));
+          idxStatus = rStr.indexOf('status');
+
+          // Bulletproof fallbacks assuming 8-column layout relative to "Department"
+          if(idxDept === -1) idxDept = rStr.includes('s/n') ? rStr.indexOf('s/n') + 1 : 1;
+          if(idxAction === -1) idxAction = idxDept + 1;
+          if(idxDue === -1) idxDue = idxDept + 2;
+          if(idxResult === -1) idxResult = idxDept + 4;
+          if(idxExp === -1) idxExp = idxDept + 5;
+          if(idxStatus === -1) idxStatus = rStr.includes('status') ? rStr.indexOf('status') : idxDept + 6;
+
+          dataStartIndex = i + 1;
+          break;
+      }
+  }
+
+  for (let i = dataStartIndex; i < rows.length; i++) {
     const c = rows[i]; 
     if (!c || c.length < 3) continue;
     
@@ -1043,8 +1061,8 @@ function processSheet(rows, proj, sheetName, isLatest) {
         if (s.includes('balance') || s.includes('bal:')) { setMetric(proj==='Crossings'?'val-cx-balance':'val-annex-balance', extractMetricValue(c)); continue; }
         
         if (String(c[0]).toLowerCase() === 'target' || s.includes('monthly target') || (s.includes('end of') && s.includes('target'))) {
-            const tName = c[2] || c[4] || c[1];
-            const tNote = c[3] || c[5] || '';
+            const tName = c[idxAction] || c[idxDept] || c[2] || c[1];
+            const tNote = c[idxAction + 1] || c[3] || '';
             const cls = s.includes('carry') ? 'carryover' : 'new-target';
             if (tName && tName.length > 3) {
                 targets.push(`<div class="target-item ${cls}"><span class="t-name">${tName}</span><span class="t-note">${tNote}</span></div>`);
@@ -1053,21 +1071,19 @@ function processSheet(rows, proj, sheetName, isLatest) {
         }
     }
     
-    // ── TASKS: Standard 8-column layout logic applied across all filtered sheets ──
-    // 0: Number, 1: Department, 2: Action, 3: Due, 4: ResultAchieve, 5: Explanation, 6: ActualResult, 7: Status
-    
-    let rawDept = String(c[1] || '').trim();
+    // ── TASKS: Apply 8-column layout using dynamic indices ──
+    let rawDept = String(c[idxDept !== -1 ? idxDept : 1] || '').trim();
     if (rawDept && !/department|s\/n|next step/i.test(rawDept)) {
         lastDept = rawDept; // Update cache when a new department row appears
     }
     
-    let action = String(c[2] || '').trim();
+    let action = String(c[idxAction !== -1 ? idxAction : 2] || '').trim();
     
     // Avoid parsing table headers or empty sub-rows
     if (!action || action.length < 4 || /department|next step|action point|sn|s\/n/i.test(action)) continue;
     
-    // Evaluate Status from Column 8 (Index 7)
-    let rawStat = String(c[7] || 'ontrack').toLowerCase();
+    // Evaluate Status from Column 8
+    let rawStat = String(c[idxStatus !== -1 ? idxStatus : 7] || 'ontrack').toLowerCase();
     let statusRaw = rawStat.replace(/[^a-z]/g, '');
     if(statusRaw.includes('delay') || statusRaw.includes('offtrack')) statusRaw = 'delayed';
     else if(statusRaw.includes('achieve') || statusRaw.includes('done') || statusRaw.includes('complete')) statusRaw = 'achieved';
@@ -1079,10 +1095,10 @@ function processSheet(rows, proj, sheetName, isLatest) {
       session: sheetName,
       dept: lastDept, // Uses cache for merged cells
       action: action, 
-      due: String(c[3] || 'TBD').trim(),
-      resultToAchieve: String(c[4] || '').trim(),
-      explanation: String(c[5] || '').trim(),
-      result: String(c[6] || '').trim(),
+      due: String(c[idxDue !== -1 ? idxDue : 3] || 'TBD').trim(),
+      resultToAchieve: String(c[idxResult !== -1 ? idxResult : 4] || '').trim(),
+      explanation: String(c[idxExp !== -1 ? idxExp : 5] || '').trim(),
+      result: String(c[idxResult !== -1 ? idxResult + 1 : 6] || '').trim(),
       status: statusRaw
     });
   }
@@ -1452,7 +1468,6 @@ const lastPointPlugin = {
 };
 Chart.register(lastPointPlugin);
 
-// Static Chart Data Placeholder - Updates with live data dynamically soon.
 const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7','Apr 13','Apr 16','Apr 20'];
 const annexInflow = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27,6.27,6.27,6.27];
 const annexBalance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,82.78,150,149.1,61.9];
