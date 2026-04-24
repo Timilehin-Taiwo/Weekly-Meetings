@@ -650,13 +650,14 @@ nav {
         <div class="metric-value" id="val-cx-budget">₦488M</div>
         <div class="metric-delta">Live Synced</div>
       </div>
-      <div class="metric-card priority-card" id="card-cx-offers">
+      <!-- Ensuring priority-card colors default properly -->
+      <div class="metric-card priority-card color-amber" id="card-cx-offers">
         <div class="priority-tag">★ Priority</div>
         <div class="metric-label">Active Offer Letters</div>
         <div class="metric-value" id="val-cx-offers">0</div>
         <div class="metric-delta" id="delta-cx-offers">Live Synced</div>
       </div>
-      <div class="metric-card priority-card" id="card-cx-balance">
+      <div class="metric-card priority-card color-red" id="card-cx-balance">
         <div class="priority-tag">★ Priority</div>
         <div class="metric-label">Account Balance</div>
         <div class="metric-value" id="val-cx-balance">₦40M</div>
@@ -682,7 +683,8 @@ nav {
           </div>
         </div>
         <div class="target-list" id="targets-crossings">
-          </div>
+          <!-- Will auto populate from Sheet -->
+        </div>
       </div>
     </div>
 
@@ -720,13 +722,13 @@ nav {
         <div class="metric-value" id="val-annex-sales">₦6.89B</div>
         <div class="metric-delta">Live Synced</div>
       </div>
-      <div class="metric-card priority-card" id="card-annex-offers">
+      <div class="metric-card priority-card color-amber" id="card-annex-offers">
         <div class="priority-tag">★ Priority</div>
         <div class="metric-label">Active Offer Letters</div>
         <div class="metric-value" id="val-annex-offers">0</div>
         <div class="metric-delta" id="delta-annex-offers">Live Synced</div>
       </div>
-      <div class="metric-card priority-card" id="card-annex-balance">
+      <div class="metric-card priority-card color-green" id="card-annex-balance">
         <div class="priority-tag">★ Priority</div>
         <div class="metric-label">Account Balance</div>
         <div class="metric-value" id="val-annex-balance">₦61.9M</div>
@@ -750,7 +752,8 @@ nav {
           </div>
         </div>
         <div class="target-list" id="targets-annexe">
-          </div>
+          <!-- Will auto populate from Sheet -->
+        </div>
       </div>
     </div>
 
@@ -773,9 +776,39 @@ nav {
   <div class="mobile-dept-scroller" id="mobile-dept-pills"></div>
 
   <div class="dept-layout">
+    <!-- Hardcoded Department Sidbars to prevent them from ever "deleting" -->
     <div class="dept-sidebar" id="sidebar-container">
-      <div class="sidebar-section" id="sidebar-crossings" style="display:none;"></div>
-      <div class="sidebar-section" id="sidebar-annexe" style="display:none;"></div>
+      
+      <!-- Lakowe Crossings Sidebar -->
+      <div class="sidebar-section" id="sidebar-crossings" style="display:none;">
+        <div class="sidebar-section-label">Lakowe Crossings</div>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Design')">Design <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Costing')">Costing <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','AMC')">AMC <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','IPD')">IPD/PMU <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Landscape')">Landscape <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Operations')">Operations <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','FINCON')">Fincon <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Sales')">Sales <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','MCC')">MCC <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','Legal')">Legal <span class="dept-count">0</span></button>
+        <button class="sidebar-item" onclick="showDept(this,'Crossings','General')">General <span class="dept-count">0</span></button>
+      </div>
+      
+      <!-- Lakowe Annexe Sidebar -->
+      <div class="sidebar-section" id="sidebar-annexe" style="display:none;">
+        <div class="sidebar-section-label annexe">Lakowe Annexe</div>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Design')">Design <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Costing')">Costing <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','IPD')">IPD <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Operations')">Operations <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Fincon')">Fincon <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Telemarketing')">Telemarketing <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','MCC')">MCC <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Sales')">Sales <span class="dept-count">0</span></button>
+        <button class="sidebar-item annexe-btn" onclick="showDept(this,'Annexe','Legal')">Legal <span class="dept-count">0</span></button>
+      </div>
+
     </div>
 
     <div class="dept-main">
@@ -835,7 +868,7 @@ let currentDept = null;
 let currentFilter = 'all';
 let viewingSessionDate = 'current'; 
 
-// Fetch the entire Excel binary to dynamically extract all tabs/sheets instead of manually publishing each sheet.
+// Excel Binaries endpoints
 const SHEET_CROSSINGS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_BotFNOFLBaUKX-lzjWZkfe2DhCWL28EmOGGBkVBnkcKxoM2l02lBjsqdhnnweUKngc1DWpO82OPL/pub?output=xlsx'; 
 const SHEET_ANNEXE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSCwJvm2NJYEAAcGRCvIEz_OnT4IqrIC8MtxXnbOAwaPuOie0nJMnPts7NQ7B4_gMzkp0cAeg8BO7Jk/pub?output=xlsx'; 
 
@@ -847,7 +880,7 @@ let availableSessions = { Crossings: [], Annexe: [] };
 // ═══════════════════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════════════════
-const STATUS_KEY = 'lakowe_status_v4';
+const STATUS_KEY = 'lakowe_status_v5';
 
 function getStatusOverrides() {
   try { return JSON.parse(localStorage.getItem(STATUS_KEY)) || {}; } catch { return {}; }
@@ -909,48 +942,50 @@ async function syncWithGoogleSheet() {
     results.forEach(res => {
       const wb = XLSX.read(res.data, {type: 'array'});
       
-      // Step 1: Find all sheets that have a Date title (e.g. "Apr 20")
+      // Step 1: Find all sheets that are Dates (e.g. "Apr 20")
       let dateSheets = wb.SheetNames.filter(name => /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*\d+/i.test(name.trim()));
+      if (dateSheets.length === 0) return;
       
-      // Step 2: DYNAMIC YEAR CALCULATION
-      // We read tabs strictly from left-to-right (the way they are placed in Excel). 
-      // We start at 2025. Every time we encounter a "Jan" tab following a later month, we bump the year up.
-      let currentYear = 2025;
-      let lastMonth = 6; // Assume starting around June based on the data
-      let validSheets = [];
-
-      dateSheets.forEach(name => {
-          const m = name.toLowerCase().match(/^([a-z]{3})\s*(\d+)/);
-          if (!m) return;
-          const monthIndex = monthMap[m[1]];
-          const day = parseInt(m[2], 10);
-
-          // If the month jumps backward significantly (e.g., Dec -> Jan), it means we crossed into a new year
-          if (monthIndex < lastMonth && (lastMonth - monthIndex) > 5) {
-              currentYear++;
+      // Step 2: Strict "January 2026 Onwards" boundary detection
+      // Extract numeric month values (Jan=1, Dec=12)
+      let monthVals = dateSheets.map(n => monthMap[n.substring(0,3).toLowerCase()]);
+      
+      // Determine if array is Newest-first or Oldest-first
+      let isNewestFirst = monthVals[0] > monthVals[monthVals.length - 1] || (monthVals[0] <= 5 && monthVals[monthVals.length - 1] >= 8); 
+      
+      let resultSheets = [];
+      if (isNewestFirst) {
+          // It looks like [Apr, Mar, Feb, Jan, Dec, Nov]
+          // Find the transition point where it drops to Dec (month 12)
+          let cutoff = dateSheets.length;
+          for(let i=0; i<dateSheets.length - 1; i++){
+               // If we step from Jan (1) to Dec (12), we crossed into 2025
+               if(monthVals[i] === 1 && monthVals[i+1] === 12) {
+                   cutoff = i + 1; 
+                   break;
+               }
           }
-          lastMonth = monthIndex;
-
-          // Push strictly ONLY 2026 dates to the dashboard (Removes Aug 2025 completely)
-          if (currentYear >= 2026) {
-              validSheets.push({
-                  name: name.trim(),
-                  date: new Date(currentYear, monthIndex - 1, day)
-              });
+          resultSheets = dateSheets.slice(0, cutoff);
+      } else {
+          // It looks like [Nov, Dec, Jan, Feb, Mar, Apr]
+          let cutoff = 0;
+          for(let i=0; i<dateSheets.length - 1; i++){
+               if(monthVals[i] === 12 && monthVals[i+1] === 1) {
+                   cutoff = i + 1; 
+                   break;
+               }
           }
-      });
+          resultSheets = dateSheets.slice(cutoff);
+          resultSheets.reverse(); // Standardize to newest first for the UI
+      }
       
-      // Sort strictly by the calculated Date object, descending (Newest first)
-      validSheets.sort((a, b) => b.date - a.date);
-      
-      // Save just the names to our session list
-      availableSessions[res.proj] = validSheets.map(s => s.name);
+      availableSessions[res.proj] = resultSheets;
       
       // Step 3: Extract data from every valid 2026 sheet
-      availableSessions[res.proj].forEach((sheetName, index) => {
+      resultSheets.forEach((sheetName, index) => {
          const ws = wb.Sheets[sheetName];
          const rows = XLSX.utils.sheet_to_json(ws, {header: 1});
-         const isLatest = index === 0; // True only for the most recent 2026 date
+         const isLatest = index === 0; // True only for the absolute most recent 2026 date
          processSheet(rows, res.proj, sheetName, isLatest);
       });
     });
@@ -961,7 +996,7 @@ async function syncWithGoogleSheet() {
     
     viewingSessionDate = 'current'; 
     applyPriorityColors();
-    rebuildSidebarAndPills(); // Dynamically generates the sidebar based on EXACT department names
+    updateSidebarCounts();
     renderOverduePanels();
     if (currentDept) renderCurrentDept();
     
@@ -974,11 +1009,12 @@ async function syncWithGoogleSheet() {
   }
 }
 
-// Extract metric values robustly
+// Extract metric values robustly - Fixed handling for M, B, K strings
 function extractMetricValue(row) {
-    for (let i = 0; i < row.length; i++) {
+    for (let i = 1; i <= 7; i++) {
         const str = String(row[i] || '').trim();
-        if (/\d/.test(str) && !/target/i.test(str)) {
+        if (/\d/.test(str) && !/target|inflow/i.test(str)) {
+            // Regex to pull out N75m or 141.34m from surrounding text
             const match = str.match(/(?:-|:)?\s*(N?[\d.,]+[bmk]?)/i);
             if (match) return match[1].toUpperCase();
             return str;
@@ -989,45 +1025,15 @@ function extractMetricValue(row) {
 
 function processSheet(rows, proj, sheetName, isLatest) {
   const targets = [];
+  let lastDept = 'General'; // CRITICAL FIX: Memory cache for merged Excel cells
   
-  // DYNAMIC HEADER MAPPING
-  // This completely eliminates the "shifted columns" bug regardless of invisible margins
-  let idxDept = -1, idxAction = -1, idxDue = -1, idxExp = -1, idxResult = -1, idxStatus = -1;
-  let dataStartIndex = 1;
-
-  for (let i = 0; i < Math.min(rows.length, 15); i++) {
-      if (!rows[i]) continue;
-      const rStr = rows[i].map(x => String(x).toLowerCase().trim());
-      
-      // If we find the row with the actual headers
-      if (rStr.includes('department') || rStr.includes('next steps') || rStr.some(x => x.includes('action'))) {
-          idxDept = rStr.indexOf('department');
-          idxAction = rStr.findIndex(x => x.includes('next step') || x.includes('action'));
-          idxDue = rStr.findIndex(x => x.includes('timeline') || x.includes('due'));
-          idxResult = rStr.findIndex(x => x === 'result');
-          idxExp = rStr.findIndex(x => x.includes('explanation') || x.includes('note'));
-          idxStatus = rStr.indexOf('status');
-
-          // Bulletproof fallbacks assuming 8-column layout relative to "S/N" or "Department"
-          if(idxDept === -1) idxDept = rStr.includes('s/n') ? rStr.indexOf('s/n') + 1 : 2;
-          if(idxAction === -1) idxAction = idxDept + 1;
-          if(idxDue === -1) idxDue = idxDept + 2;
-          if(idxResult === -1) idxResult = idxDept + 4;
-          if(idxExp === -1) idxExp = idxDept + 5;
-          if(idxStatus === -1) idxStatus = rStr.includes('status') ? rStr.indexOf('status') : idxDept + 6;
-
-          dataStartIndex = i + 1;
-          break;
-      }
-  }
-  
-  for (let i = dataStartIndex; i < rows.length; i++) {
+  for (let i = 0; i < rows.length; i++) {
     const c = rows[i]; 
     if (!c || c.length < 3) continue;
     
     const s = String(c.join(' ')).toLowerCase();
     
-    // METRICS
+    // ── METRICS: Update Dashboard only if this is the newest sheet ──
     if (isLatest) {
         if (s.includes('inflow') && !s.includes('target')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', extractMetricValue(c)); continue; }
         if ((s.includes('sales-') || s.includes('sale:') || s.includes('sales:')) && !s.includes('value')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', extractMetricValue(c)); continue; }
@@ -1037,8 +1043,8 @@ function processSheet(rows, proj, sheetName, isLatest) {
         if (s.includes('balance') || s.includes('bal:')) { setMetric(proj==='Crossings'?'val-cx-balance':'val-annex-balance', extractMetricValue(c)); continue; }
         
         if (String(c[0]).toLowerCase() === 'target' || s.includes('monthly target') || (s.includes('end of') && s.includes('target'))) {
-            const tName = c[idxAction] || c[idxDept] || c[2] || c[1];
-            const tNote = c[idxAction + 1] || c[3] || '';
+            const tName = c[2] || c[4] || c[1];
+            const tNote = c[3] || c[5] || '';
             const cls = s.includes('carry') ? 'carryover' : 'new-target';
             if (tName && tName.length > 3) {
                 targets.push(`<div class="target-item ${cls}"><span class="t-name">${tName}</span><span class="t-note">${tNote}</span></div>`);
@@ -1047,14 +1053,21 @@ function processSheet(rows, proj, sheetName, isLatest) {
         }
     }
     
-    // Use dynamically found indices, or fall back safely
-    let dept = String(c[idxDept !== -1 ? idxDept : 1] || '').trim();
-    let action = String(c[idxAction !== -1 ? idxAction : 2] || '').trim();
+    // ── TASKS: Standard 8-column layout logic applied across all filtered sheets ──
+    // 0: Number, 1: Department, 2: Action, 3: Due, 4: ResultAchieve, 5: Explanation, 6: ActualResult, 7: Status
     
-    if (!action || action.length < 4 || /department|next steps|action point|sn|s\/n/i.test(action)) continue;
-    if (!dept || /department|s\/n/i.test(dept)) continue;
+    let rawDept = String(c[1] || '').trim();
+    if (rawDept && !/department|s\/n|next step/i.test(rawDept)) {
+        lastDept = rawDept; // Update cache when a new department row appears
+    }
     
-    let rawStat = String(c[idxStatus !== -1 ? idxStatus : 7] || 'ontrack').toLowerCase();
+    let action = String(c[2] || '').trim();
+    
+    // Avoid parsing table headers or empty sub-rows
+    if (!action || action.length < 4 || /department|next step|action point|sn|s\/n/i.test(action)) continue;
+    
+    // Evaluate Status from Column 8 (Index 7)
+    let rawStat = String(c[7] || 'ontrack').toLowerCase();
     let statusRaw = rawStat.replace(/[^a-z]/g, '');
     if(statusRaw.includes('delay') || statusRaw.includes('offtrack')) statusRaw = 'delayed';
     else if(statusRaw.includes('achieve') || statusRaw.includes('done') || statusRaw.includes('complete')) statusRaw = 'achieved';
@@ -1064,12 +1077,12 @@ function processSheet(rows, proj, sheetName, isLatest) {
     taskDatabase.push({
       project: proj,
       session: sheetName,
-      dept: dept || 'General',
+      dept: lastDept, // Uses cache for merged cells
       action: action, 
-      due: String(c[idxDue !== -1 ? idxDue : 3] || 'TBD').trim(),
-      resultToAchieve: String(c[idxResult !== -1 ? idxResult : 4] || '').trim(),
-      explanation: String(c[idxExp !== -1 ? idxExp : 5] || '').trim(),
-      result: String(c[idxResult !== -1 ? idxResult + 1 : 6] || '').trim(),
+      due: String(c[3] || 'TBD').trim(),
+      resultToAchieve: String(c[4] || '').trim(),
+      explanation: String(c[5] || '').trim(),
+      result: String(c[6] || '').trim(),
       status: statusRaw
     });
   }
@@ -1086,7 +1099,7 @@ function setMetric(id, val) {
 }
 
 // ═══════════════════════════════════════════════
-// COLOR CODING
+// COLOR CODING & METRICS PARSING
 // ═══════════════════════════════════════════════
 function parseMillions(str) {
   if (!str) return null;
@@ -1096,6 +1109,7 @@ function parseMillions(str) {
   let val = parseFloat(numMatch[1]);
   if (numMatch[2] === 'B') val *= 1000;
   else if (numMatch[2] === 'K') val /= 1000;
+  // If 'M', it's already in millions, leave as is.
   return val;
 }
 function balanceColorClass(valStr) {
@@ -1167,56 +1181,47 @@ function renderOverduePanels() {
 }
 
 // ═══════════════════════════════════════════════
-// SIDEBAR COUNTS & MOBILE PILLS DYNAMIC GENERATION
+// SIDEBAR COUNTS & MOBILE PILLS
 // ═══════════════════════════════════════════════
-function rebuildSidebarAndPills() {
-  if (!currentProject) return;
-  
-  const latest = availableSessions[currentProject] && availableSessions[currentProject][0];
-  if (!latest) return;
-  
-  let rawDepts = taskDatabase
-      .filter(t => t.project === currentProject && t.session === latest)
-      .map(t => t.dept.trim());
-      
-  let depts = [...new Set(rawDepts)].filter(d => d.length > 1);
-  
-  if (depts.length > 0 && !depts.includes(currentDept)) {
-      currentDept = depts[0];
-  }
+function updateSidebarCounts() {
+  document.querySelectorAll('.sidebar-item').forEach(btn => {
+    const oc = btn.getAttribute('onclick') || '';
+    const m = oc.match(/showDept\(this,'([^']+)','([^']+)'\)/);
+    if (!m) return;
+    
+    const proj = m[1];
+    const deptFilter = m[2].toLowerCase();
+    const latest = availableSessions[proj] && availableSessions[proj][0];
+    
+    const count = taskDatabase.filter(t => t.project === proj && t.dept.toLowerCase().includes(deptFilter) && t.session === latest).length;
+    const span = btn.querySelector('.dept-count');
+    if (span) span.textContent = count;
+  });
+  rebuildMobilePills();
+}
 
-  const sidebarId = currentProject === 'Crossings' ? 'sidebar-crossings' : 'sidebar-annexe';
-  const sidebarSection = document.getElementById(sidebarId);
-  const btnClass = currentProject === 'Crossings' ? '' : 'annexe-btn';
-  
-  if (sidebarSection) {
-      let sidebarHtml = `<div class="sidebar-section-label ${currentProject === 'Annexe' ? 'annexe' : ''}">Lakowe ${currentProject}</div>`;
-      depts.forEach(d => {
-          const count = taskDatabase.filter(t => t.project === currentProject && t.dept === d && t.session === latest).length;
-          const isActive = currentDept === d ? 'active' : '';
-          sidebarHtml += `<button class="sidebar-item ${btnClass} ${isActive}" onclick="showDept(this, '${currentProject}', '${d}')">${d} <span class="dept-count">${count}</span></button>`;
-      });
-      sidebarSection.innerHTML = sidebarHtml;
-      sidebarSection.style.display = 'block';
-  }
+const CX_DEPTS = ['Design','Costing','AMC','IPD','Landscape','Operations','Fincon','Sales','MCC','General'];
+const ANNEX_DEPTS = ['Design','Costing','IPD','Operations','Fincon','Telemarketing','MCC','Sales','Legal'];
 
-  const pillsContainer = document.getElementById('mobile-dept-pills');
+function rebuildMobilePills() {
+  const container = document.getElementById('mobile-dept-pills');
+  if (!container || !currentProject) { if(container) container.innerHTML=''; return; }
+  
+  const depts = currentProject === 'Crossings' ? CX_DEPTS : ANNEX_DEPTS;
   const activeClass = currentProject === 'Crossings' ? 'active-cx' : 'active-annex';
+  const latest = availableSessions[currentProject] && availableSessions[currentProject][0];
   
-  if (pillsContainer) {
-      let pillsHtml = depts.map(d => {
-          const count = taskDatabase.filter(t => t.project === currentProject && t.dept === d && t.session === latest).length;
-          const isActive = currentDept === d ? activeClass : '';
-          return `<button class="mobile-dept-pill ${isActive}" onclick="showDeptMobile('${d}')">${d} <span class="pill-count">${count}</span></button>`;
-      }).join('');
-      pillsContainer.innerHTML = pillsHtml;
-  }
+  container.innerHTML = depts.map(d => {
+    const count = taskDatabase.filter(t => t.project === currentProject && t.dept.toLowerCase().includes(d.toLowerCase()) && t.session === latest).length;
+    const isActive = currentDept === d ? activeClass : '';
+    return `<button class="mobile-dept-pill ${isActive}" onclick="showDeptMobile('${d}')">${d} <span class="pill-count">${count}</span></button>`;
+  }).join('');
 }
 
 function showDeptMobile(dept) {
   currentDept = dept;
   viewingSessionDate = 'current';
-  rebuildSidebarAndPills();
+  updateSidebarCounts();
   renderDeptContent(currentProject, dept);
 }
 
@@ -1280,9 +1285,9 @@ function renderCurrentDept() {
   let tasks;
   if (viewingSessionDate === 'current') {
     const latest = availableSessions[currentProject] && availableSessions[currentProject][0];
-    tasks = taskDatabase.filter(t => t.project === currentProject && t.dept === currentDept && t.session === latest);
+    tasks = taskDatabase.filter(t => t.project === currentProject && t.dept.toLowerCase().includes(currentDept.toLowerCase()) && t.session === latest);
   } else {
-    tasks = taskDatabase.filter(t => t.project === currentProject && t.dept === currentDept && t.session === viewingSessionDate);
+    tasks = taskDatabase.filter(t => t.project === currentProject && t.dept.toLowerCase().includes(currentDept.toLowerCase()) && t.session === viewingSessionDate);
   }
 
   const overrides = getStatusOverrides();
@@ -1301,7 +1306,7 @@ function renderCurrentDept() {
 
   const list = document.getElementById('dynamic-tasks-list');
   if (filtered.length === 0) {
-    list.innerHTML = `<div style="padding:20px;color:#999;text-align:center;font-size:13px">No tasks matched your criteria.</div>`;
+    list.innerHTML = `<div style="padding:20px;color:#999;text-align:center;font-size:13px">No tasks matched your criteria. (Try changing your filter or hit "Sync" to fetch latest data)</div>`;
     return;
   }
 
@@ -1396,8 +1401,8 @@ function selectProject(proj) {
   document.getElementById('block-crossings').style.display = proj === 'Crossings' ? 'block' : 'none';
   document.getElementById('block-annexe').style.display = proj === 'Annexe' ? 'block' : 'none';
   
-  document.getElementById('sidebar-crossings').style.display = 'none';
-  document.getElementById('sidebar-annexe').style.display = 'none';
+  document.getElementById('sidebar-crossings').style.display = proj === 'Crossings' ? 'block' : 'none';
+  document.getElementById('sidebar-annexe').style.display = proj === 'Annexe' ? 'block' : 'none';
 
   document.getElementById('nav-tabs-group').style.display = 'flex';
   document.getElementById('bottom-nav').style.display = 'block';
@@ -1407,8 +1412,12 @@ function selectProject(proj) {
 
   document.getElementById('panel-placeholder').style.display = '';
   document.getElementById('dynamic-dept-container').style.display = 'none';
-  
-  rebuildSidebarAndPills();
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+
+  updateSidebarCounts();
+  applyPriorityColors();
+  renderOverduePanels();
+  rebuildMobilePills();
 }
 
 // ═══════════════════════════════════════════════
@@ -1443,6 +1452,7 @@ const lastPointPlugin = {
 };
 Chart.register(lastPointPlugin);
 
+// Static Chart Data Placeholder - Updates with live data dynamically soon.
 const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7','Apr 13','Apr 16','Apr 20'];
 const annexInflow = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27,6.27,6.27,6.27];
 const annexBalance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,82.78,150,149.1,61.9];
@@ -1499,4 +1509,3 @@ window.onload = function () {
 
 </body>
 </html>
-
