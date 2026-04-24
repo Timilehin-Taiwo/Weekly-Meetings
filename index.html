@@ -63,6 +63,13 @@
   --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
 }
 
+/* ── CRITICAL MOBILE VIEWPORT FIX ── */
+html, body {
+  overflow-x: hidden; /* Prevents the entire page from sliding horizontally */
+  width: 100%;
+  max-width: 100vw;
+}
+
 body {
   font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
@@ -190,7 +197,7 @@ nav {
 
 /* ── DASHBOARD ── */
 .dash-container { max-width: 1060px; margin: 0 auto; padding: 0 20px 48px; }
-.project-block { margin-bottom: 48px; }
+.project-block { margin-bottom: 48px; min-width: 0; }
 .project-heading {
   display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
   padding-bottom: 12px; border-bottom: 2px solid var(--brand-grey-light);
@@ -262,7 +269,11 @@ nav {
   border-radius: var(--radius-pill); text-transform: uppercase;
   letter-spacing: 0.04em; white-space: nowrap; flex-shrink: 0;
 }
-.overdue-action { color: var(--text-primary); font-weight: 600; flex: 1; min-width: 120px; }
+.overdue-action { 
+  color: var(--text-primary); font-weight: 600; flex: 1; 
+  min-width: 0; /* Changed from fixed px to allow wrapping */
+  word-wrap: break-word;
+}
 .overdue-due { color: var(--status-red); font-size: 10px; font-weight: 700; white-space: nowrap; }
 
 /* Charts */
@@ -283,8 +294,8 @@ nav {
 .target-item.new-target .t-name { color: #2e7d32; }
 .target-item.carryover { border-left-color: #f44336; }
 .target-item.carryover .t-name { color: #c62828; }
-.t-name { font-weight: 800; min-width: 120px; flex-shrink: 0; font-size: 11px; }
-.t-note { color: var(--text-secondary); line-height: 1.5; }
+.t-name { font-weight: 800; min-width: 0; flex-basis: 35%; flex-shrink: 0; font-size: 11px; word-wrap: break-word;}
+.t-note { color: var(--text-secondary); line-height: 1.5; min-width: 0; word-wrap: break-word;}
 
 /* Alert Strip */
 .alert-strip {
@@ -327,7 +338,11 @@ nav {
 }
 
 /* Dept Main */
-.dept-main { min-height: 500px; }
+.dept-main { 
+  min-height: 500px; 
+  min-width: 0; /* CRITICAL FIX: Stops nested scrollbars from breaking the grid layout */
+  width: 100%;
+}
 .dept-panel { display: none; animation: fadeIn 0.25s ease; }
 .dept-panel.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
@@ -337,6 +352,7 @@ nav {
   display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
   overflow-x: auto; padding-bottom: 4px;
   scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  width: 100%;
 }
 .dept-history-bar::-webkit-scrollbar { display: none; }
 .history-pill {
@@ -358,12 +374,13 @@ nav {
   padding: 18px; margin-bottom: 16px; box-shadow: var(--shadow);
   display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
 }
+.dept-header-text { min-width: 0; }
 .dept-header-text h2 { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
-.dept-header-text p { font-size: 13px; color: var(--text-secondary); }
+.dept-header-text p { font-size: 13px; color: var(--text-secondary); word-wrap: break-word; }
 .dept-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
 /* Filter Tabs & Task Cards Strict Theming */
-.filter-tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; width: 100%; }
 .filter-tab {
   padding: 6px 14px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700;
   cursor: pointer; border: 1.5px solid var(--border); background: var(--white);
@@ -376,11 +393,12 @@ nav {
 .filter-tab[data-filter="update"].active { background: var(--status-orange); border-color: var(--status-orange); }
 .filter-tab[data-filter="achieved"].active { background: var(--status-blue); border-color: var(--status-blue); }
 
-.next-steps-list { display: flex; flex-direction: column; gap: 12px; }
+.next-steps-list { display: flex; flex-direction: column; gap: 12px; width: 100%; }
 .step-card {
   background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 16px; box-shadow: var(--shadow); cursor: pointer;
   position: relative; transition: all 0.2s; border-left-width: 4px;
+  min-width: 0;
 }
 .step-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
 .step-card:active { transform: translateY(0); }
@@ -395,14 +413,32 @@ nav {
 .step-context {
   font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
   color: var(--text-muted); margin-bottom: 5px;
+  word-wrap: break-word; overflow-wrap: break-word;
 }
 .s-ontrack .step-context { color: var(--status-green); }
 .s-delayed .step-context { color: var(--status-red); }
 .s-update .step-context { color: var(--status-orange); }
 .s-achieved .step-context { color: var(--status-blue); }
 
-.step-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.step-text { font-size: 13.5px; color: var(--text-primary); line-height: 1.55; font-weight: 700; flex: 1; }
+.step-card-top { 
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; 
+  min-width: 0; 
+}
+
+.step-text { 
+  font-size: 13.5px; 
+  color: var(--text-primary); 
+  line-height: 1.55; 
+  font-weight: 700; 
+  flex: 1; 
+  
+  /* CRITICAL FIX: Ensures text wraps, bullet points are respected, and container isn't pushed wide */
+  min-width: 0; 
+  white-space: pre-wrap; 
+  word-wrap: break-word; 
+  overflow-wrap: break-word; 
+}
+
 .step-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
 .step-date {
   font-size: 10px; color: var(--text-muted); font-weight: 700;
@@ -425,6 +461,8 @@ nav {
   display: none; margin-top: 14px; padding-top: 12px;
   border-top: 1px dashed var(--border-md); font-size: 13px;
   color: var(--text-secondary); line-height: 1.65;
+  white-space: pre-wrap; /* Keeps formatting from sheet */
+  word-wrap: break-word;
 }
 .step-card.expanded .step-details-pane { display: block; animation: fadeIn 0.2s ease; }
 .pane-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand-grey); margin-bottom: 6px; }
@@ -463,6 +501,8 @@ nav {
 /* Mobile Dept Pills */
 .mobile-dept-scroller {
   display: none;
+  width: 100%;
+  max-width: 100vw;
   overflow-x: auto; -webkit-overflow-scrolling: touch;
   scrollbar-width: none; padding: 0 4px 8px;
   gap: 8px;
@@ -537,6 +577,8 @@ nav {
 
   /* Overdue items */
   .overdue-action { font-size: 11px; }
+  
+  .t-name { min-width: 80px; }
 }
 
 @media (max-width: 400px) {
@@ -943,24 +985,17 @@ async function syncWithGoogleSheet() {
       let resultSheets = [];
       
       if (markerIndex !== -1) {
-          // As requested: anything AFTER "2026>>>" is 2026 (e.g., January onwards)
           let sheetsAfterMarker = allSheets.slice(markerIndex + 1);
-          
-          // Filter to only include valid date sheets
           resultSheets = sheetsAfterMarker.filter(name => /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*\d+/i.test(name.trim()));
           
-          // Standardize to newest first for the UI
           if (resultSheets.length > 1) {
               let firstMonth = monthMap[resultSheets[0].substring(0,3).toLowerCase()];
               let lastMonth = monthMap[resultSheets[resultSheets.length-1].substring(0,3).toLowerCase()];
-              
-              // If the sheets are ordered Oldest to Newest (e.g., Jan -> Apr), reverse them
               if (firstMonth <= lastMonth) {
                   resultSheets.reverse();
               }
           }
       } else {
-          // Fallback if the "2026>>>" marker is missing: Use month-transition boundary
           let dateSheets = allSheets.filter(name => /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*\d+/i.test(name.trim()));
           if (dateSheets.length === 0) return;
           
@@ -991,12 +1026,11 @@ async function syncWithGoogleSheet() {
       resultSheets.forEach((sheetName, index) => {
          const ws = wb.Sheets[sheetName];
          const rows = XLSX.utils.sheet_to_json(ws, {header: 1});
-         const isLatest = index === 0; // True only for the absolute most recent 2026 date
+         const isLatest = index === 0; 
          processSheet(rows, res.proj, sheetName, isLatest);
       });
     });
     
-    // Display updates
     const now = new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'});
     document.getElementById('last-updated-text').textContent = 'Live Synced: ' + now;
     
@@ -1006,21 +1040,17 @@ async function syncWithGoogleSheet() {
     renderOverduePanels();
     if (currentDept) renderCurrentDept();
     
-    console.log(`Successfully synced ${taskDatabase.length} tasks from Google Sheets.`);
   } catch (error) {
-    console.error('Error syncing with Google Sheets:', error);
-    alert('Failed to sync. Please check your internet connection.');
+    console.error('Error syncing:', error);
   } finally {
     document.querySelectorAll('.sync-btn').forEach(btn => btn.classList.remove('syncing'));
   }
 }
 
-// Extract metric values robustly - Fixed handling for M, B, K strings
 function extractMetricValue(row) {
     for (let i = 1; i <= 7; i++) {
         const str = String(row[i] || '').trim();
         if (/\d/.test(str) && !/target|inflow/i.test(str)) {
-            // Regex to pull out N75m or 141.34m from surrounding text
             const match = str.match(/(?:-|:)?\s*(N?[\d.,]+[bmk]?)/i);
             if (match) return match[1].toUpperCase();
             return str;
@@ -1031,7 +1061,7 @@ function extractMetricValue(row) {
 
 function processSheet(rows, proj, sheetName, isLatest) {
   const targets = [];
-  let lastDept = 'General'; // CRITICAL FIX: Memory cache for merged Excel cells
+  let lastDept = 'General';
   
   for (let i = 0; i < rows.length; i++) {
     const c = rows[i]; 
@@ -1039,7 +1069,6 @@ function processSheet(rows, proj, sheetName, isLatest) {
     
     const s = String(c.join(' ')).toLowerCase();
     
-    // ── METRICS: Update Dashboard only if this is the newest sheet ──
     if (isLatest) {
         if (s.includes('inflow') && !s.includes('target')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', extractMetricValue(c)); continue; }
         if ((s.includes('sales-') || s.includes('sale:') || s.includes('sales:')) && !s.includes('value')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', extractMetricValue(c)); continue; }
@@ -1059,20 +1088,15 @@ function processSheet(rows, proj, sheetName, isLatest) {
         }
     }
     
-    // ── TASKS: Standard 8-column layout logic applied across all filtered sheets ──
-    // 0: Number, 1: Department, 2: Action, 3: Due, 4: ResultAchieve, 5: Explanation, 6: ActualResult, 7: Status
-    
     let rawDept = String(c[1] || '').trim();
     if (rawDept && !/department|s\/n|next step/i.test(rawDept)) {
-        lastDept = rawDept; // Update cache when a new department row appears
+        lastDept = rawDept; 
     }
     
     let action = String(c[2] || '').trim();
     
-    // Avoid parsing table headers or empty sub-rows
     if (!action || action.length < 4 || /department|next step|action point|sn|s\/n/i.test(action)) continue;
     
-    // Evaluate Status from Column 8 (Index 7)
     let rawStat = String(c[7] || 'ontrack').toLowerCase();
     let statusRaw = rawStat.replace(/[^a-z]/g, '');
     if(statusRaw.includes('delay') || statusRaw.includes('offtrack')) statusRaw = 'delayed';
@@ -1083,7 +1107,7 @@ function processSheet(rows, proj, sheetName, isLatest) {
     taskDatabase.push({
       project: proj,
       session: sheetName,
-      dept: lastDept, // Uses cache for merged cells
+      dept: lastDept,
       action: action, 
       due: String(c[3] || 'TBD').trim(),
       resultToAchieve: String(c[4] || '').trim(),
@@ -1104,9 +1128,6 @@ function setMetric(id, val) {
   if (el && val) el.textContent = val;
 }
 
-// ═══════════════════════════════════════════════
-// COLOR CODING & METRICS PARSING
-// ═══════════════════════════════════════════════
 function parseMillions(str) {
   if (!str) return null;
   const s = str.replace(/[₦,\s]/g,'').toUpperCase();
@@ -1115,7 +1136,6 @@ function parseMillions(str) {
   let val = parseFloat(numMatch[1]);
   if (numMatch[2] === 'B') val *= 1000;
   else if (numMatch[2] === 'K') val /= 1000;
-  // If 'M', it's already in millions, leave as is.
   return val;
 }
 function balanceColorClass(valStr) {
@@ -1149,9 +1169,6 @@ function applyPriorityColors() {
   document.getElementById('val-annex-offers').className = 'metric-value ' + offersColorClass(aOff);
 }
 
-// ═══════════════════════════════════════════════
-// OVERDUE PANEL
-// ═══════════════════════════════════════════════
 function renderOverduePanels() {
   ['Crossings','Annexe'].forEach(proj => {
     const el = document.getElementById('overdue-' + proj.toLowerCase());
@@ -1186,9 +1203,6 @@ function renderOverduePanels() {
   });
 }
 
-// ═══════════════════════════════════════════════
-// SIDEBAR COUNTS & MOBILE PILLS
-// ═══════════════════════════════════════════════
 function updateSidebarCounts() {
   document.querySelectorAll('.sidebar-item').forEach(btn => {
     const oc = btn.getAttribute('onclick') || '';
@@ -1231,9 +1245,6 @@ function showDeptMobile(dept) {
   renderDeptContent(currentProject, dept);
 }
 
-// ═══════════════════════════════════════════════
-// HISTORY BAR DYNAMIC GENERATION
-// ═══════════════════════════════════════════════
 function buildHistoryBar() {
   const bar = document.getElementById('history-bar');
   if (!currentProject) return;
@@ -1258,9 +1269,6 @@ function switchSession(dateStr) {
   renderCurrentDept();
 }
 
-// ═══════════════════════════════════════════════
-// DEPT RENDERING
-// ═══════════════════════════════════════════════
 function showDept(btn, proj, dept) {
   currentDept = dept;
   viewingSessionDate = 'current';
@@ -1458,7 +1466,6 @@ const lastPointPlugin = {
 };
 Chart.register(lastPointPlugin);
 
-// Static Chart Data Placeholder - Updates with live data dynamically soon.
 const labels = ['Jan 5','Jan 12','Jan 19','Jan 26','Feb 2','Feb 9','Feb 16','Feb 23','Mar 2','Mar 9','Mar 16','Mar 23','Mar 30','Apr 2','Apr 7','Apr 13','Apr 16','Apr 20'];
 const annexInflow = [5.97,5.14,5.97,5.97,6.4,6.05,6.08,6.11,6.14,6.17,6.25,6.27,6.27,6.27,6.27,6.27,6.27,6.27];
 const annexBalance = [388,161,172.8,99.5,89,80.4,150.8,87.9,105.7,65.3,73.1,36.6,58.9,62.9,82.78,150,149.1,61.9];
@@ -1502,11 +1509,7 @@ new Chart(document.getElementById('c3'), {
   options: baseOpts
 });
 
-// ═══════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════
 window.onload = function () {
-  // applyStoredStatuses(); // Optional if defined elsewhere, keeping script block intact.
   applyPriorityColors();
   syncWithGoogleSheet();
   setInterval(syncWithGoogleSheet, AUTO_SYNC_MINUTES * 60 * 1000);
