@@ -3,7 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Projects Tracker — Performance Dashboard</title>
+<title>Projects Dashboard</title>
+<meta name="application-name" content="Projects Dashboard">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Projects Dashboard">
+<meta property="og:title" content="Projects Dashboard">
+<meta property="og:description" content="Mixta Africa — Live Performance Dashboard">
+<meta property="og:image" content="Mixta Africa.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Projects Dashboard">
+<meta name="twitter:image" content="Mixta Africa.jpg">
+<link rel="icon" type="image/jpeg" href="Mixta Africa.jpg">
+<link rel="apple-touch-icon" href="Mixta Africa.jpg">
+<link rel="manifest" id="pwa-manifest">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -26,10 +40,14 @@
   --brand-grey-light: #f2f2f2;
   --brand-grey-dark: #424242;
 
-  --cx-color: var(--brand-red);
-  --cx-bg: #fff0f0;
-  --annex-color: var(--brand-grey-dark);
-  --annex-bg: var(--brand-grey-light);
+  /* Crossings = Green | Annexe = Red */
+  --cx-color: #1b5e20;
+  --cx-bg: #f0faf0;
+  --cx-color-mid: #2e7d32;
+  --cx-color-hover: #145214;
+  --annex-color: #D32F2F;
+  --annex-bg: #fff0f0;
+  --annex-color-hover: #B71C1C;
 
   /* Status Indicators */
   --status-green: #2e7d32;
@@ -47,6 +65,10 @@
   --status-blue: #1565c0;
   --status-blue-bg: #f0f6ff;
   --status-blue-border: #42a5f5;
+
+  --status-grey: #616161;
+  --status-grey-bg: #f5f5f5;
+  --status-grey-border: #9e9e9e;
 
   --metric-green: #2e7d32;
   --metric-amber: #e65100;
@@ -70,7 +92,7 @@ body {
   font-size: 14px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden; /* Replaced aggressive html/body combo to fix trackpad scrolling */
+  overflow-x: hidden; 
 }
 
 /* ── NAV ── */
@@ -98,20 +120,20 @@ nav {
   transition: all 0.2s; font-family: inherit;
 }
 .nav-tab:hover { background: var(--brand-grey-light); color: var(--text-primary); }
-.nav-tab.active { background: var(--brand-red); color: #fff; border-color: var(--brand-red); }
+.nav-tab.active { background: var(--active-theme-color, var(--cx-color)); color: #fff; border-color: var(--active-theme-color, var(--cx-color)); }
 .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .nav-date { font-size: 11px; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
 .nav-badge {
   font-size: 10px; font-weight: 800; padding: 3px 10px;
   border-radius: var(--radius-pill); letter-spacing: 0.04em; text-transform: uppercase;
 }
-.badge-cx { background: var(--cx-bg); color: var(--cx-color); }
-.badge-annex { background: var(--annex-bg); color: var(--annex-color); }
+.badge-cx { background: var(--cx-bg); color: var(--cx-color); border: 1px solid rgba(27,94,32,0.2); }
+.badge-annex { background: var(--annex-bg); color: var(--annex-color); border: 1px solid rgba(211,47,47,0.2); }
 .nav-project-btn { cursor: pointer; opacity: 0.35; transition: opacity 0.2s; }
 .nav-project-btn:hover { opacity: 0.7; }
 .nav-project-btn.active { opacity: 1; }
 .sync-btn {
-  background: var(--brand-grey-dark); color: white;
+  background: var(--active-theme-color, var(--cx-color)); color: white;
   font-size: 11px; font-weight: 700; padding: 7px 12px;
   border-radius: var(--radius-sm); cursor: pointer;
   transition: background 0.2s; border: none;
@@ -143,11 +165,11 @@ nav {
   padding-bottom: env(safe-area-inset-bottom, 0px);
   -webkit-tap-highlight-color: transparent;
 }
-.bottom-nav-btn.active { color: var(--brand-red); }
+.bottom-nav-btn.active { color: var(--active-theme-color, var(--cx-color)); }
 .bottom-nav-btn.active .bnav-dot { display: block; }
 .bnav-icon { font-size: 20px; line-height: 1; }
 .bnav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
-.bnav-dot { display: none; width: 4px; height: 4px; border-radius: 50%; background: var(--brand-red); position: absolute; top: 8px; }
+.bnav-dot { display: none; width: 4px; height: 4px; border-radius: 50%; background: var(--active-theme-color, var(--cx-color)); position: absolute; top: 8px; }
 
 /* ── PAGES ── */
 .page { display: none; margin-top: var(--nav-h); min-height: calc(100vh - var(--nav-h)); padding-top: 16px; }
@@ -161,11 +183,10 @@ nav {
   text-align: center;
 }
 .landing-logo-mark {
-  width: 56px; height: 56px; background: var(--brand-red);
-  border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   margin-bottom: 24px;
-  box-shadow: 0 8px 24px rgba(211,47,47,0.3);
 }
+.landing-logo-mark img { width: 180px; height: auto; object-fit: contain; }
 .landing-container h2 {
   font-size: 22px; font-weight: 800; margin-bottom: 8px;
   letter-spacing: -0.03em;
@@ -183,10 +204,10 @@ nav {
 .landing-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
 .landing-btn:active { transform: translateY(0); }
 .landing-btn small { font-size: 11px; font-weight: 500; opacity: 0.75; }
-.btn-cx { background: var(--brand-red); }
-.btn-cx:hover { background: var(--brand-red-hover); }
-.btn-annex { background: var(--brand-grey-dark); }
-.btn-annex:hover { background: #1a1a1a; }
+.btn-cx { background: var(--cx-color); }
+.btn-cx:hover { background: var(--cx-color-hover); }
+.btn-annex { background: var(--annex-color); }
+.btn-annex:hover { background: var(--annex-color-hover); }
 
 /* ── DASHBOARD ── */
 .dash-container { max-width: 1060px; margin: 0 auto; padding: 0 20px 48px; }
@@ -257,7 +278,7 @@ nav {
 }
 .overdue-item:last-child { border-bottom: none; }
 .overdue-dept {
-  background: var(--brand-red); color: white;
+  background: var(--active-theme-color, var(--cx-color)); color: white;
   font-size: 9px; font-weight: 800; padding: 2px 7px;
   border-radius: var(--radius-pill); text-transform: uppercase;
   letter-spacing: 0.04em; white-space: nowrap; flex-shrink: 0;
@@ -275,20 +296,42 @@ nav {
   background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 18px; box-shadow: var(--shadow);
 }
-.chart-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
+.chart-card-header { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 12px; gap: 6px; }
 .chart-card h3 { font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
 .chart-wrap { position: relative; height: 190px; width: 100%; }
-.target-legend { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: flex; gap: 8px; }
-.legend-red { color: #d32f2f; }
-.legend-green { color: #2e7d32; }
-.target-list { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; max-height: 190px; overflow-y: auto; padding-right: 5px; }
-.target-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; border-left: 3px solid transparent; padding-left: 10px; }
-.target-item.new-target { border-left-color: #4caf50; }
-.target-item.new-target .t-name { color: #2e7d32; }
-.target-item.carryover { border-left-color: #f44336; }
-.target-item.carryover .t-name { color: #c62828; }
-.t-name { font-weight: 800; min-width: 0; flex-basis: 35%; flex-shrink: 0; font-size: 11px; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; }
-.t-note { color: var(--text-secondary); line-height: 1.5; min-width: 0; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; }
+.target-legend { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; display: flex; gap: 12px; justify-content: flex-start; flex-wrap: wrap; }
+.legend-dot { display: inline-flex; align-items: center; gap: 4px; }
+.legend-dot::before { content: '●'; }
+.legend-done { color: #2e7d32; }
+.legend-ongoing { color: #e65100; }
+.legend-atrisk { color: #c62828; }
+.metric-color-legend {
+  display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+  padding: 7px 12px; background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); margin-bottom: 12px; font-size: 10px;
+  font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.metric-color-legend .mc-item { display: inline-flex; align-items: center; gap: 5px; }
+.mc-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.mc-red { background: #c62828; }
+.mc-amber { background: #ff9800; }
+.mc-green { background: #2e7d32; }
+.mc-note { color: var(--text-muted); font-weight: 500; text-transform: none; letter-spacing: 0; font-size: 10px; }
+.target-list { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; max-height: 210px; overflow-y: auto; padding-right: 4px; }
+.target-item { display: flex; align-items: stretch; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid transparent; font-size: 12px; }
+.target-item.t-done { background: #f0faf0; border-color: #a5d6a7; }
+.target-item.t-ongoing { background: #fff4e5; border-color: #ffcc80; }
+.target-item.t-atrisk { background: #fff5f5; border-color: #ef9a9a; }
+.t-status-bar { width: 4px; flex-shrink: 0; }
+.t-done .t-status-bar { background: #2e7d32; }
+.t-ongoing .t-status-bar { background: #e65100; }
+.t-atrisk .t-status-bar { background: #c62828; }
+.t-body { padding: 8px 10px; flex: 1; min-width: 0; }
+.t-name { font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; word-break: break-word; overflow-wrap: break-word; }
+.t-done .t-name { color: #1b5e20; }
+.t-ongoing .t-name { color: #bf360c; }
+.t-atrisk .t-name { color: #b71c1c; }
+.t-note { color: var(--text-secondary); line-height: 1.5; font-size: 11px; word-break: break-word; overflow-wrap: break-word; }
 
 /* Alert Strip */
 .alert-strip {
@@ -310,9 +353,9 @@ nav {
 .sidebar-section:not(:last-child) { border-bottom: 1px solid var(--border); }
 .sidebar-section-label {
   font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--brand-red); padding: 0 16px 8px;
+  color: var(--cx-color); padding: 0 16px 8px;
 }
-.sidebar-section-label.annexe { color: var(--brand-grey-dark); }
+.sidebar-section-label.annexe { color: var(--annex-color); }
 .sidebar-item {
   display: flex; align-items: center; gap: 10px;
   padding: 9px 16px; cursor: pointer; font-size: 12px; font-weight: 700;
@@ -321,8 +364,8 @@ nav {
   min-height: 40px;
 }
 .sidebar-item:hover { background: var(--brand-grey-light); color: var(--text-primary); }
-.sidebar-item.active { background: var(--brand-red); color: #fff; }
-.sidebar-item.active.annexe-btn { background: var(--brand-grey-dark); }
+.sidebar-item.active { background: var(--cx-color); color: #fff; }
+.sidebar-item.active.annexe-btn { background: var(--annex-color); }
 .sidebar-item.active .dept-count { background: rgba(255,255,255,0.25); color: #fff; }
 .dept-count {
   margin-left: auto; font-size: 10px; font-weight: 800;
@@ -335,7 +378,7 @@ nav {
   min-height: 500px; 
   min-width: 0;
   width: 100%;
-  overflow-y: auto; /* CRITICAL FIX: Trackpad Scroll Lock resolved natively */
+  overflow-y: auto; 
   overflow-x: hidden;
 }
 .dept-panel { display: none; animation: fadeIn 0.25s ease; }
@@ -344,24 +387,44 @@ nav {
 
 /* History Selector */
 .dept-history-bar {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
-  overflow-x: auto; padding-bottom: 4px;
-  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;
   width: 100%;
 }
-.dept-history-bar::-webkit-scrollbar { display: none; }
+.history-row {
+  display: flex; align-items: center; gap: 8px;
+  overflow-x: auto; padding-bottom: 2px;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.history-row::-webkit-scrollbar { display: none; }
 .history-pill {
   flex-shrink: 0; padding: 6px 14px; border-radius: var(--radius-pill);
   font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s;
   border: 1.5px solid var(--border); background: var(--white); color: var(--text-muted);
   font-family: inherit;
 }
-.history-pill:hover { border-color: var(--brand-red); color: var(--brand-red); }
-.history-pill.active { background: var(--brand-red); border-color: var(--brand-red); color: white; }
+.history-pill:hover { border-color: var(--active-theme-color, var(--cx-color)); color: var(--active-theme-color, var(--cx-color)); }
+.history-pill.active { background: var(--active-theme-color, var(--cx-color)); border-color: var(--active-theme-color, var(--cx-color)); color: white; }
 .history-label {
   font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;
   letter-spacing: 0.06em; white-space: nowrap; flex-shrink: 0;
 }
+/* Date sub-pills row */
+.date-sub-row {
+  display: flex; align-items: center; gap: 6px;
+  overflow-x: auto; padding-bottom: 2px;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  padding-left: 4px;
+}
+.date-sub-row::-webkit-scrollbar { display: none; }
+.date-pill {
+  flex-shrink: 0; padding: 4px 12px; border-radius: var(--radius-pill);
+  font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  border: 1.5px solid var(--border); background: var(--bg); color: var(--text-muted);
+  font-family: inherit; letter-spacing: 0.04em;
+}
+.date-pill:hover { border-color: var(--active-theme-color, var(--cx-color)); color: var(--active-theme-color, var(--cx-color)); }
+.date-pill.active { background: var(--active-theme-color, var(--cx-color)); border-color: var(--active-theme-color, var(--cx-color)); color: white; }
+.date-sub-label { font-size: 9px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
 
 /* Dept Header */
 .dept-header {
@@ -381,17 +444,18 @@ nav {
   cursor: pointer; border: 1.5px solid var(--border); background: var(--white);
   color: var(--text-muted); transition: all 0.2s; font-family: inherit;
 }
-.filter-tab:hover { border-color: var(--brand-grey); color: var(--text-primary); }
+.filter-tab:hover { border-color: var(--active-theme-color, var(--cx-color)); color: var(--active-theme-color, var(--cx-color)); }
 .filter-tab.active { background: var(--text-primary); border-color: var(--text-primary); color: white; }
 .filter-tab[data-filter="ontrack"].active { background: var(--status-green); border-color: var(--status-green); }
 .filter-tab[data-filter="delayed"].active { background: var(--status-red); border-color: var(--status-red); }
+.filter-tab[data-filter="onhold"].active { background: var(--status-grey); border-color: var(--status-grey); }
 .filter-tab[data-filter="update"].active { background: var(--status-orange); border-color: var(--status-orange); }
 .filter-tab[data-filter="achieved"].active { background: var(--status-blue); border-color: var(--status-blue); }
 
 .next-steps-list { display: flex; flex-direction: column; gap: 12px; width: 100%; }
 
-/* ── UI REFACTOR: MONTHLY GROUPING ACCORDIONS ── */
-.month-accordion {
+/* Status Group Accordions */
+.status-accordion {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--white);
@@ -399,7 +463,7 @@ nav {
   overflow: hidden;
   box-shadow: var(--shadow);
 }
-.month-header {
+.status-header {
   padding: 14px 16px;
   background: var(--bg);
   cursor: pointer;
@@ -412,19 +476,19 @@ nav {
   transition: background 0.2s;
   color: var(--text-primary);
 }
-.month-header:hover { background: #ebebeb; }
-.month-toggle-icon { font-size: 10px; transition: transform 0.2s; }
-.month-accordion.expanded .month-toggle-icon { transform: rotate(180deg); }
-.month-tasks-wrapper {
+.status-header:hover { background: #ebebeb; }
+.status-toggle-icon { font-size: 10px; transition: transform 0.2s; }
+.status-accordion.expanded .status-toggle-icon { transform: rotate(180deg); }
+.status-tasks-wrapper {
   display: none;
   padding: 16px;
   flex-direction: column;
   gap: 12px;
   border-top: 1px solid var(--border);
 }
-.month-accordion.expanded .month-tasks-wrapper { display: flex; }
+.status-accordion.expanded .status-tasks-wrapper { display: flex; }
 
-.month-tasks-wrapper .step-card {
+.status-tasks-wrapper .step-card {
   box-shadow: none;
   border: 1px solid var(--border);
   border-left-width: 4px;
@@ -443,6 +507,7 @@ nav {
 .step-card.s-ontrack { border-left-color: var(--status-green-border); background: var(--status-green-bg); }
 .step-card.s-delayed { border-left-color: var(--status-red-border); background: var(--status-red-bg); }
 .step-card.s-update { border-left-color: var(--status-orange-border); background: var(--status-orange-bg); }
+.step-card.s-onhold { border-left-color: var(--status-grey-border); background: var(--status-grey-bg); }
 .step-card.s-achieved { border-left-color: var(--status-blue-border); background: var(--status-blue-bg); opacity: 0.75; }
 
 /* Context Line */
@@ -454,11 +519,12 @@ nav {
 .s-ontrack .step-context { color: var(--status-green); }
 .s-delayed .step-context { color: var(--status-red); }
 .s-update .step-context { color: var(--status-orange); }
+.s-onhold .step-context { color: var(--status-grey); }
 .s-achieved .step-context { color: var(--status-blue); }
 
 .step-card-top { 
   display: flex; 
-  flex-direction: row; /* CRITICAL FIX: explicitly declare row to stop squishing */
+  flex-direction: row; 
   align-items: flex-start; justify-content: space-between; gap: 12px; 
   min-width: 0; 
   width: 100%;
@@ -472,7 +538,7 @@ nav {
   flex: 1; 
   min-width: 0; 
   white-space: pre-wrap; 
-  word-break: break-word; /* CRITICAL FIX: Stops text running vertically */
+  word-break: break-word; 
   word-wrap: break-word; 
   overflow-wrap: break-word; 
 }
@@ -493,6 +559,7 @@ nav {
 .sb-ontrack { background: rgba(46,125,50,0.12); color: var(--status-green); }
 .sb-delayed { background: rgba(198,40,40,0.12); color: var(--status-red); }
 .sb-update { background: rgba(237,108,2,0.12); color: var(--status-orange); }
+.sb-onhold { background: rgba(158,158,158,0.15); color: var(--status-grey); }
 .sb-achieved { background: rgba(21,101,192,0.12); color: var(--status-blue); }
 
 .step-details-pane {
@@ -527,6 +594,41 @@ nav {
 .btn-update:hover { background: var(--status-orange); color: white; }
 .btn-ontrack { border-color: var(--status-green-border); color: var(--status-green); background: var(--status-green-bg); }
 .btn-ontrack:hover { background: var(--status-green); color: white; }
+.btn-onhold { border-color: var(--status-grey-border); color: var(--status-grey); background: var(--status-grey-bg); }
+.btn-onhold:hover { background: var(--status-grey); color: white; }
+
+/* Team Updates Box */
+.team-updates-section {
+  margin-top: 30px; background: var(--white); border: 1px solid var(--border); 
+  border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow);
+}
+.team-updates-section h3 {
+  font-size: 14px; font-weight: 800; margin-bottom: 14px; color: var(--text-primary);
+}
+.updates-list {
+  max-height: 250px; overflow-y: auto; margin-bottom: 16px; 
+  display: flex; flex-direction: column; gap: 10px;
+}
+.update-item {
+  background: var(--bg); padding: 12px; border-radius: var(--radius-sm); font-size: 13px;
+  border-left: 3px solid var(--active-theme-color, var(--cx-color));
+}
+.update-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+.update-input-group { display: flex; flex-direction: column; gap: 10px; }
+.update-input-group textarea {
+  width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 13px; resize: vertical; min-height: 70px;
+}
+.update-input-group input {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 13px;
+}
+.update-input-group button {
+  align-self: flex-start; padding: 10px 20px; background: var(--active-theme-color, var(--cx-color));
+  color: #fff; border: none; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer;
+  transition: opacity 0.2s; font-family: inherit; font-size: 13px;
+}
+.update-input-group button:hover { opacity: 0.85; }
 
 /* Empty State */
 .empty-state {
@@ -555,8 +657,8 @@ nav {
   font-family: inherit; display: inline-flex; align-items: center; gap: 6px;
   -webkit-tap-highlight-color: transparent;
 }
-.mobile-dept-pill.active-cx { background: var(--brand-red); border-color: var(--brand-red); color: white; }
-.mobile-dept-pill.active-annex { background: var(--brand-grey-dark); border-color: var(--brand-grey-dark); color: white; }
+.mobile-dept-pill.active-cx { background: var(--cx-color); border-color: var(--cx-color); color: white; }
+.mobile-dept-pill.active-annex { background: var(--annex-color); border-color: var(--annex-color); color: white; }
 .mobile-dept-pill .pill-count {
   background: rgba(255,255,255,0.25); color: inherit;
   font-size: 9px; padding: 1px 6px; border-radius: var(--radius-pill);
@@ -565,12 +667,74 @@ nav {
   background: var(--brand-grey-light); color: var(--text-muted);
 }
 
+/* ── Diagnostic Panel ── */
+.diag-panel {
+  position: fixed; bottom: 0; right: 0; z-index: 1000;
+  width: 380px; max-width: 96vw;
+  background: #1a1a2e; color: #e0e0e0;
+  border-radius: 12px 0 0 0;
+  box-shadow: -4px -4px 24px rgba(0,0,0,0.35);
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  transform: translateY(calc(100% - 42px));
+  transition: transform 0.3s ease;
+  overflow: hidden;
+}
+.diag-panel.open { transform: translateY(0); }
+.diag-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; background: #16213e; cursor: pointer;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: #90caf9; user-select: none;
+  gap: 8px;
+}
+.diag-header-left { display: flex; align-items: center; gap: 8px; }
+.diag-badge-count {
+  background: #ef5350; color: white; font-size: 9px; font-weight: 800;
+  padding: 2px 7px; border-radius: 100px; display: none;
+}
+.diag-badge-count.has-issues { display: inline-block; }
+.diag-body { max-height: 320px; overflow-y: auto; padding: 12px 14px; }
+.diag-sheet { margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; }
+.diag-sheet:last-child { border-bottom: none; margin-bottom: 0; }
+.diag-sheet-name { color: #90caf9; font-weight: 700; margin-bottom: 4px; font-size: 11px; }
+.diag-stat { color: #b0bec5; margin-bottom: 2px; }
+.diag-info { color: #78909c; margin-bottom: 4px; font-size: 10px; line-height: 1.6; word-break: break-all; }
+.diag-warn { color: #ffb74d; margin-bottom: 2px; font-size: 10px; }
+.diag-err { color: #ef9a9a; margin-bottom: 2px; font-size: 10px; }
+.diag-ok { color: #81c784; margin-bottom: 2px; }
+.diag-empty { color: #546e7a; text-align: center; padding: 20px; font-size: 11px; }
+
+/* Admin Auth Modal */
+.admin-modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.admin-modal {
+  background: #fff; padding: 28px; border-radius: var(--radius); width: 90%; max-width: 320px;
+  box-shadow: var(--shadow-md); text-align: center; font-family: 'DM Sans', sans-serif;
+}
+.admin-modal h3 { margin-bottom: 8px; font-weight: 800; font-size: 18px; color: var(--text-primary); }
+.admin-modal p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
+.admin-modal input {
+  width: 100%; padding: 12px; margin-bottom: 16px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; text-align: center;
+}
+.admin-modal-actions { display: flex; gap: 10px; justify-content: center; }
+.admin-modal-actions button {
+  padding: 10px 18px; border-radius: var(--radius-sm); border: none; font-weight: 700;
+  cursor: pointer; flex: 1; font-family: inherit; font-size: 13px; transition: opacity 0.2s;
+}
+.admin-modal-actions button:hover { opacity: 0.85; }
+.btn-cancel { background: var(--brand-grey-light); color: var(--text-secondary); }
+.btn-login { background: var(--text-primary); color: #fff; }
+
 /* Utility */
 .show-done-toggle {
   display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
   color: var(--text-muted); cursor: pointer; user-select: none; padding: 0 2px;
 }
-.show-done-toggle input { accent-color: var(--brand-red); width: 14px; height: 14px; cursor: pointer; }
+.show-done-toggle input { accent-color: var(--active-theme-color, var(--cx-color)); width: 14px; height: 14px; cursor: pointer; }
 
 /* ── RESPONSIVE / MOBILE ── */
 @media (max-width: 768px) {
@@ -606,6 +770,26 @@ nav {
 }
 </style>
 
+<script>
+(function() {
+  const manifest = {
+    name: "Projects Dashboard",
+    short_name: "Projects Dashboard",
+    description: "Mixta Africa — Live Performance Dashboard",
+    start_url: "./",
+    display: "standalone",
+    background_color: "#f8f8f8",
+    theme_color: "#1b5e20",
+    icons: [
+      { src: "Mixta Africa.jpg", sizes: "192x192", type: "image/jpeg", purpose: "any maskable" },
+      { src: "Mixta Africa.jpg", sizes: "512x512", type: "image/jpeg", purpose: "any maskable" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').setAttribute('href', url);
+})();
+</script>
 </head>
 <body>
 
@@ -659,12 +843,7 @@ nav {
 <div id="page-landing" class="page active">
   <div class="landing-container">
     <div class="landing-logo-mark">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="7" height="7"></rect>
-        <rect x="14" y="3" width="7" height="7"></rect>
-        <rect x="14" y="14" width="7" height="7"></rect>
-        <rect x="3" y="14" width="7" height="7"></rect>
-      </svg>
+      <img src="Mixta Africa.jpg" alt="Mixta Africa" />
     </div>
     <h2>Projects Tracker</h2>
     <p>Select a project to view its live performance dashboard</p>
@@ -688,7 +867,14 @@ nav {
     <div class="project-heading">
       <span class="nav-badge badge-cx">Lakowe Crossings</span>
       <h2>Performance Overview</h2>
-      <span class="ph-date">Jan 5 – Apr 20, 2026</span>
+      <span class="ph-date" id="ph-date-cx">Jan 5 – Apr 20, 2026</span>
+    </div>
+
+    <div class="metric-color-legend">
+      <span class="mc-item"><span class="mc-dot mc-red"></span>Danger</span>
+      <span class="mc-item"><span class="mc-dot mc-amber"></span>Caution</span>
+      <span class="mc-item"><span class="mc-dot mc-green"></span>Healthy</span>
+      <span class="mc-note">— Account Balance &amp; Active Offer Letters</span>
     </div>
 
     <div class="metrics-grid">
@@ -705,11 +891,6 @@ nav {
       <div class="metric-card">
         <div class="metric-label">Value of Sales</div>
         <div class="metric-value" id="val-cx-sales">₦2.07B</div>
-        <div class="metric-delta">Live Synced</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Budget Spent</div>
-        <div class="metric-value" id="val-cx-budget">₦488M</div>
         <div class="metric-delta">Live Synced</div>
       </div>
       <div class="metric-card priority-card color-amber" id="card-cx-offers">
@@ -737,10 +918,11 @@ nav {
       </div>
       <div class="chart-card">
         <div class="chart-card-header">
-          <h3>Monthly Targets</h3>
+          <h3 id="targets-cx-title">End of April Targets</h3>
           <div class="target-legend">
-            <span class="legend-red">● Carried</span>
-            <span class="legend-green">● New</span>
+            <span class="legend-dot legend-done">Done</span>
+            <span class="legend-dot legend-ongoing">Ongoing</span>
+            <span class="legend-dot legend-atrisk">At Risk</span>
           </div>
         </div>
         <div class="target-list" id="targets-crossings">
@@ -763,7 +945,14 @@ nav {
     <div class="project-heading">
       <span class="nav-badge badge-annex">Lakowe Annexe</span>
       <h2>Performance Overview</h2>
-      <span class="ph-date">Jan 5 – Apr 20, 2026</span>
+      <span class="ph-date" id="ph-date-annex">Jan 5 – Apr 20, 2026</span>
+    </div>
+
+    <div class="metric-color-legend">
+      <span class="mc-item"><span class="mc-dot mc-red"></span>Danger</span>
+      <span class="mc-item"><span class="mc-dot mc-amber"></span>Caution</span>
+      <span class="mc-item"><span class="mc-dot mc-green"></span>Healthy</span>
+      <span class="mc-note">— Account Balance &amp; Active Offer Letters</span>
     </div>
 
     <div class="metrics-grid">
@@ -805,10 +994,11 @@ nav {
       </div>
       <div class="chart-card">
         <div class="chart-card-header">
-          <h3>Monthly Targets</h3>
+          <h3 id="targets-annex-title">End of April Targets</h3>
           <div class="target-legend">
-            <span class="legend-red">● Carried</span>
-            <span class="legend-green">● New</span>
+            <span class="legend-dot legend-done">Done</span>
+            <span class="legend-dot legend-ongoing">Ongoing</span>
+            <span class="legend-dot legend-atrisk">At Risk</span>
           </div>
         </div>
         <div class="target-list" id="targets-annexe">
@@ -902,15 +1092,54 @@ nav {
           <button class="filter-tab active" data-filter="all" onclick="setFilter('all',this)">All</button>
           <button class="filter-tab" data-filter="ontrack" onclick="setFilter('ontrack',this)">● On Track</button>
           <button class="filter-tab" data-filter="delayed" onclick="setFilter('delayed',this)">● Delayed</button>
+          <button class="filter-tab" data-filter="onhold" onclick="setFilter('onhold',this)">● On Hold</button>
           <button class="filter-tab" data-filter="update" onclick="setFilter('update',this)">▶ Update</button>
           <button class="filter-tab" data-filter="achieved" onclick="setFilter('achieved',this)">✓ Achieved</button>
         </div>
+        
         <div class="next-steps-list" id="dynamic-tasks-list"></div>
+
+        <div class="team-updates-section">
+          <h3>Team Updates & Pre-Meeting Notes</h3>
+          <div id="updates-list" class="updates-list"></div>
+          <div class="update-input-group">
+            <textarea id="new-update-text" placeholder="Type your pre-meeting update or note here..."></textarea>
+            <input type="text" id="new-update-author" placeholder="Your Name (optional)">
+            <button onclick="submitTeamUpdate()">Submit Update</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
   </div>
 </div>
+</div>
+
+<div class="diag-panel" id="diag-panel">
+  <div class="diag-header" onclick="openDiagPanel()">
+    <div class="diag-header-left">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Sheet Diagnostics
+      <span class="diag-badge-count" id="diag-issue-count">0</span>
+    </div>
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+  </div>
+  <div class="diag-body" id="diag-body">
+    <div class="diag-empty">Sync data to see sheet diagnostics</div>
+  </div>
+</div>
+
+<div class="admin-modal-overlay" id="admin-modal">
+  <div class="admin-modal">
+    <h3>Admin Authentication</h3>
+    <p>Please enter the admin password to access the Sheet Diagnostics panel.</p>
+    <input type="password" id="admin-pwd" placeholder="Enter password" onkeydown="if(event.key === 'Enter') submitAdmin()">
+    <div class="admin-modal-actions">
+      <button class="btn-cancel" onclick="closeAdminModal()">Cancel</button>
+      <button class="btn-login" onclick="submitAdmin()">Login</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -923,6 +1152,7 @@ let currentProject = null;
 let currentDept = null;
 let currentFilter = 'all';
 let viewingSessionDate = 'current'; 
+let diagUnlocked = false;
 
 // Excel Binaries endpoints
 const SHEET_CROSSINGS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_BotFNOFLBaUKX-lzjWZkfe2DhCWL28EmOGGBkVBnkcKxoM2l02lBjsqdhnnweUKngc1DWpO82OPL/pub?output=xlsx'; 
@@ -932,6 +1162,7 @@ const AUTO_SYNC_MINUTES = 5;
 
 let taskDatabase = [];
 let availableSessions = { Crossings: [], Annexe: [] };
+let sheetDiag = {}; 
 
 // ═══════════════════════════════════════════════
 // STORAGE & UTILS
@@ -950,7 +1181,7 @@ function taskId(t) {
   return (t.project + '_' + t.dept + '_' + t.session + '_' + t.action).replace(/\W+/g,'_').substring(0, 60);
 }
 
-// ── FIX 1: Excel Serial Date Formatter (fixes 42638 bleeding out) ──
+// ── EXCEL SERIAL DATE FORMATTER ──
 function formatExcelDate(val) {
   if (!val) return 'TBD';
   
@@ -989,6 +1220,64 @@ function isOverdue(task) {
 }
 
 // ═══════════════════════════════════════════════
+// ADMIN MODAL & TEAM UPDATES
+// ═══════════════════════════════════════════════
+function openDiagPanel() {
+  if (diagUnlocked) {
+    document.getElementById('diag-panel').classList.toggle('open');
+  } else {
+    document.getElementById('admin-pwd').value = '';
+    document.getElementById('admin-modal').style.display = 'flex';
+  }
+}
+function closeAdminModal() {
+  document.getElementById('admin-modal').style.display = 'none';
+}
+function submitAdmin() {
+  const pwd = document.getElementById('admin-pwd').value;
+  if (pwd === 'PDadmin1234') {
+    diagUnlocked = true;
+    closeAdminModal();
+    document.getElementById('diag-panel').classList.add('open');
+  } else {
+    alert('Incorrect admin password.');
+  }
+}
+
+function submitTeamUpdate() {
+  const text = document.getElementById('new-update-text').value.trim();
+  const author = document.getElementById('new-update-author').value.trim() || 'Anonymous';
+  if (!text) return;
+  const key = `deptupdate:${currentProject}:${currentDept}`;
+  let updates = JSON.parse(localStorage.getItem(key) || '[]');
+  updates.push({ text, author, timestamp: new Date().toISOString() });
+  if (updates.length > 30) updates.shift();
+  localStorage.setItem(key, JSON.stringify(updates));
+  document.getElementById('new-update-text').value = '';
+  renderUpdatesList();
+}
+
+function renderUpdatesList() {
+  const key = `deptupdate:${currentProject}:${currentDept}`;
+  let updates = JSON.parse(localStorage.getItem(key) || '[]');
+  const list = document.getElementById('updates-list');
+  if(!list) return;
+  
+  if(updates.length === 0) {
+    list.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">No pre-meeting updates recorded yet.</div>';
+    return;
+  }
+  
+  list.innerHTML = updates.map(u => `
+    <div class="update-item">
+      <div class="update-meta"><strong>${u.author}</strong> — ${new Date(u.timestamp).toLocaleString('en-GB', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'})}</div>
+      <div style="white-space: pre-wrap; word-break: break-word;">${u.text}</div>
+    </div>
+  `).reverse().join('');
+}
+
+
+// ═══════════════════════════════════════════════
 // GOOGLE SHEETS DYNAMIC EXCEL FETCH
 // ═══════════════════════════════════════════════
 async function syncWithGoogleSheet() {
@@ -1005,6 +1294,7 @@ async function syncWithGoogleSheet() {
     
     taskDatabase = []; 
     availableSessions = { Crossings: [], Annexe: [] };
+    sheetDiag = {};
     document.getElementById('targets-crossings').innerHTML = '';
     document.getElementById('targets-annexe').innerHTML = '';
     
@@ -1013,7 +1303,6 @@ async function syncWithGoogleSheet() {
       
       let allSheets = wb.SheetNames;
       
-      // ── FIX 2: STRICT 2026>> DIVIDER BOUNDARY ──
       let markerIndex = allSheets.findIndex(name => name.includes('2026>>'));
       let resultSheets = [];
       
@@ -1024,13 +1313,11 @@ async function syncWithGoogleSheet() {
           if (resultSheets.length > 1) {
               let firstMonth = monthMap[resultSheets[0].substring(0,3).toLowerCase()];
               let lastMonth = monthMap[resultSheets[resultSheets.length-1].substring(0,3).toLowerCase()];
-              // Auto-reverse if ordered oldest-to-newest
               if (firstMonth <= lastMonth) {
                   resultSheets.reverse();
               }
           }
       } else {
-          // Absolute fallback if the marker was completely deleted: ensure no 2025 sheets bypass.
           let dateSheets = allSheets.filter(name => /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*\d+/i.test(name.trim()));
           if (dateSheets.length === 0) return;
           
@@ -1068,7 +1355,8 @@ async function syncWithGoogleSheet() {
     const now = new Date().toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'});
     document.getElementById('last-updated-text').textContent = 'Live Synced: ' + now;
     
-    viewingSessionDate = 'current'; 
+    viewingSessionDate = 'current';
+    updateDashboardDates();
     applyPriorityColors();
     updateSidebarCounts();
     renderOverduePanels();
@@ -1081,7 +1369,6 @@ async function syncWithGoogleSheet() {
   }
 }
 
-// ── FIX 6: Robust dashboard card data mapping ──
 function extractMetricValue(rowArray, isCurrency) {
     let combined = rowArray.join(' ').toLowerCase();
     
@@ -1104,83 +1391,190 @@ function extractMetricValue(rowArray, isCurrency) {
 function processSheet(rows, proj, sheetName, isLatest) {
   const targets = [];
   let lastDept = 'General';
-  
-  // ── Dynamic Column Mapper (Fixes Crossings mismatch and vertical text blowouts) ──
+  let inTargetSection = false; 
+  let tasksAdded = 0;
+  let targetsAdded = 0;
+  let rowsScanned = rows.length;
+
   let colMap = { dept: 1, action: 2, due: 3, result: 4, explanation: 5, status: 7 };
-  
-  for(let r=0; r<Math.min(10, rows.length); r++) {
-      if(!rows[r]) continue;
-      let rowStr = rows[r].join(' ').toLowerCase();
-      if ((rowStr.includes('department') || rowStr.includes('dept')) && (rowStr.includes('step') || rowStr.includes('action') || rowStr.includes('task'))) {
-          for(let c=0; c<rows[r].length; c++) {
-              let h = String(rows[r][c]).toLowerCase();
-              if(h.includes('department') || h.includes('dept')) colMap.dept = c;
-              if(h.includes('step') || h.includes('action') || h.includes('task')) colMap.action = c;
-              if(h.includes('timeline') || h.includes('due') || h.includes('target')) colMap.due = c;
-              if(h.includes('result')) colMap.result = c;
-              if(h.includes('explanation') || h.includes('note')) colMap.explanation = c;
-              if(h.includes('status')) colMap.status = c;
-          }
-          break;
+
+  for (let r = 0; r < Math.min(12, rows.length); r++) {
+    if (!rows[r]) continue;
+    const rowStr = rows[r].join(' ').toLowerCase();
+    if ((rowStr.includes('department') || rowStr.includes('dept')) &&
+        (rowStr.includes('step') || rowStr.includes('action') || rowStr.includes('task') || rowStr.includes('next'))) {
+      
+      for (let ci = 0; ci < rows[r].length; ci++) {
+        const h = String(rows[r][ci]).toLowerCase().trim();
+        if (!h) continue;
+
+        if (h.includes('department') || h === 'dept') { colMap.dept = ci; continue; }
+
+        if (h.includes('timeline') || h === 'due date' || (h.includes('due') && !h.includes('next'))) {
+          colMap.due = ci; continue;
+        }
+
+        if ((h.includes('next step') || h.includes('action') || h === 'task') &&
+            !h.includes('timeline') && !h.includes('due')) {
+          colMap.action = ci; continue;
+        }
+
+        if (h.includes('result') || h.includes('description')) { colMap.result = ci; continue; }
+        if (h.includes('explanation') || h.includes('note')) { colMap.explanation = ci; continue; }
+        if (h === 'status' || (h.includes('status') && h.length < 15)) { colMap.status = ci; continue; }
       }
+
+      sheetDiag[sheetName] = sheetDiag[sheetName] || {};
+      sheetDiag[sheetName].colMap = {...colMap};
+      sheetDiag[sheetName].headerRow = rows[r].map(String);
+      break;
+    }
   }
 
+  let operationsOfferFound = false;
+
   for (let i = 0; i < rows.length; i++) {
-    const c = rows[i]; 
-    if (!c || c.length < 3) continue;
-    
+    const c = rows[i];
+    if (!c || c.length < 2) continue;
+
+    const rowStr = c.join(' ').toLowerCase();
+
+    // ── DEPT TRACKING ──
+    {
+      const deptCellEarly = String(c[colMap.dept] || '').trim();
+      if (deptCellEarly &&
+          !/^(department|dept|s\/n|next step|action point|status|result|explanation|due|timeline)$/i.test(deptCellEarly) &&
+          !/^\d{5,}$/.test(deptCellEarly) &&
+          !/^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.test(deptCellEarly)) {
+        lastDept = deptCellEarly;
+      }
+    }
+
     if (isLatest) {
-        let rowStr = c.join(' ').toLowerCase();
-        
-        if (rowStr.includes('inflow') && !rowStr.includes('target')) { setMetric(proj==='Crossings'?'val-cx-inflow':'val-annex-inflow', extractMetricValue(c, true)); continue; }
-        if ((rowStr.includes('sales-') || rowStr.includes('sale:') || rowStr.includes('sales:')) && !rowStr.includes('value')) { setMetric(proj==='Crossings'?'val-cx-units':'val-annex-units', extractMetricValue(c, false)); continue; }
-        if (rowStr.includes('value of sales') || rowStr.includes('tvs')) { setMetric(proj==='Crossings'?'val-cx-sales':'val-annex-sales', extractMetricValue(c, true)); continue; }
-        if (rowStr.includes('budget spent')) { setMetric(proj==='Crossings'?'val-cx-budget':'val-annex-budget', extractMetricValue(c, true)); continue; }
-        if (rowStr.includes('offer letter')) { setMetric(proj==='Crossings'?'val-cx-offers':'val-annex-offers', extractMetricValue(c, false)); continue; }
-        if (rowStr.includes('balance') || rowStr.includes('bal:')) { setMetric(proj==='Crossings'?'val-cx-balance':'val-annex-balance', extractMetricValue(c, true)); continue; }
-        
-        if (String(c[0]).toLowerCase() === 'target' || rowStr.includes('monthly target') || (rowStr.includes('end of') && rowStr.includes('target'))) {
-            const tName = c[2] || c[4] || c[1];
-            const tNote = c[3] || c[5] || '';
-            const cls = rowStr.includes('carry') ? 'carryover' : 'new-target';
-            if (tName && tName.length > 3) {
-                targets.push(`<div class="target-item ${cls}"><span class="t-name">${tName}</span><span class="t-note">${tNote}</span></div>`);
-            }
-            continue;
+      if (rowStr.includes('inflow') && !rowStr.includes('target') && !rowStr.includes('end of')) {
+        setMetric(proj === 'Crossings' ? 'val-cx-inflow' : 'val-annex-inflow', extractMetricValue(c, true));
+        continue;
+      }
+      if ((rowStr.includes('sales-') || rowStr.includes('sale:') || rowStr.includes('sales:')) && !rowStr.includes('value')) {
+        setMetric(proj === 'Crossings' ? 'val-cx-units' : 'val-annex-units', extractMetricValue(c, false));
+        continue;
+      }
+      if (rowStr.includes('value of sales') || rowStr.includes('tvs')) {
+        setMetric(proj === 'Crossings' ? 'val-cx-sales' : 'val-annex-sales', extractMetricValue(c, true));
+        continue;
+      }
+      if (rowStr.includes('budget spent')) {
+        setMetric(proj === 'Crossings' ? 'val-cx-budget' : 'val-annex-budget', extractMetricValue(c, true));
+        continue;
+      }
+      if (rowStr.includes('balance') || rowStr.includes('bal:')) {
+        setMetric(proj === 'Crossings' ? 'val-cx-balance' : 'val-annex-balance', extractMetricValue(c, true));
+        continue;
+      }
+
+      if (!operationsOfferFound && /operations/i.test(lastDept) && rowStr.includes('offer letter')) {
+        setMetric(proj === 'Crossings' ? 'val-cx-offers' : 'val-annex-offers', extractMetricValue(c, false));
+        operationsOfferFound = true;
+      }
+
+      // ── TARGETS ROW DETECTION (Supports merged headers and explicit Target dept names) ──
+      const isTargetHeader = /end of .+ target/i.test(rowStr) || /target/i.test(String(c[colMap.dept] || '').trim());
+      if (isTargetHeader) {
+        inTargetSection = true;
+        continue; 
+      }
+
+      if (inTargetSection) {
+        const deptCell = String(c[colMap.dept] || '').trim().toLowerCase();
+        const allCells = c.map(v => String(v || '').trim()).filter(Boolean);
+
+        if (allCells.length === 0) {
+          inTargetSection = false;
+          continue;
         }
+        if (deptCell && !/target/i.test(deptCell) && allCells.length > 1) {
+          inTargetSection = false;
+        } else {
+          const targetColIndex = proj === 'Crossings' ? colMap.explanation : colMap.result;
+          let tContent = String(c[targetColIndex] || '').trim();
+          let tLabel = String(c[colMap.action] || '').trim();
+          
+          if (!tContent && tLabel) tContent = tLabel; // Fallback
+
+          const tStatRaw = String(c[colMap.status] || '').toLowerCase().replace(/[^a-z]/g,'');
+          let tCls = 't-ongoing'; 
+          if (tStatRaw.includes('done') || tStatRaw.includes('achieve') || tStatRaw.includes('complete')) tCls = 't-done';
+          else if (tStatRaw.includes('risk') || tStatRaw.includes('delay') || tStatRaw.includes('red')) tCls = 't-atrisk';
+          else if (rowStr.includes('done') || rowStr.includes('achieved') || rowStr.includes('complete')) tCls = 't-done';
+          else if (rowStr.includes('at risk') || rowStr.includes('delayed') || rowStr.includes('offtrack')) tCls = 't-atrisk';
+          
+          const displayText = tContent || tLabel;
+          const displayLabel = (tContent && tLabel) ? tLabel : '▸';
+          
+          if (displayText) {
+            targets.push(`<div class="target-item ${tCls}"><div class="t-status-bar"></div><div class="t-body"><div class="t-name">${displayLabel}</div><div class="t-note">${displayText}</div></div></div>`);
+            targetsAdded++;
+          }
+          continue;
+        }
+      }
     }
-    
-    let rawDept = String(c[colMap.dept] || '').trim();
-    if (rawDept && !/department|s\/n|next step/i.test(rawDept)) {
-        lastDept = rawDept; 
-    }
-    
+
     let action = String(c[colMap.action] || '').trim();
-    if (!action || action.length < 4 || /department|next step|action point|sn|s\/n/i.test(action)) continue;
-    
+
+    if (!action || action.length < 4) continue;
+    if (/^(department|next step|action point|s\/n|status|result|explanation|due|timeline)$/i.test(action)) continue;
+    if (/^\d{5,}$/.test(action) || /gmt\+/i.test(action) || /west africa standard time/i.test(action)) continue;
+    if (/end of .+ target/i.test(action)) continue;
+
+    // ── STATUS (INCLUDING ON HOLD BUCKET) ──
     let rawStat = String(c[colMap.status] || 'ontrack').toLowerCase();
     let statusRaw = rawStat.replace(/[^a-z]/g, '');
-    if(statusRaw.includes('delay') || statusRaw.includes('offtrack')) statusRaw = 'delayed';
-    else if(statusRaw.includes('achieve') || statusRaw.includes('done') || statusRaw.includes('complete')) statusRaw = 'achieved';
-    else if(statusRaw.includes('update')) statusRaw = 'update';
+    
+    if (rowStr.includes('on hold')) statusRaw = 'onhold';
+    else if (statusRaw.includes('onhold')) statusRaw = 'onhold';
+    else if (statusRaw.includes('delay') || statusRaw.includes('offtrack')) statusRaw = 'delayed';
+    else if (statusRaw.includes('achieve') || statusRaw.includes('done') || statusRaw.includes('complete')) statusRaw = 'achieved';
+    else if (statusRaw.includes('update')) statusRaw = 'update';
     else statusRaw = 'ontrack';
+
+    const explanationText = String(c[colMap.explanation] || '').trim();
 
     taskDatabase.push({
       project: proj,
       session: sheetName,
       dept: lastDept,
-      action: action, 
-      due: formatExcelDate(c[colMap.due]), 
+      action: action,
+      due: formatExcelDate(c[colMap.due]),
       resultToAchieve: String(c[colMap.result] || '').trim(),
-      explanation: String(c[colMap.explanation] || '').trim(),
+      explanation: explanationText,
       status: statusRaw
     });
+    tasksAdded++;
   }
-  
+
   if (isLatest && targets.length > 0) {
     const el = document.getElementById(proj === 'Crossings' ? 'targets-crossings' : 'targets-annexe');
-    if(el) el.innerHTML += targets.join('');
+    if (el) el.innerHTML += targets.join('');
   }
+
+  sheetDiag[sheetName] = sheetDiag[sheetName] || {};
+  Object.assign(sheetDiag[sheetName], {
+    proj, isLatest, rowsScanned, tasksAdded, targetsAdded,
+    colMap: sheetDiag[sheetName].colMap || colMap,
+    headerRow: sheetDiag[sheetName].headerRow || [],
+    warnings: []
+  });
+  const d = sheetDiag[sheetName];
+  if (tasksAdded === 0) d.warnings.push('⚠ Zero tasks extracted — action column may be mapped incorrectly');
+  if (isLatest && targetsAdded === 0) d.warnings.push('⚠ No targets found — check for "Target" dept or merged header row');
+  if (d.colMap && d.colMap.action === d.colMap.due) d.warnings.push('❌ action and due columns map to same index — header scan failed');
+  if (d.headerRow && d.colMap) {
+    const actionHeader = d.headerRow[d.colMap.action] || '(empty)';
+    const dueHeader = d.headerRow[d.colMap.due] || '(empty)';
+    d.info = `action col ${d.colMap.action} → "${actionHeader}" | due col ${d.colMap.due} → "${dueHeader}"`;
+  }
+  renderDiagPanel();
 }
 
 function setMetric(id, val) {
@@ -1310,24 +1704,66 @@ function buildHistoryBar() {
   if (!currentProject) return;
   
   const sessions = availableSessions[currentProject] || [];
-  const uniqueMonths = [...new Set(sessions.map(s => s.substring(0,3).toLowerCase()))];
-  
-  let html = '<span class="history-label">History:</span>';
-  html += `<button class="history-pill ${viewingSessionDate==='current'?'active':''}" onclick="switchSession('current')">Current</button>`;
-  
-  uniqueMonths.forEach(m => {
-    const displayMonth = m.charAt(0).toUpperCase() + m.slice(1);
-    const isActive = viewingSessionDate === m ? 'active' : '';
-    html += `<button class="history-pill ${isActive}" onclick="switchSession('${m}')">${displayMonth}</button>`;
+  const monthGroups = {};
+  sessions.forEach(s => {
+    const m = s.substring(0,3).toLowerCase();
+    if (!monthGroups[m]) monthGroups[m] = [];
+    monthGroups[m].push(s);
   });
-  bar.innerHTML = html;
+  
+  const activeMonth = viewingSessionDate === 'current' ? null :
+    (viewingSessionDate.length === 3 ? viewingSessionDate : viewingSessionDate.substring(0,3).toLowerCase());
+  
+  let monthRow = '<div class="history-row"><span class="history-label">Period:</span>';
+  monthRow += `<button class="history-pill ${viewingSessionDate==='current'?'active':''}" onclick="switchSession('current')">Current</button>`;
+  Object.keys(monthGroups).forEach(m => {
+    const displayMonth = m.charAt(0).toUpperCase() + m.slice(1);
+    const isActive = activeMonth === m ? 'active' : '';
+    monthRow += `<button class="history-pill ${isActive}" onclick="expandMonth('${m}')">${displayMonth}</button>`;
+  });
+  monthRow += '</div>';
+  
+  let dateRow = '';
+  if (activeMonth && monthGroups[activeMonth] && monthGroups[activeMonth].length > 0) {
+    dateRow = '<div class="date-sub-row"><span class="date-sub-label">↳ Date:</span>';
+    monthGroups[activeMonth].forEach(sheetName => {
+      const label = formatSheetName(sheetName);
+      const isActive = viewingSessionDate === sheetName ? 'active' : '';
+      dateRow += `<button class="date-pill ${isActive}" onclick="switchSession('${sheetName}')">${label}</button>`;
+    });
+    dateRow += '</div>';
+  }
+  
+  bar.innerHTML = monthRow + dateRow;
+}
+
+function formatSheetName(sheetName) {
+  return sheetName.replace(/^([a-z]{3})\s*(\d+)/i, (_, m, d) => 
+    m.charAt(0).toUpperCase() + m.slice(1).toLowerCase() + ' ' + d.padStart(2,'0')
+  );
+}
+
+function expandMonth(m) {
+  const sessions = availableSessions[currentProject] || [];
+  const monthSessions = sessions.filter(s => s.toLowerCase().startsWith(m));
+  if (monthSessions.length === 1) {
+    switchSession(monthSessions[0]);
+  } else if (monthSessions.length > 0) {
+    switchSession(monthSessions[0]);
+  }
 }
 
 function switchSession(val) {
   viewingSessionDate = val;
   buildHistoryBar();
   const dateLabel = document.getElementById('viewing-date-label');
-  dateLabel.textContent = val === 'current' ? 'Current' : (val.charAt(0).toUpperCase() + val.slice(1) + ' Rollup');
+  if (val === 'current') {
+    dateLabel.textContent = 'Current';
+  } else if (val.length === 3) {
+    dateLabel.textContent = val.charAt(0).toUpperCase() + val.slice(1) + ' Rollup';
+  } else {
+    dateLabel.textContent = formatSheetName(val);
+  }
   renderCurrentDept();
 }
 
@@ -1354,6 +1790,7 @@ function renderDeptContent(proj, dept) {
   renderCurrentDept();
 }
 
+// ── V3 UPDATE: STATUS ACCORDION GROUPING ──
 function renderCurrentDept() {
   if (!currentProject || !currentDept) return;
   const showDone = document.getElementById('show-done-toggle') && document.getElementById('show-done-toggle').checked;
@@ -1362,9 +1799,11 @@ function renderCurrentDept() {
   if (viewingSessionDate === 'current') {
     const latest = availableSessions[currentProject] && availableSessions[currentProject][0];
     tasks = taskDatabase.filter(t => t.project === currentProject && t.dept.toLowerCase().includes(currentDept.toLowerCase()) && t.session === latest);
-  } else {
+  } else if (viewingSessionDate.length === 3) {
     const latestInMonth = availableSessions[currentProject].find(s => s.toLowerCase().startsWith(viewingSessionDate));
     tasks = taskDatabase.filter(t => t.project === currentProject && t.dept.toLowerCase().includes(currentDept.toLowerCase()) && t.session === latestInMonth);
+  } else {
+    tasks = taskDatabase.filter(t => t.project === currentProject && t.dept.toLowerCase().includes(currentDept.toLowerCase()) && t.session === viewingSessionDate);
   }
 
   const overrides = getStatusOverrides();
@@ -1383,33 +1822,45 @@ function renderCurrentDept() {
 
   const list = document.getElementById('dynamic-tasks-list');
   if (filtered.length === 0) {
-    list.innerHTML = `<div style="padding:20px;color:#999;text-align:center;font-size:13px">No tasks matched your criteria. (Try changing your filter or hit "Sync" to fetch latest data)</div>`;
+    list.innerHTML = `<div class="empty-state"><h3>No tasks found</h3><p>Try changing your filter or hit "Sync" to fetch latest data.</p></div>`;
+    renderUpdatesList();
     return;
   }
 
   const isHistory = viewingSessionDate !== 'current';
   
-  // ── FIX 3: GROUP BY MONTH LOGIC FOR ACCORDION UI ──
-  const groupedTasks = {};
+  // Group by specific status buckets
+  const groupedByStatus = { ontrack: [], delayed: [], onhold: [], update: [], achieved: [] };
   filtered.forEach(t => {
-      const mMatch = t.session.match(/^[a-z]{3}/i);
-      const monthName = mMatch ? mMatch[0].charAt(0).toUpperCase() + mMatch[0].slice(1).toLowerCase() : 'Other';
-      if(!groupedTasks[monthName]) groupedTasks[monthName] = [];
-      groupedTasks[monthName].push(t);
+      let s = t.status || 'ontrack';
+      if (!groupedByStatus[s]) s = 'ontrack';
+      groupedByStatus[s].push(t);
   });
 
+  const statusConfig = [
+      { key: 'ontrack', title: 'On Track', expanded: true },
+      { key: 'delayed', title: 'Delayed', expanded: true },
+      { key: 'onhold', title: 'On Hold', expanded: false },
+      { key: 'update', title: 'Update', expanded: false },
+      { key: 'achieved', title: 'Achieved', expanded: false }
+  ];
+
   let finalHTML = '';
-  for(const month in groupedTasks) {
-      let tasksHTML = groupedTasks[month].map(t => {
+  statusConfig.forEach(cfg => {
+      const groupTasks = groupedByStatus[cfg.key];
+      if (groupTasks.length === 0) return;
+
+      let tasksHTML = groupTasks.map(t => {
           const id = taskId(t);
           const status = t.status || 'ontrack';
-          const statusLabel = {ontrack:'On Track',delayed:'Delayed',update:'Update',achieved:'Achieved'}[status] || 'On Track';
+          const statusLabel = {ontrack:'On Track',delayed:'Delayed',onhold:'On Hold',update:'Update',achieved:'Achieved'}[status] || 'On Track';
           const dueCls = isOverdue(t) ? 'overdue' : '';
           
           const actionButtons = !isHistory ? `
             <div class="status-actions" onclick="event.stopPropagation()">
               <button class="status-btn btn-achieved" onclick="setTaskStatus('${id}','achieved')">✓ Achieved</button>
               <button class="status-btn btn-delayed" onclick="setTaskStatus('${id}','delayed')">⚠ Delayed</button>
+              <button class="status-btn btn-onhold" onclick="setTaskStatus('${id}','onhold')">● On Hold</button>
               <button class="status-btn btn-update" onclick="setTaskStatus('${id}','update')">▶ Update</button>
               <button class="status-btn btn-ontrack" onclick="setTaskStatus('${id}','ontrack')">▲ On Track</button>
             </div>` : '';
@@ -1431,22 +1882,25 @@ function renderCurrentDept() {
           </div>`;
       }).join('');
 
+      const expClass = cfg.expanded ? 'expanded' : '';
+
       finalHTML += `
-      <div class="month-accordion">
-          <div class="month-header" onclick="this.parentElement.classList.toggle('expanded')">
+      <div class="status-accordion ${expClass}">
+          <div class="status-header" onclick="this.parentElement.classList.toggle('expanded')">
               <div style="display:flex; align-items:center; gap:8px;">
-                  <span>${month} Tasks</span>
-                  <span class="nav-badge" style="background:var(--border-md); color:var(--text-primary);">${groupedTasks[month].length}</span>
+                  <span>${cfg.title} Tasks</span>
+                  <span class="nav-badge" style="background:var(--border-md); color:var(--text-primary);">${groupTasks.length}</span>
               </div>
-              <span class="month-toggle-icon">▼</span>
+              <span class="status-toggle-icon">▼</span>
           </div>
-          <div class="month-tasks-wrapper">
+          <div class="status-tasks-wrapper">
               ${tasksHTML}
           </div>
       </div>`;
-  }
+  });
 
   list.innerHTML = finalHTML;
+  renderUpdatesList();
 }
 
 function setTaskStatus(id, status) {
@@ -1499,6 +1953,9 @@ function selectProject(proj) {
   viewingSessionDate = 'current';
   currentFilter = 'all';
 
+  const themeColor = proj === 'Crossings' ? '#1b5e20' : '#D32F2F';
+  document.documentElement.style.setProperty('--active-theme-color', themeColor);
+
   document.querySelectorAll('.nav-project-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(proj === 'Crossings' ? 'btn-nav-cx' : 'btn-nav-annex').classList.add('active');
 
@@ -1518,10 +1975,39 @@ function selectProject(proj) {
   document.getElementById('dynamic-dept-container').style.display = 'none';
   document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
 
+  updateTargetHeaders();
+
   updateSidebarCounts();
   applyPriorityColors();
   renderOverduePanels();
   rebuildMobilePills();
+}
+
+function updateDashboardDates() {
+  const monthNames = {jan:'Jan',feb:'Feb',mar:'Mar',apr:'Apr',may:'May',jun:'Jun',jul:'Jul',aug:'Aug',sep:'Sep',oct:'Oct',nov:'Nov',dec:'Dec'};
+  ['Crossings','Annexe'].forEach(proj => {
+    const sessions = availableSessions[proj];
+    if (!sessions || sessions.length === 0) return;
+    const latest = sessions[0]; 
+    const m = latest.match(/^([a-z]{3})\s*(\d+)/i);
+    if (!m) return;
+    const mon = monthNames[m[1].toLowerCase()] || m[1];
+    const day = parseInt(m[2]);
+    const dateStr = `Jan 5 – ${mon} ${day}, 2026`;
+    const elId = proj === 'Crossings' ? 'ph-date-cx' : 'ph-date-annex';
+    const el = document.getElementById(elId);
+    if (el) el.textContent = dateStr;
+  });
+}
+
+function updateTargetHeaders() {
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const currentMonthName = months[new Date().getMonth()];
+  const label = `End of ${currentMonthName} Targets`;
+  const cxEl = document.getElementById('targets-cx-title');
+  const annexEl = document.getElementById('targets-annex-title');
+  if (cxEl) cxEl.textContent = label;
+  if (annexEl) annexEl.textContent = label;
 }
 
 // ═══════════════════════════════════════════════
@@ -1581,7 +2067,7 @@ new Chart(document.getElementById('c1'), {
   data: {
     labels,
     datasets: [
-      { label: 'Inflow (₦B)', data: annexInflow, borderColor: '#616161', backgroundColor: 'rgba(97,97,97,0.08)', borderWidth: 2.5, pointRadius: 2.5, pointBackgroundColor: '#616161', fill: true, tension: 0.4, yAxisID: 'y' },
+      { label: 'Inflow (₦B)', data: annexInflow, borderColor: '#2e7d32', backgroundColor: 'rgba(46,125,50,0.08)', borderWidth: 2.5, pointRadius: 2.5, pointBackgroundColor: '#2e7d32', fill: true, tension: 0.4, yAxisID: 'y' },
       { label: 'Balance (₦100M)', data: annexBalance.map(v => +(v/100).toFixed(2)), borderColor: '#1565c0', backgroundColor: 'rgba(21,101,192,0.05)', borderWidth: 2, pointRadius: 2.5, pointBackgroundColor: '#1565c0', fill: false, tension: 0.4, borderDash: [4, 3], yAxisID: 'y1' }
     ]
   },
@@ -1593,13 +2079,56 @@ new Chart(document.getElementById('c3'), {
   data: {
     labels,
     datasets: [
-      { label: 'Inflow (₦B)', data: cxInflow, borderColor: '#D32F2F', backgroundColor: 'rgba(211,47,47,0.08)', borderWidth: 2.5, pointRadius: 2.5, pointBackgroundColor: '#D32F2F', fill: true, tension: 0.4 }
+      { label: 'Inflow (₦B)', data: cxInflow, borderColor: '#2e7d32', backgroundColor: 'rgba(46,125,50,0.08)', borderWidth: 2.5, pointRadius: 2.5, pointBackgroundColor: '#2e7d32', fill: true, tension: 0.4 }
     ]
   },
   options: baseOpts
 });
 
+function renderDiagPanel() {
+  const body = document.getElementById('diag-body');
+  const badge = document.getElementById('diag-issue-count');
+  if (!body) return;
+  const sheets = Object.keys(sheetDiag);
+  if (sheets.length === 0) {
+    body.innerHTML = '<div class="diag-empty">Sync data to see sheet diagnostics</div>';
+    return;
+  }
+  let totalIssues = 0;
+  let html = '';
+  sheets.forEach(name => {
+    const d = sheetDiag[name];
+    const hasWarn = d.warnings && d.warnings.length > 0;
+    if (hasWarn) totalIssues += d.warnings.length;
+    html += `<div class="diag-sheet">`;
+    html += `<div class="diag-sheet-name">📄 ${name} <span style="color:#546e7a;font-weight:400;">[${d.proj}${d.isLatest?' · latest':''}]</span></div>`;
+    html += `<div class="diag-stat">Rows scanned: ${d.rowsScanned} &nbsp;|&nbsp; Tasks: <span style="color:${d.tasksAdded>0?'#81c784':'#ef9a9a'}">${d.tasksAdded}</span> &nbsp;|&nbsp; Targets: <span style="color:${d.targetsAdded>0?'#81c784':'#ffb74d'}">${d.targetsAdded}</span></div>`;
+    if (d.info) html += `<div class="diag-info">${d.info}</div>`;
+    if (hasWarn) {
+      d.warnings.forEach(w => {
+        const cls = w.startsWith('❌') ? 'diag-err' : 'diag-warn';
+        html += `<div class="${cls}">${w}</div>`;
+      });
+    } else {
+      html += `<div class="diag-ok">✓ No issues detected</div>`;
+    }
+    html += `</div>`;
+  });
+  body.innerHTML = html;
+  badge.textContent = totalIssues;
+  
+  if (totalIssues > 0 && diagUnlocked) {
+    badge.classList.add('has-issues');
+    document.getElementById('diag-panel').classList.add('open');
+  } else if (totalIssues > 0) {
+    badge.classList.add('has-issues');
+  } else {
+    badge.classList.remove('has-issues');
+  }
+}
+
 window.onload = function () {
+  updateTargetHeaders();
   applyPriorityColors();
   syncWithGoogleSheet();
   setInterval(syncWithGoogleSheet, AUTO_SYNC_MINUTES * 60 * 1000);
